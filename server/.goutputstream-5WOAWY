@@ -1,0 +1,191 @@
+#include"svr.h"
+ 
+typedef struct SVR_SERVER_DEV_E 
+{
+ 
+ WV_THR_HNDL_T thrHndl; 
+ WV_U32      open;
+ WV_U32      close; 
+ WV_U32      mSocket;
+ WV_U32      cSocket;
+ WV_U32      port;  
+ 
+} SVR_SERVER_DEV_E; 
+
+static SVR_SERVER_DEV_E  * pSvrDev;
+
+
+
+/********************************************************
+
+WV_S32 SVR_GetConf(SVR_SERVER_DEV_E  * pDev)
+
+********************************************************/
+WV_S32  SVR_GetConf(SVR_SERVER_DEV_E  * pDev)
+{
+ pDev -> port = 2323;
+ return WV_SOK;
+}
+
+
+
+/********************************************************
+
+WV_S32 SVR_Init(SVR_SERVER_DEV_E  * pDev)
+
+********************************************************/ 
+WV_S32  SVR_Init(SVR_SERVER_DEV_E  * pDev)
+{
+    unsigned int reuse;
+	socklen_t len;
+	struct sockaddr_in addr;
+	WV_S32 status;
+
+	pDev -> mSocket = socket(AF_INET,SOCK_STREAM,0);
+	if (pDev -> mSocket < 0) 
+	{ 
+		WV_ERROR("SERVER  socket init error.\r\n");
+	    return  WV_EFAIL; 
+	 }
+	 
+	//fcntl(DpDev ->mSocket,F_SETFL,O_NONBLOCK);//no block
+	reuse = 1;
+	len = sizeof(reuse);
+	setsockopt(pDev ->mSocket, SOL_SOCKET,SO_REUSEADDR,(char*)&reuse,len);
+	
+	addr.sin_family = AF_INET;
+	addr.sin_port = htons(pDev ->port);
+	addr.sin_addr.s_addr = htonl(INADDR_ANY);  
+	bzero(&(addr.sin_zero), 8);
+	status  =  bind(pDev ->mSocket, (struct sockaddr *) &addr, sizeof(addr));
+	if( status < 0 )
+	{
+		close(pDev ->mSocket); 
+		pDev ->mSocket = -1; 
+		WV_ERROR("SERVER socket bind  error = %d.\r\n",status);
+		return WV_EFAIL;
+	} 
+	 
+  return WV_SOK;
+}
+
+/********************************************************
+
+WV_S32 SVR_DeInit(SVR_SERVER_DEV_E  * pDev)
+
+********************************************************/ 
+
+WV_S32 SVR_DeInit(SVR_SERVER_DEV_E *pDev)
+{
+  if(pDev -> cSocket >= 0)
+  {
+     close(pDev->cSocket);
+     pDev->cSocket = -1; 
+  }
+  
+ if(pDev -> mSocket >= 0)
+  {
+     close(pDev->mSocket);
+     pDev->mSocket = -1; 
+  }
+  
+  return  WV_SOK;
+}
+
+/*********************************************************
+
+void * SVR_SERVER_Proc(void * prm);
+
+*********************************************************/
+void * SVR_SERVER_Proc(void * prm)
+{
+	SVR_SERVER_DEV_E  * pDev;
+	WV_S32 ret,len; 
+	WV_U8 recvBuf[2048];
+	pDev = (SVR_SERVER_DEV_E *) prm;
+	
+	//
+	if( SVR_Init(pDev) == WV_EFAIL)
+	  {
+	    return NULL;
+	  } 
+	pDev -> open   = 1;
+	pDev -> close  = 0; 
+	while(pDev -> open  == 1)
+	{
+		  ret  =   listen(pDev -> mSocket,1);
+		  if ( ret  < 0 ) 
+		  {
+				close(pDev ->mSocket); 
+				pDev ->mSocket = -1; 
+				WV_ERROR("SERVER socket listen  error = %d.\r\n",ret);
+				return NULL;
+		  }
+		  
+		   pDev ->cSocket = accept(  pDev ->mSocket,NULL, NULL); 
+		   if( pDev -> cSocket < 0)
+		   {
+		     WV_ERROR("SERVER  SOCKET  ACCEPT   error =.\r\n");
+		   }
+		  // 
+		  while(pDev ->cSocket >= 0)
+		  {
+		      len = recv(pDev ->cSocket,recvBuf,2000,0);
+		      if(len > 0)
+		      {
+		         WV_printf("server recv data[%d] = 0x%x\r\n",len,recvBuf[0]);  
+		         
+		         if(recvBuf[0] == 'q')
+		         {
+		           close(pDev ->cSocket); 
+				   pDev ->cSocket = -1;  
+		         }
+		      } 
+		      
+		  } 
+		  
+	}
+	 
+	SVR_DeInit(pDev); 
+	pDev -> close  = 1;  
+   
+	return NULL; 
+}
+
+
+
+/********************************************************************
+
+WV_S32  SVR_Open();
+
+********************************************************************/
+
+WV_S32  SVR_Open()
+{
+
+  pSvrDev = (SVR_SERVER_DEV_E *)malloc(sizeof(SVR_SERVER_DEV_E)); 
+  memset(pSvrDev,0,sizeof(SVR_SERVER_DEV_E));
+  SVR_GetConf(pSvrDev);
+  WV_CHECK_RET( WV_THR_Create(&(pSvrDev->thrHndl),SVR_SERVER_Proc, WV_THR_PRI_DEFAULT, WV_THR_STACK_SIZE_DEFAULT, (void *)pSvrDev));
+  return WV_SOK;
+}
+
+
+/********************************************************************
+
+WV_S32  SVR_Close();
+
+********************************************************************/
+
+WV_S32  SVR_Close()
+{
+  
+   if(pSvrDev->open == 1)
+   {
+   	  pSvrDev->open = 0;
+   	  while(pSvrDev->close == 1) ;
+      WV_THR_Destroy(&(pSvrDev->thrHndl));
+   } 
+   free (pSvrDev);
+   return WV_SOK; 
+}

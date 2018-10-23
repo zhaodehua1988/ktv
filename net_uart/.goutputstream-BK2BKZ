@@ -1,0 +1,625 @@
+#include "net_uart.h"
+#include "svr_frame.h"
+
+#define NET_UART_BUF_MAXLEN 1024
+#define NET_UART_CMDFILE  "./env/NetToUartCmd.dat"
+#define NET_UART_MAX_LEN  256 
+#define NET_UART_SCENE_NUM  64
+typedef struct NET_UART_SCENE_CMD_S
+{
+	
+	WV_U8 CmdLen;
+	WV_U8 ScenceCmd[64];
+	WV_U8 CmdEna;
+	WV_U8 AckEna;
+	WV_U8 AckLen;
+	WV_U8 AckCmd[64]; 
+}NET_UART_SCENE_CMD_S;
+
+
+typedef struct NET_UART_DEV_E
+{
+	WV_THR_HNDL_T thrHndl;	
+	WV_U32      open;
+	WV_U32      close; 
+	WV_S32      mSocket;
+	WV_U32      port;
+	struct sockaddr_in svrAddr;
+	struct sockaddr_in cliAddr;
+	WV_U8       pBuf[NET_UART_BUF_MAXLEN];
+	SVR_FRAME_HEAD_E  *pHead;
+	NET_UART_SCENE_CMD_S sceneCmd[NET_UART_SCENE_NUM]; 
+}NET_UART_DEV_E;
+
+
+static NET_UART_DEV_E* pgNetUartDev;
+
+/****************************************************************************************
+
+WV_S32 NET_UART_SetSceneCmd(WV_U8 *pData,WV_S32 len);
+
+****************************************************************************************/
+WV_S32 NET_UART_SetSceneCmd(WV_U8 *pData,WV_S32 len)
+{
+	FILE *fp;
+	//open sceneCmd.dat
+	fp = fopen(NET_UART_SCENE_CMD_S,"wb+");
+	if(fp == NULL)
+	{
+		NET_UART_printf("fopen sceneCmd.dat error \n"); 
+		return -1;
+	}
+	WV_S32 writeLen;
+	writeLen =fwrite(pData,1,len,fp);
+	if(writeLen != len)
+	{
+		NET_UART_printf("fwrite uart cmd file error \n");
+		fclose(fp);	
+		return -1;
+	}
+	
+	fclose(fp);
+
+	return 0;	
+	
+}
+
+/****************************************************************************
+
+WV_S32 NET_UART_InfraredCmd(WV_U8* pBuf,WV_S32 dataLen);
+//接收到红外人体感应
+****************************************************************************/
+WV_S32 NET_UART_InfraredCmd(WV_U8* pBuf,WV_S32 dataLen)
+{
+	if(dataLen != 0 ){
+		return WV_EFAIL;
+	}
+
+	NET_UART_printf("hong wai gan ying\n");
+
+	//open the outline
+	
+}
+/********************************************************
+
+WV_S32 NET_UART_GetSceneCmd(NET_UART_DEV_E  * pDev)
+
+*********************************************************/ 
+WV_S32 NET_UART_SetNetConf(WV_U8 *pBuf,WV_S32 bufLen)
+{
+	WV_S8 name[64]={0};
+	WV_U32 data=0;
+	WV_S32 i,j=0,len=0,ret=0;
+	for(i=0;i<64;i++)
+	{
+		if(buf[i] == '#')
+			return 0;
+		if(buf[i] == ' ')
+			continue;
+		if(buf[i] == '=')
+			break;
+		 name[j] = buf[i];
+		j++;
+	}
+	
+	i++;
+	
+//ClientIp = 192.168.0.98        # 串口分配器ip地址
+//ClientPort = 9600 #串口分配器 端口号	
+
+	if(strcmp(name,"ClientIp") == 0)
+	{	j=0;
+		WV_U8 ip[32]={0};
+		for(;i<64;i++)
+		{
+			if(buf[i] == '#')
+				break;
+			if(buf[i] == ' ')
+				continue;
+			 name[j] = buf[i];
+			j++;
+		}
+		if(j == 0) ret = -1;
+		//printf("********SetSerialConf [%s]=%d *************\n ",name,data);	
+		
+	}
+	else if(strcmp(name,"ClientPort") == 0)
+	{
+		sscanf(&buf[i],"%d",&data);
+		data = atoi(&buf[i]);
+		
+		//printf("********SetSerialConf [%s]=%d *************\n ",name,data);
+		
+	}
+	
+	printf("********SetSerialConf [%s]=%d *************\n ",name,data);
+	return ret;	
+}
+/********************************************************
+
+WV_S32 NET_UART_GetNetUartConf(NET_UART_DEV_E  * pDev)
+
+*********************************************************/ 
+WV_S32 NET_UART_GetNetUartConf(NET_UART_DEV_E  * pDev)
+{
+
+	WV_S8 buf[1024];
+	WV_S32 i,j,ret;
+	ret = access(NET_UART_CMDFILE,W_OK);
+
+	if(ret != 0){
+		NET_UART_printf("access file [%s] error\n",NET_UART_CMDFILE);
+		return -1;
+	}
+
+	FILE *fp;
+	//open sceneCmd.dat
+	fp = fopen(NET_UART_CMDFILE,"rb+");
+	if(fp == NULL)
+	{
+		NET_UART_printf("fopen file [%s] error\n",NET_UART_CMDFILE);
+		return -1;
+	}
+
+	while(fgets(buf,sizeof(buf),fp))
+	{
+		if(buf[0] == '#')
+			continue;
+		if(buf[0] == '<')
+		{
+			if(strncmp(buf,"<DevConf>",9) == 0)
+			{
+				while(fgets(buf,sizeof(buf),fp))
+				{
+					if(buf[0] == '#')
+						continue;
+					if(buf[0] == '<')
+						break;
+					NET_UART_SetNetConf(buf);
+				}
+				break;
+			} 
+			
+		}
+
+	}
+
+	//get scene cmd 
+	while(fgets(buf,sizeof(buf),fp))
+	{
+		if(buf[0] == '#')
+			continue;
+		if(buf[0] == '<')
+			break;
+		for(i=0;i<1024;i++)
+		{
+			if(buf[i] == 0x0d)
+			{
+				buf[i] = 0x0a;			
+			}
+		}
+		//TSK_UART_AnalyzeCmd(buf);
+	}
+
+	//printf scene cmd
+/*
+	for(i=0;i<TSK_UART_SCENE_NUM;i++)
+	{
+		if(pDev->sceneCmd[i].CmdLen > 0 )
+		{
+			printf("scene[%d] cmd:",i);
+			for(j=0;j<pDev->sceneCmd[i].CmdLen;j++)
+			{
+				printf("0x%02x ",pDev->sceneCmd[i].ScenceCmd[j]);
+			}
+
+			if(pDev->sceneCmd[i].AckEna == 1)
+			{
+				printf("ask: ");
+				for(j=0;j<pDev->sceneCmd[i].AckLen;j++)
+				{
+					printf("0x%02x ",pDev->sceneCmd[i].AckCmd[j]);
+				}
+			}
+
+			printf("\n");
+		}
+	}
+*/
+	fclose(fp);
+	return 0;
+}
+/******************************************************************************
+
+WV_S32 NET_UART_SceneCmd(NET_UART_DEV_E  *pDev,WV_U8 *pBuf,WV_S32 len);
+
+******************************************************************************/
+WV_S32 NET_UART_SceneCmd(NET_UART_DEV_E  *pDev,WV_U8 *pBuf,WV_S32 len)
+{
+
+	WV_S32 i,j;
+	for(i=0;i<NET_UART_SCENE_NUM;i++)
+	{
+		if(pDev->sceneCmd[i].CmdLen == len)
+		{
+			for(j=0;j<len;j++)
+			{
+				if(pDev->sceneCmd[i].ScenceCmd[j] != pBuf[j])
+				{
+					NET_UART_printf("\nscene cmd error \n");
+					break;
+				}
+			}
+			//printf("i=%dj=%d,len=%d ,pDev->sceneCmd[i].CmdEna=[%d]\n",i,j,len,pDev->sceneCmd[i].CmdEna);
+			if(j==len && pDev->sceneCmd[i].CmdEna == 0)
+			{
+				NET_UART_printf("get cmd scene id[%d]\n",i);	
+				NET_UART_Change(i);			
+				if(pDev->sceneCmd[i].AckEna == 1)
+				{
+					//uart ack cmd 
+					//TSK_UART_SceneAck(pDev,i);
+				}
+				
+				pDev->sceneCmd[i].CmdEna = 1;
+				//printf("set scenecmd [%d] ena \n",i);
+				break;
+			}
+					
+		}
+	
+	}
+
+	return WV_SOK;
+}
+
+/******************************************************************************
+
+WV_S32 NET_UART_SceneCheck(NET_UART_DEV_E  *pDev,WV_U8 *pBuf,WV_S32 len);
+
+******************************************************************************/
+WV_S32 NET_UART_SceneCheck(NET_UART_DEV_E  *pDev,WV_U8 *pBuf,WV_S32 len)
+{
+
+	WV_S32 i,j;
+	for(i=0;i<NET_UART_SCENE_NUM;i++)
+	{
+		//printf("i=%d,max[%d],cmdLen=%d\n",i,TSK_UART_SCENE_NUM,pDev->sceneCmd[i].CmdLen);
+		
+		if(pDev->sceneCmd[i].CmdLen == len)
+		{
+			
+			for(j=0;j<len;j++)
+			{
+				//printf("sceneCmd[%02x],uartcmd[%02x]\n",pDev->sceneCmd[i].ScenceCmd[j], pBuf[j]);
+				if(pDev->sceneCmd[i].ScenceCmd[j] != pBuf[j])
+				{
+					break;
+				}
+			}
+
+			if((j==len) && (pDev->sceneCmd[i].CmdEna == 0))
+			{
+				//printf(" scence id [%d] is not ena \n",i);
+				return WV_SOK;
+			}
+					
+		}
+	
+	}
+
+	if(i== 	NET_UART_SCENE_NUM)
+	{
+		//printf("clean cmd ena flag \n");	
+		for(i=0;i<NET_UART_SCENE_NUM;i++)
+		{
+			if(pDev->sceneCmd[i].CmdLen == len)
+			{
+				for(j=0;j<len;j++)
+				{
+					if(pDev->sceneCmd[i].ScenceCmd[j] != pBuf[j])
+						break;
+				}
+
+				if(j==len && pDev->sceneCmd[i].CmdEna == 1)
+				{
+						NET_UART_printf("clean cmd ena flga [%d]\n",i);
+						pDev->sceneCmd[i].CmdEna = 0;
+					
+				}
+					
+			}
+	
+		}	
+		
+	}
+	
+	return WV_SOK;	
+
+}
+
+
+/****************************************************************************
+
+WV_S32 NET_UART_Uart485Cmd(WV_U8* pBuf,WV_S32 dataLen);
+接收到墙板485控制命令
+****************************************************************************/
+WV_S32 NET_UART_Uart485Cmd(WV_U8* pBuf,WV_S32 dataLen)
+{
+	if(dataLen == 0 ){
+		return WV_EFAIL;
+	}
+
+	NET_UART_printf("get 485 cmd \n");
+	//open the outline
+	
+}
+
+
+/****************************************************************************
+
+WV_S32 NET_UART_SvrInit(NET_UART_DEV_E * pDev)
+
+****************************************************************************/
+WV_S32 NET_UART_SvrInit(NET_UART_DEV_E * pDev)
+{
+	WV_U32 reuse;
+	WV_S32 status;
+	socklen_t len;
+	
+	struct sockaddr_in* pAddr;
+	pAddr = &(pDev->svrAddr);
+	if((pDev->mSocket = socket(AF_INET,SOCK_DGRAM,0)) == -1){
+		NET_UART_printf("UDP socket init error.\r\n ");
+		return WV_EFAIL;
+	}
+
+	reuse = 1;
+	len = sizeof(reuse);
+	setsockopt(pDev ->mSocket, SOL_SOCKET,SO_REUSEADDR,(WV_S8*)&reuse,len);
+
+	pDev->port = NET_UART_GetKtvNetPort();
+	memset(pAddr,0,sizeof(struct sockaddr_in));
+	pAddr->sin_family = AF_INET;
+	pAddr->sin_port = htons(pDev->port);
+	pAddr->sin_addr.s_addr = htonl(INADDR_ANY);  
+	bzero(&(pAddr->sin_zero), 8);
+	status  =  bind(pDev ->mSocket, (struct sockaddr*)pAddr, sizeof(struct sockaddr));
+	if( status < 0 )
+	{
+		close(pDev ->mSocket); 
+		pDev ->mSocket = -1; 
+		NET_UART_printf("SERVER socket bind  error = %d.\r\n",status);
+		return WV_EFAIL;
+	} 
+
+	return WV_SOK;
+}
+
+/****************************************************************************
+
+WV_S32 NET_UART_SvrDeInit(NET_UART_DEV_E * pDev)
+
+****************************************************************************/
+WV_S32 NET_UART_SvrDeInit(NET_UART_DEV_E * pDev)
+{
+
+	if(pDev->mSocket >= 0)
+	{
+		close(pDev->mSocket);
+		pDev->mSocket = -1; 
+	}
+	
+	NET_UART_printf("UDP socket DeInit ok\r\n");
+	return  WV_SOK;
+
+}
+/****************************************************************************
+
+WV_S32 NET_UART_Recv(WV_S32 socket,WV_U8 * pBuf, WV_S32 len)
+
+****************************************************************************/
+WV_S32 NET_UART_Recv(WV_S32 socket,NET_UART_DEV_E * pDev, WV_S32 len)
+{
+
+  WV_S32 recvLen,recvToal,reqLen,ret =0;
+
+  recvToal = 0; 
+   WV_U8 pRevBuf[NET_UART_BUF_MAXLEN];
+	socklen_t addrLen = sizeof(struct sockaddr_in);
+	//recvLen = recvfrom(socket,pRevBuf,len,0,(struct sockaddr*)&(pgNetUartDev->cliAddr),&addrLen );
+	recvLen = recvfrom(socket,pRevBuf,len,0,NULL,NULL);
+	int i;
+	if(recvLen >0)
+	{ 	  
+
+		memset(pDev->pBuf,0,NET_UART_BUF_MAXLEN);
+		memcpy(pDev->pBuf,pRevBuf,recvLen);
+		ret = recvLen;
+
+	}
+	else if(recvLen == 0)
+	{
+		NET_UART_printf("SERVER CNNECT loss !!!!!!!!!! %d",recvLen);
+		ret = recvLen;
+
+	}
+	else
+	{
+
+		NET_UART_printf("SERVER recv EROOR !!!!!!!!!! %d",recvLen);
+		ret = -1;
+
+	}
+
+     
+ 	return ret;
+}
+
+/****************************************************************************
+
+WV_S32 NET_UART_Send(WV_U8 pData,WV_U32 dataLen)
+
+****************************************************************************/
+WV_S32 NET_UART_Send(WV_U8 *pData,WV_U32 dataLen)
+{
+	WV_S32 i;
+	for(i=0;i<dataLen;i++)
+	{
+		printf("%02x ",pData[i]);
+	}	
+	printf("\r\n");
+	socklen_t addrLen = sizeof(struct sockaddr_in);
+	sendto(pgNetUartDev->mSocket, pData, dataLen, 0, &pgNetUartDev->cliAddr, addrLen);
+	return WV_SOK;	
+}
+
+/****************************************************************************
+
+WV_S32 NET_UART_Get_Cmd(NET_UART_DEV_E * pDev)
+
+****************************************************************************/
+WV_S32 NET_UART_Get_Cmd(NET_UART_DEV_E * pDev)
+{
+	//get 
+	WV_S32 len,i;
+	
+	len = NET_UART_Recv(pDev ->mSocket,pDev,NET_UART_BUF_MAXLEN);
+
+	return len;
+}
+
+
+/****************************************************************************
+
+WV_S32 NET_UART_CMD_Porc(NET_UART_DEV_E *pDev,WV_S32 cmdLen)
+
+****************************************************************************/
+WV_S32 NET_UART_CMD_Porc(NET_UART_DEV_E *pDev,WV_S32 cmdLen)
+{
+
+	WV_S32 ret=0;
+	WV_U32 port;
+	WV_S8 ip[20];
+	WV_S32 i;
+#if 0
+	printf("get cmd:");
+	for(i=0;i<cmdLen;i++)
+	{
+		printf("%02x",pDev->pBuf[i]);
+	}	
+	printf("\n");
+#endif
+	
+	if(cmdLen < sizeof(SVR_FRAME_HEAD_E)){
+
+		WV_ERROR("get uart dev to server cmd error !")
+		return WV_EFAIL;
+	}
+
+	pDev->pHead = (SVR_FRAME_HEAD_E *)pDev->pbuf
+	if(pDev->pHead->sync != SVR_SYNC_WORD || pDev->pHead->cmdL0 !=0x2e){
+		WV_ERROR("get uart dev to server cmd error !")
+		return WV_EFAIL;		
+	}
+
+	if(pDev->pHead->dataNum != (cmdLen - sizeof(SVR_FRAME_HEAD_E)){
+		WV_ERROR("get uart dev to server cmd error !")
+		return WV_EFAIL;		
+	}
+	
+	switch(pDev->pHead->cmdL1){
+
+		case 1:
+			break;
+		case 2:
+			break;
+		case 3:	
+			break;
+	}
+
+	return ret;
+}
+
+/****************************************************************************
+
+void *NET_UART_Proc(void *prm)
+
+****************************************************************************/
+void *NET_UART_Proc(void *prm)
+{
+
+	NET_UART_DEV_E *pDev;
+	WV_S32 ret,recvLen;
+	pDev = (NET_UART_DEV_E *)prm;
+//	if(NET_UART_Init(pDev) == WV_EFAIL){
+//		return NULL;
+//	}
+
+	pDev->open = 1;
+	pDev->close = 0;
+	while(pDev->open == 1){
+		
+		recvLen = NET_UART_Get_Cmd(pDev);
+		if(recvLen <=0 ){
+			NET_UART_printf("udp get cmd error!!!!!!!!!!\n");
+			continue;
+		}
+		
+		ret = NET_UART_CMD_Porc(pDev,recvLen);
+		if(ret != WV_SOK){
+			NET_UART_printf("udp get info error!!!!!!!\r\n");
+			continue;				
+		}
+		
+
+	
+		
+	}
+	return WV_SOK;
+}
+
+/****************************************************************************
+
+WV_S32 NET_UART_Open()
+
+****************************************************************************/
+WV_S32 NET_UART_Open()
+{
+
+	NET_UART_printf("NET_UART open\n");
+	pgNetUartDev = ( NET_UART_DEV_E*)malloc( sizeof(NET_UART_DEV_E));
+	memset(pgNetUartDev,0,sizeof(NET_UART_DEV_E));
+	if (NET_UART_GetNetUartConf(pgNetUartDev) != 0 ){
+		return WV_EFAIL;
+	}
+	if(NET_UART_SvrInit(pgNetUartDev) == WV_EFAIL){
+		return WV_EFAIL;
+	}
+	WV_CHECK_RET( WV_THR_Create(&(pgNetUartDev->thrHndl),NET_UART_Proc, WV_THR_PRI_DEFAULT, WV_THR_STACK_SIZE_DEFAULT, (void *)pgNetUartDev));
+
+	return WV_SOK;		
+
+}
+
+/****************************************************************************
+
+WV_S32 NET_UART_Close()
+
+****************************************************************************/
+WV_S32 NET_UART_Close()
+{
+  
+   if(pgNetUartDev->open == 1)
+   {
+   	  pgNetUartDev->open = 0;
+   	  while(pgNetUartDev->close == 1) ;
+      WV_THR_Destroy(&(pgNetUartDev->thrHndl));
+   }
+
+   NET_UART_SvrDeInit(pgNetUartDev);
+
+	free(pgNetUartDev);
+	return WV_SOK;
+}
+

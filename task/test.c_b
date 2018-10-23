@@ -1,0 +1,67 @@
+#include <stdio.h>
+int main()
+{
+
+	char buf[128]="0f | F1 02 03 04 05 | 06 07 08 9f";
+	int a,i,k,j=0;
+
+	char temp[3];
+	memset(temp,0,sizeof(temp));
+	for(i=0;i<strlen(buf);i++)
+	{
+		if(buf[i] != ' ')
+		{
+			if(buf[i] == '|') break;
+	
+			temp[j]=buf[i];
+			j++;
+			if(j>=3) return -1;
+		}
+	}
+	sscanf(temp,"%x",&a);
+	printf("a=%02x\n",a);
+	printf("temp = %s\n",temp);
+	memset(temp,0,sizeof(temp));
+printf("***************************\n");
+	j=0;
+	for(i=i+1;i<strlen(buf);i++)
+	{
+		if(buf[i] == '|')
+		{
+			break;
+		}
+				
+		if(buf[i] != ' ' )
+		{
+			temp[j]=buf[i];
+			j++;
+			if(j==2){
+				j=0;
+				sscanf(temp,"%x",&a);
+				printf("a=%02x\n",a);
+				printf("temp = %s\n",temp);
+				memset(temp,0,sizeof(temp));	
+			}
+		}
+	}
+
+	printf("*************************************\n");
+	j=0;
+	for(i=i+1;i<strlen(buf);i++)
+	{
+		if(buf[i] != ' ')
+		{
+			temp[j]=buf[i];
+			j++;
+			if(j==2)
+			{
+				j=0;
+				sscanf(temp,"%x",&a);
+				printf("a=%02x\n",a);
+				printf("temp = %s\n",temp);
+				memset(temp,0,sizeof(temp));				
+			}
+		}
+	}
+	return 0;
+}
