@@ -12,6 +12,8 @@ typedef struct SVR_CONTROL_CONF_E
 	WV_U8 KtvDev;  // 0：雷石 1：视易 2:音创 3:视易新版本 4:雷石新版本
 	SVR_CONTROL_KTV_CHANGEMODE_E movChangeMode; //0:关闭 ;1:背景视频随动 ;2:场景随动
 	WV_S32 port; //udp端口号
+	WV_S32 openDev; //0:ktv控制开关机不生效，1:ktv控制开关机生效
+	WV_S32 openProjector; //0：ktv控制开关投影不生效，1:ktv控制开关投影生效
 	WV_S32 typeRound;// 根据歌曲类别进行循环播放，1：ena，0disable
 
 }SVR_CONTROL_CONF_E;
@@ -60,6 +62,27 @@ WV_S32 SVR_CONTROL_GetTypeRound()
 	SVR_CONTROL_printf("get Ktv Dev port[%d]\n",gControlDev.port);
 	return gControlDev.typeRound;
 }
+/********************************************************
+
+WV_S32 SVR_CONTROL_GetOpenDev();
+
+*********************************************************/ 
+WV_S32 SVR_CONTROL_GetOpenDev()
+{
+	SVR_CONTROL_printf("get Ktv Dev openDev [%d]\n",gControlDev.openDev);
+	return gControlDev.openDev;
+}
+
+/********************************************************
+
+WV_S32 SVR_CONTROL_GetOpenProjector();
+
+*********************************************************/ 
+WV_S32 SVR_CONTROL_GetOpenProjector()
+{
+	SVR_CONTROL_printf("get Ktv Dev openProjector[%d]\n",gControlDev.openProjector);
+	return gControlDev.openProjector;
+}
 
 /********************************************************
 
@@ -101,6 +124,12 @@ WV_S32 SVR_CONTROL_GetKTVConf(WV_S8 * buf)
 	}else if(strcmp(name,"TypeRound") == 0)
 	{
 		gControlDev.typeRound = data;
+	}else if(strcmp(name,"OpenDev") == 0)
+	{
+		gControlDev.openDev = data;
+	}else if(strcmp(name,"OpenProjector") == 0)
+	{
+		gControlDev.openProjector = data;
 	}
 	
 	SVR_CONTROL_printf("KTVDev = %d ,MovChangeMode = %d \n",gControlDev.KtvDev,gControlDev.movChangeMode);

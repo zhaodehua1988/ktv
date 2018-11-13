@@ -558,6 +558,11 @@ WV_S32 NET_UART_ProjectorCmd(WV_U32 openProjector);
 ****************************************************************************/
 WV_S32 NET_UART_ProjectorCmd(WV_U32 openProjector)
 {
+
+	//开关投影命令不生效，直接返回
+    if(SVR_CONTROL_GetOpenProjector() != 1){
+        return WV_SOK;
+    }
 	//接收ktv设备发送的开关机，开关投影命令，通过网络发送给网转串设备。
 	SVR_FRAME_HEAD_E head={SVR_SYNC_WORD,0x2e,0x3,0,0,0,0};
 	WV_U8 buf[64]={0};	
@@ -745,7 +750,7 @@ WV_S32 NET_UART_Recv(WV_S32 socket,NET_UART_DEV_E * pDev, WV_S32 len)
 	if(recvLen >0)
 	{ 	  
 
-		printf("-----------net uart get udp data ----------------\n");
+		//printf("-----------net uart get udp data ----------------\n");
 		memset(pDev->pBuf,0,NET_UART_BUF_MAXLEN);
 		memcpy(pDev->pBuf,pRevBuf,recvLen);
 		ret = recvLen;
@@ -814,7 +819,7 @@ WV_S32 NET_UART_CMD_Porc(NET_UART_DEV_E *pDev,WV_S32 cmdLen)
 	WV_U32 port;
 	WV_S8 ip[20];
 	WV_S32 i;
-#if 1
+#if 0
 	printf("get cmd:");
 	for(i=0;i<cmdLen;i++)
 	{

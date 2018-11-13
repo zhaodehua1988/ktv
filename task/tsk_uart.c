@@ -525,7 +525,7 @@ WV_S32 TSK_UART_SetSpeed(WV_U32 baud)
 		 TSK_UART_printf(" UART SetSpeed  error  !!!"); 
 	}
 	tcflush(gUartDev.fd,TCIOFLUSH);
-#if 1
+
 	if(flag == 1)
 	{
 		ret = TSK_UART_Set_Speci_Speed(baud);
@@ -535,7 +535,6 @@ WV_S32 TSK_UART_SetSpeed(WV_U32 baud)
 		}
 	}
 
-#endif
 	return ret; 
 }
 
@@ -2263,9 +2262,11 @@ WV_S32 TSK_UART_SceneLoopOpen()
 	//WV_CMD_Register("get","tty","set uart  num ",TSK_UART_GetDev); 
 	memset(&gSceneLoop,0,sizeof(gSceneLoop));
 	TSK_UART_GetSceneLoop();
+	if(gSceneLoop.loopEna == 0){
+		return WV_SOK;
+	}
 	WV_RET_ADD( WV_THR_Create(&gSceneLoop.thrHndl, TSK_UART_Loop , WV_THR_PRI_DEFAULT, WV_THR_STACK_SIZE_DEFAULT, &gSceneLoop),ret);
-
-
+	return WV_SOK;
 }
 
 /****************************************************************************************

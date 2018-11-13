@@ -5,7 +5,7 @@
 #include "tsk_conf.h"
 #include "tsk_fpga.h"
 #include "sys_info.h"
-
+#include "svr_control_cmd.h"
 #define TSK_SCENE_OUTPUT_ANGLE_FILE "./env/angle.txt"
 #define TSK_SCENE_SETALPHA_SLEEP 35000
 typedef struct TSK_SCENE_DEV_E
@@ -21,7 +21,9 @@ typedef struct TSK_SCENE_DEV_E
     WV_U8  addOutline; //0:disable 1:enabale
     WV_U8  addAni;    //0:disable 1:enable
 } TSK_SCENE_DEV_E;   
+
 TSK_SCENE_DEV_E   gCurScene;
+TSK_SCENE_DEV_E   gLastScene;
 
 struct timeval SceneChangeTimeStart;
 WV_U32 SceneChangeDataType;
@@ -748,7 +750,6 @@ WV_S32 TSK_SCENE_SetDefault(WV_U32  id )
 /*******************************************************************
  WV_S32 TSK_SCENE_GetConf();
 *******************************************************************/
-
 WV_S32 TSK_SCENE_GetConf()
 {
     WV_S32 ret = 0;
@@ -885,6 +886,17 @@ WV_S32 TSK_SCENE_SceneOpen()
     WV_printf("*********scene open *************** \n");
     WV_S32 i,j;
     WV_S8  name[WV_CONF_NAME_MAX_LEN];
+    if((TSK_USB_GetShowFlag() == 0) && (TSK_Mobile_GetShowFlag()==0))
+    {
+
+        //for win
+        FPGA_CONF_SetWin (gCurScene.scene.winNum ,gCurScene.scene.win);
+
+        // for animation
+        TSK_SCENE_ConfAni();
+//        HIS_FB_ClrFpga();
+
+    }
 
     TSK_PLAYER_ChangeMode(TSK_PLAYER_MODE_1920_1080);//virture screen	size 1920*1080
     //for player
@@ -909,17 +921,6 @@ WV_S32 TSK_SCENE_SceneOpen()
     }
     TSK_PLAYER_ReadVolume();
 //    HIS_FB_ClrFpga();
-    if((TSK_USB_GetShowFlag() == 0) && (TSK_Mobile_GetShowFlag()==0))
-    {
-
-        //for win
-        FPGA_CONF_SetWin (gCurScene.scene.winNum ,gCurScene.scene.win);
-
-        // for animation
-        TSK_SCENE_ConfAni();
-//        HIS_FB_ClrFpga();
-
-    }
 
     if(gCurScene.DevCascading == 1)
     {
@@ -951,7 +952,14 @@ WV_S32 TSK_SCENE_SceneClose()
 
     WV_S32 ret = 0,i;
 
-    if((TSK_USB_GetShowFlag() == 0) && (TSK_Mobile_GetShowFlag()==0))
+ 
+    for(i=0;i<TSK_SCENE_MOV_USE_NUM-1;i++)
+    {
+
+        TSK_PLAYER_Destory(i);
+    }
+
+   if((TSK_USB_GetShowFlag() == 0) && (TSK_Mobile_GetShowFlag()==0))
     {
 
         // for animation
@@ -964,12 +972,6 @@ WV_S32 TSK_SCENE_SceneClose()
         FPGA_CONF_SetWin (0 ,gCurScene.scene.win);
         // for movi
     }
-    for(i=0;i<TSK_SCENE_MOV_USE_NUM-1;i++)
-    {
-
-        TSK_PLAYER_Destory(i);
-    }
-
     gCurScene.sceneOpen = 0;
     WV_printf("\n****scene close ***********\n");
 
@@ -982,6 +984,11 @@ WV_S32 TSK_SCENE_SceneClose()
 *******************************************************************/
 WV_S32 TSK_SCENE_Standby() 
 {
+    //开关机命令不生效，直接返回
+    if(SVR_CONTROL_GetOpenDev() != 1){
+        return WV_SOK;
+    }
+
     if(gCurScene.standby  == 1 )
     {
         return WV_SOK;
@@ -1014,7 +1021,10 @@ WV_S32 TSK_SCENE_Standby()
 *******************************************************************/
 WV_S32 TSK_SCENE_StartingUP() 
 {
-
+        //开关机命令不生效，直接返回
+    if(SVR_CONTROL_GetOpenDev() != 1){
+        return WV_SOK;
+    }
     if(gCurScene.standby  == 0 )
     {
         return WV_SOK;
@@ -1026,7 +1036,7 @@ WV_S32 TSK_SCENE_StartingUP()
         {
                 TSK_SCENE_ChangePlayMode(1);
         }
-        */
+    */
 
     SYS_INFO_DevReset();
     gCurScene.standby = 0;

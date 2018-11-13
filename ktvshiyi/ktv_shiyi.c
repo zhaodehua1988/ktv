@@ -15,13 +15,15 @@
 #define KTV_SHIYI_CMDFILE  "./env/netContrl.dat"
 
 //九州
-//#define KTV_SHIYI_REGISTMSG_DATA "{\"developerId\":\"JZ7807K4\",\"appId\":\"GD34B12D\",\"deviceId\":\"%02x%02x%02x%02x%02x%02x\"}"
+#define KTV_SHIYI_REGISTMSG_DATA "{\"developerId\":\"JZ7807K4\",\"appId\":\"GD34B12D\",\"deviceId\":\"%02x%02x%02x%02x%02x%02x\"}"
 
 //北京蕃秀
-#define KTV_SHIYI_REGISTMSG_DATA "{\"developerId\":\"FXK5DZ3Z\",\"appId\":\"14BT4FAD\",\"deviceId\":\"%02x%02x%02x%02x%02x%02x\"}"
+//#define KTV_SHIYI_REGISTMSG_DATA "{\"developerId\":\"FXK5DZ3Z\",\"appId\":\"14BT4FAD\",\"deviceId\":\"%02x%02x%02x%02x%02x%02x\"}"
 
 //subscribe 订阅开机、关机、歌曲播放三个事件
+
 #define KTV_SHIYI_SUBSCRIBE_DATA "{events:[\"event/room/state/opened\",\"event/room/state/closed\",\"event/evmedia/program/start\"]}"
+//#define KTV_SHIYI_SUBSCRIBE_DATA "{events:[\"event/room/state/opened\",\"event/room/state/closed\",\"event/evmedia/program/start\",\"event/evmedia/playctrl/next\",\"event/evmedia/playctrl/replay\",\"event/evmedia/track/ori\",\"event/evmedia/track/acc\",\"event/evmedia/playctrl/pause\"]}"
 
 #define KTV_SHIYI_DB_FILE_PATH      "./env/shiyi.db"
 #define KTV_SHIYI_DB_TABLE_NAME     "SongClass"
@@ -46,7 +48,7 @@
 
 
 
-#define TEST_DEBUG 0
+#define TEST_DEBUG 1
 typedef struct KTV_SHIYI_HEAD_E 
 {
 	WV_U8  identification[6];
@@ -375,7 +377,7 @@ WV_S32 KTV_SHIYI_GetCmd(WV_U8 *pBuf)
 	{
 		if(ret == TIMEOUT)
 		{
-			//KTV_SHIYI_printf(" get cmd time out ret=[%d] !\n",ret);
+			KTV_SHIYI_printf(" get cmd time out ret=[%d] !\n",ret);
 		}else{
 			KTV_SHIYI_printf(" get cmd error ret=[%d]!\n",ret);
 		}
@@ -573,7 +575,7 @@ WV_S32 KTV_SHIYI_Register(KTV_SHIYI_DEV_E  * pDev)
 	if(ret != 0 ){
 
 		KTV_SHIYI_printf("Register cmd send error !\n");
-		return WV_SOK;	
+		return WV_EFAIL;	
 	}
 
 	if(KTV_SHIYI_CheckErr() != 0 )

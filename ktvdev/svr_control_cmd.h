@@ -33,6 +33,8 @@ WV_S32 SVR_CONTROL_GetKtvChangeMode();
 WV_S32 SVR_CONTROL_GetTypeRound();
 WV_S32 SVR_CONTROL_Cmd_Init();
 WV_S32 SVR_CONTROL_GetKtvChangeMode();
+WV_S32 SVR_CONTROL_GetOpenDev();
+WV_S32 SVR_CONTROL_GetOpenProjector();
 //WV_S32 SVR_CONTROL_ReadConfFileCmd();
 #endif
 
