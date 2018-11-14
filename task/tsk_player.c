@@ -426,8 +426,6 @@ WV_S32  TSK_PLAYER_Creat(WV_S32 id)
             WV_CHECK_RET(  HIS_DIS_WinCreat(&(gTskPlayer[id].winHandl),gTskPlayer[id].winRect));
             WV_CHECK_RET(  HIS_DIS_WinAttach(&(gTskPlayer[id].winHandl),&(gTskPlayer[id].avPlayHandl)));
             WV_CHECK_RET(  HIS_DIS_WinStart(&(gTskPlayer[id].winHandl)));
-
-            //WV_CHECK_RET(  HIS_PLAYER_Create(&(gTskPlayer[id].playerHandl) ,&(gTskPlayer[id].avPlayHandl)));
             gTskPlayer[id].winEna = 1;
             if( (gTskPlayer[id].winLastRect.s32X != gTskPlayer[id].winRect.s32X) || (gTskPlayer[id].winLastRect.s32Y != gTskPlayer[id].winRect.s32Y) \
                     || (gTskPlayer[id].winLastRect.s32Width != gTskPlayer[id].winRect.s32Width) || (gTskPlayer[id].winLastRect.s32Height != gTskPlayer[id].winRect.s32Height))
@@ -441,16 +439,16 @@ WV_S32  TSK_PLAYER_Creat(WV_S32 id)
 
         }
         WV_CHECK_RET(  HIS_PLAYER_Create(&(gTskPlayer[id].playerHandl) ,&(gTskPlayer[id].avPlayHandl)));
-        WV_CHECK_RET(  HIS_PLAYER_Start(&(gTskPlayer[id].playerHandl) ,gTskPlayer[id].fileName));
-
+        //清除黑场
         HI_BOOL bEnable;
         HIS_DIS_GetWinFreezeStatus(&(gTskPlayer[id].winHandl),&bEnable);
-//        printf("win freez is [%d]\n",bEnable);
+        //printf("win freez is [%d]\n",bEnable);
         if(	bEnable != HI_FALSE)
         {
             HIS_DIS_WinFreeze(&(gTskPlayer[id].winHandl),HI_FALSE,1);
         }
-
+        //开始播放
+        TSK_PLAYER_Start(id);
     }
 
     gTskPlayer[id].playerEna = 1;
@@ -481,20 +479,17 @@ WV_S32  TSK_PLAYER_Destory(WV_S32 id)
         system("echo 3 > /proc/sys/vm/drop_caches");//  echo 3 > /proc/sys/vm/drop_caches");
 
         //WV_printf(" TSK_PLAYER_Destory  %d\n",id);
-
+#if 0
         HI_BOOL bEnable;
         HIS_DIS_GetWinFreezeStatus(&(gTskPlayer[id].winHandl),&bEnable);
-        //printf("win freez is [%d]\n",bEnable);
+        printf("win freez is [%d]\n",bEnable);
         if(	bEnable != HI_TRUE)
         {
             //HIS_DIS_WinFreeze(&(gTskPlayer[id].winHandl),HI_TRUE,1);
         }
-
+#endif
         TSK_PLAYER_Stop(id);
-        //printf("his player stop  \n");
         HIS_PLAYER_Destory(&(gTskPlayer[id].playerHandl));
-
-        //		printf("his player destory  \n");
         gTskPlayer[id].playerEna = 0;
 
     }
@@ -505,7 +500,7 @@ WV_S32  TSK_PLAYER_Destory(WV_S32 id)
                 || (gTskPlayer[id].winLastRect.s32Width != gTskPlayer[id].winRect.s32Width) || (gTskPlayer[id].winLastRect.s32Height != gTskPlayer[id].winRect.s32Height))
         {
             //HIS_PLAYER_Destory(&(gTskPlayer[id].playerHandl));
-            //WV_printf("****destroy window ****\n");
+            WV_printf("****destroy window ****\n");
             gTskPlayer[id].winLastRect.s32X 	 = gTskPlayer[id].winRect.s32X;
             gTskPlayer[id].winLastRect.s32Y 	 = gTskPlayer[id].winRect.s32Y;
             gTskPlayer[id].winLastRect.s32Width  = gTskPlayer[id].winRect.s32Width;

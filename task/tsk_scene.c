@@ -13,17 +13,18 @@ typedef struct TSK_SCENE_DEV_E
     WV_U32 sceneOpen;
     WV_U32  id;
     TSK_SCENE_INFO_S   scene;
+    TSK_SCENE_INFO_S   lastScene;
     WV_U32 DevCascading;  // 级联信息 0: not sync;1:master 2: slave
     WV_U32 PlayMode;    //0:player循环播放 1:player随机播放
     WV_U32 volume[3];
     WV_U32 LightEna;    //0:disable 1:enable
     WV_U32 standby;    //0:standby disable (starting Up); 1:standby ena
+    WV_S32 winChange;  //0:开窗无变化，1:开窗有变化
     WV_U8  addOutline; //0:disable 1:enabale
     WV_U8  addAni;    //0:disable 1:enable
 } TSK_SCENE_DEV_E;   
 
 TSK_SCENE_DEV_E   gCurScene;
-TSK_SCENE_DEV_E   gLastScene;
 
 struct timeval SceneChangeTimeStart;
 WV_U32 SceneChangeDataType;
@@ -759,6 +760,7 @@ WV_S32 TSK_SCENE_GetConf()
     SYS_ENV_GetU32("SceneCurId",pData);
     gCurScene.id = data;
     TSK_SCENE_GetScene(gCurScene.id,&gCurScene.scene);
+    gCurScene.lastScene = gCurScene.scene;
     return ret;
 
 }
@@ -886,6 +888,19 @@ WV_S32 TSK_SCENE_SceneOpen()
     WV_printf("*********scene open *************** \n");
     WV_S32 i,j;
     WV_S8  name[WV_CONF_NAME_MAX_LEN];
+    TSK_PLAYER_ChangeMode(TSK_PLAYER_MODE_1920_1080);//virture screen	size 1920*1080
+
+    if(gCurScene.winChange != 0 ){
+        if(gCurScene.addOutline == 1){
+            gCurScene.addOutline = 0;
+            TSK_SCENE_AddLastWin();
+        }else{
+            FPGA_CONF_SetWin(gCurScene.scene.winNum ,gCurScene.scene.win);
+            TSK_SCENE_ConfAni();
+        }
+    }
+
+    /*
     if((TSK_USB_GetShowFlag() == 0) && (TSK_Mobile_GetShowFlag()==0))
     {
 
@@ -896,9 +911,8 @@ WV_S32 TSK_SCENE_SceneOpen()
         TSK_SCENE_ConfAni();
 //        HIS_FB_ClrFpga();
 
-    }
-
-    TSK_PLAYER_ChangeMode(TSK_PLAYER_MODE_1920_1080);//virture screen	size 1920*1080
+    }*/
+    
     //for player
     for(i=0;i<TSK_SCENE_MOV_USE_NUM;i++)
     {
@@ -958,19 +972,12 @@ WV_S32 TSK_SCENE_SceneClose()
 
         TSK_PLAYER_Destory(i);
     }
-
-   if((TSK_USB_GetShowFlag() == 0) && (TSK_Mobile_GetShowFlag()==0))
-    {
-
-        // for animation
+    if (gCurScene.winChange != 0){
         for(i = 0;i< HIS_HIGO_GODEC_NUM ; i++ )
         {
             TSK_GO_DecClose(i);
         }
-//        sleep(1);
-        //gCurScene.scene.winNum = 0;
         FPGA_CONF_SetWin (0 ,gCurScene.scene.win);
-        // for movi
     }
     gCurScene.sceneOpen = 0;
     WV_printf("\n****scene close ***********\n");
@@ -1030,14 +1037,6 @@ WV_S32 TSK_SCENE_StartingUP()
         return WV_SOK;
     }
 
-    /*
-        TSK_SCENE_SceneInit();
-        if(SVR_CONTROL_GetKtvDev() == 0)//雷石点歌机，初始化时默认歌曲随机播放
-        {
-                TSK_SCENE_ChangePlayMode(1);
-        }
-    */
-
     SYS_INFO_DevReset();
     gCurScene.standby = 0;
     return WV_SOK;
@@ -1069,7 +1068,9 @@ WV_S32 TSK_SCENE_SendSync()
     WV_CHECK_RET( WV_THR_Create(&thrHndl,TSK_SCENE_Sync, WV_THR_PRI_DEFAULT, WV_THR_STACK_SIZE_DEFAULT, NULL));
     return WV_SOK;
 }
-
+/*******************************************************************
+WV_S32 TSK_SCENE_SetAlpha();
+*******************************************************************/
 WV_S32 TSK_SCENE_SetAlpha()
 {
     WV_S32 i;
@@ -1091,7 +1092,9 @@ WV_S32 TSK_SCENE_SetAlpha()
     HIS_FB_SetAlpha(255);
     return WV_SOK;
 }
-
+/*******************************************************************
+WV_S32 TSK_SCENE_GetChangeTimeOut();
+*******************************************************************/
 WV_S32 TSK_SCENE_GetChangeTimeOut()
 {
     float TimeUse = 0;
@@ -1108,13 +1111,56 @@ WV_S32 TSK_SCENE_GetChangeTimeOut()
         return WV_SOK;
     }
 }
+/*******************************************************************
+WV_S32 TSK_SCENE_GetWinChange();
+功能：查看开窗和图片位置是否变化
+返回值：0-位置无变化，其他-位置变化
+*******************************************************************/
+WV_S32 TSK_SCENE_GetWinChange()
+{
+    WV_S32 change,i;
+    change  = 0;
+    if(gCurScene.scene.winNum == gCurScene.lastScene.winNum && gCurScene.scene.animationNum == gCurScene.lastScene.animationNum){
+        
+        printf("+++++++++++++++cu win num = %d,sceneid[%d],lastid[%d]  \n",gCurScene.scene.winNum,gCurScene.scene.win[i].outId,gCurScene.lastScene.win[i].outId);
+        for(i=0;i<gCurScene.scene.winNum;i++){
+            if(gCurScene.scene.win[i].outId != gCurScene.lastScene.win[i].outId || \
+            gCurScene.scene.win[i].videoId != gCurScene.lastScene.win[i].videoId || \
+            gCurScene.scene.win[i].x != gCurScene.lastScene.win[i].x || \
+            gCurScene.scene.win[i].y != gCurScene.lastScene.win[i].y || \
+            gCurScene.scene.win[i].w != gCurScene.lastScene.win[i].w || \
+            gCurScene.scene.win[i].h != gCurScene.lastScene.win[i].h ){
+                change++;
+                return change;
+            }
+        }
 
+        for(i=0;i< gCurScene.scene.animationNum;i++){
+            if(gCurScene.scene.animation[i].id !=  gCurScene.lastScene.animation[i].id || \
+            gCurScene.scene.animation[i].ena !=  gCurScene.lastScene.animation[i].ena || \
+            gCurScene.scene.animation[i].x !=  gCurScene.lastScene.animation[i].x || \
+            gCurScene.scene.animation[i].y !=  gCurScene.lastScene.animation[i].y || \
+            gCurScene.scene.animation[i].w !=  gCurScene.lastScene.animation[i].w || \
+            gCurScene.scene.animation[i].h !=  gCurScene.lastScene.animation[i].h ){
+                change++;
+                return change;;
+            }
+            
+        }
+    }else{
+
+        printf("+++++++++++++++win num is not eq \n");
+        change ++;
+    }
+    return change;
+
+}
 /*******************************************************************
  WV_S32 TSK_SCENE_Change( WV_U32  id);
 *******************************************************************/
 WV_S32 TSK_SCENE_Change(WV_U32 DataType, WV_U32  id)
 {
-    //printf("change scene to [%d]\n",id);
+      //printf("change scene to [%d]\n",id);
     if ((DataType == TSK_SCENE_TYPE_UARTDATA) && (SceneChangeDataType == TSK_SCENE_TYPE_NETDATA))
     {
         if (TSK_SCENE_GetChangeTimeOut() != WV_SOK)
@@ -1131,6 +1177,11 @@ WV_S32 TSK_SCENE_Change(WV_U32 DataType, WV_U32  id)
     }
     gCurScene.id = id;
     WV_CHECK_RET(TSK_SCENE_GetScene(gCurScene.id,&gCurScene.scene));
+    printf("--------------winid[%d]\n",gCurScene.scene.win[0].outId);
+    printf("1111111111111111111\n");
+    gCurScene.winChange = TSK_SCENE_GetWinChange();
+    printf("+++++++++++win change = %d \n",gCurScene.winChange);
+    gCurScene.lastScene = gCurScene.scene;
     WV_S32 i;
     for(i=0;i<TSK_SCENE_MOV_USE_NUM;i++)
     {
@@ -1417,7 +1468,7 @@ WV_S32 TSK_SCENE_SetWinNum(WV_U32    num)
 /*******************************************************************
 
 WV_S32 TSK_SCENE_DeletLastWin();
-删除红外开窗
+删除红外开窗(或者串口开窗)
 *******************************************************************/
 WV_S32 TSK_SCENE_DeletLastWin()
 {
@@ -1442,7 +1493,7 @@ WV_S32 TSK_SCENE_DeletLastWin()
 /*******************************************************************
 
 WV_S32 TSK_SCENE_AddLastWin();
-添加红外开窗
+添加红外开窗(或者串口开窗)
 *******************************************************************/
 WV_S32 TSK_SCENE_AddLastWin()
 {
@@ -1474,6 +1525,7 @@ WV_S32 TSK_SCENE_AddLastWin()
         gCurScene.scene.win[gCurScene.scene.winNum].videoId = chn;
         gCurScene.scene.winNum ++;
         TSK_SCENE_ConfWin();
+        gCurScene.scene.winNum --;
         gCurScene.addOutline = 1;
     }
     //添加开窗背景图片

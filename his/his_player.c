@@ -1345,12 +1345,9 @@ WV_S32  HIS_PLAYER_Start(HI_HANDLE  * pHndlPlayer ,WV_U8 * pFileName)
         fp = NULL;
     }
     //printf("In HIS_PLAYER_Start used HI_SVR_PLAYER_Invoke+++++++++\n");
-    HI_SVR_PLAYER_Invoke(*pHndlPlayer, HI_FORMAT_INVOKE_SET_LOG_LEVEL, (HI_VOID *)HI_FORMAT_LOG_QUITE);
+    //zdh//HI_SVR_PLAYER_Invoke(*pHndlPlayer, HI_FORMAT_INVOKE_SET_LOG_LEVEL, (HI_VOID *)HI_FORMAT_LOG_QUITE);
     //printf("In HIS_PLAYER_Start used HI_SVR_PLAYER_EnableDbg+++++++++++++++\n");
     HI_SVR_PLAYER_EnableDbg(HI_FALSE);
-
-
-    //HI_SVR_PLAYER_EnableDbg(HI_TRUE);
 
     s32Ret = HI_SVR_PLAYER_SetMedia(*pHndlPlayer, HI_SVR_PLAYER_MEDIA_STREAMFILE, &stMedia);
     if (HI_SUCCESS != s32Ret)
@@ -1360,7 +1357,7 @@ WV_S32  HIS_PLAYER_Start(HI_HANDLE  * pHndlPlayer ,WV_U8 * pFileName)
     //printf("In HIS_PLAYER_Start used HI_SVR_PLAYER_SetMedia+++++++++++++\n");
     /***************************************************/
     //test set net filebuf size
-
+#if 1
     HI_S64 s64BufMaxSize =(10*1024*1024);
 
     s32Ret = HI_SVR_PLAYER_Invoke(*pHndlPlayer,HI_FORMAT_INVOKE_SET_BUFFER_MAX_SIZE, &s64BufMaxSize);
@@ -1398,7 +1395,7 @@ WV_S32  HIS_PLAYER_Start(HI_HANDLE  * pHndlPlayer ,WV_U8 * pFileName)
     }
     //printf("In HIS_PLAYER_Start used HI_SVR_PLAYER_Invoke agen and agen +++++++++\n");
 
-
+#endif
     if(TSK_SCENE_GetSyncEna() == 0)
     {
         //printf("In HIS_PLAYER_Start TSK_SCENE_GetSyncEna() == 0 ++++++++\n");
