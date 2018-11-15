@@ -17,6 +17,7 @@
 #include "wv_sqlite3.h"
 #include "tsk_text.h"
 #include "sys_env.h"
+#include "sys_file.h"
 #define  SVR_CMD_MAX_NUM    128
 #define  POINT_MAX_COL      128
 #define  POINT_MAX_RAW      128
@@ -1277,23 +1278,29 @@ WV_S32  SVR_CMD_GetPic(SVR_FRAME_HEAD_E * pHead ,WV_U8 *pData)
 WV_S32  SVR_CMD_GetControlProtocol(SVR_FRAME_HEAD_E * pHead ,WV_U8 *pData); 
 
 //获取控制协议包括串口协议和网络协议
+case 0:串口协议文件
+case 1:网络协议文件
+case 2：点歌机歌曲数据库 
 ********************************************************************/
 WV_S32  SVR_CMD_GetControlProtocol(SVR_FRAME_HEAD_E * pHead ,WV_U8 *pData)
 {
 	WV_S32 ret;
 	switch(pHead->cmdL1)
 	{
+
 		case 0:
 			ret = TSK_UART_SetUartSceneCmd(pData,pHead->dataNum);
 			break;
 		case 1:
 			ret = SVR_CONTROL_GetConfFileCmd(pData,pHead->dataNum);
 			break;
+		case 2:
+			ret = SYS_FILE_GetConfFile(pData,pHead->dataNum,pHead->cmdL1,pHead->arg1);
+			break;
 		default:
 			ret = -1;
 			break;
 	}
-
 	SVR_CMD_Ack(pHead,ret);
 	return WV_SOK;
 }

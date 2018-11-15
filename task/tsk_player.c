@@ -442,9 +442,6 @@ WV_S32  TSK_PLAYER_Creat(WV_S32 id)
         //开始播放
         WV_CHECK_RET(  HIS_PLAYER_Create(&(gTskPlayer[id].playerHandl) ,&(gTskPlayer[id].avPlayHandl)));
         TSK_PLAYER_Start(id);
-        //sleep(2);
-        //printf("----------sleep 2--------------\n");
-        //清除窗口冻结
         HI_BOOL bEnable;
         HIS_DIS_GetWinFreezeStatus(&(gTskPlayer[id].winHandl),&bEnable);
         printf("start..win freez is [%d]\n",bEnable);

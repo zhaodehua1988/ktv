@@ -15,10 +15,10 @@
 #define KTV_SHIYI_CMDFILE  "./env/netContrl.dat"
 
 //九州
-#define KTV_SHIYI_REGISTMSG_DATA "{\"developerId\":\"JZ7807K4\",\"appId\":\"GD34B12D\",\"deviceId\":\"%02x%02x%02x%02x%02x%02x\"}"
+//#define KTV_SHIYI_REGISTMSG_DATA "{\"developerId\":\"JZ7807K4\",\"appId\":\"GD34B12D\",\"deviceId\":\"%02x%02x%02x%02x%02x%02x\"}"
 
 //北京蕃秀
-//#define KTV_SHIYI_REGISTMSG_DATA "{\"developerId\":\"FXK5DZ3Z\",\"appId\":\"14BT4FAD\",\"deviceId\":\"%02x%02x%02x%02x%02x%02x\"}"
+#define KTV_SHIYI_REGISTMSG_DATA "{\"developerId\":\"FXK5DZ3Z\",\"appId\":\"14BT4FAD\",\"deviceId\":\"%02x%02x%02x%02x%02x%02x\"}"
 
 //subscribe 订阅开机、关机、歌曲播放三个事件
 

@@ -1375,10 +1375,6 @@ WV_S32 TSK_UART_SetUartSceneCmd(WV_U8 *pData,WV_S32 len)
 	}
 	
 	fclose(fp);
-
-	//memset(gUartDev.sceneCmd,0,sizeof(gUartDev.sceneCmd));
-	//TSK_UART_AnalyzeCmd(pData);
-
 	return 0;	
 	
 }
