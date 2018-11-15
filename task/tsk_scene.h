@@ -140,5 +140,5 @@ WV_S32 TSK_SCENE_StartingUP();
 
 WV_S32 TSK_SCENE_AddLastWin();
 WV_S32 TSK_SCENE_DeletLastWin();
-
+WV_S32 TSK_SCENE_SetWinChange(WV_S32 ena);
 #endif

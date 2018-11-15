@@ -426,6 +426,7 @@ WV_S32  TSK_PLAYER_Creat(WV_S32 id)
             WV_CHECK_RET(  HIS_DIS_WinCreat(&(gTskPlayer[id].winHandl),gTskPlayer[id].winRect));
             WV_CHECK_RET(  HIS_DIS_WinAttach(&(gTskPlayer[id].winHandl),&(gTskPlayer[id].avPlayHandl)));
             WV_CHECK_RET(  HIS_DIS_WinStart(&(gTskPlayer[id].winHandl)));
+           // WV_CHECK_RET(  HIS_PLAYER_Create(&(gTskPlayer[id].playerHandl) ,&(gTskPlayer[id].avPlayHandl)));
             gTskPlayer[id].winEna = 1;
             if( (gTskPlayer[id].winLastRect.s32X != gTskPlayer[id].winRect.s32X) || (gTskPlayer[id].winLastRect.s32Y != gTskPlayer[id].winRect.s32Y) \
                     || (gTskPlayer[id].winLastRect.s32Width != gTskPlayer[id].winRect.s32Width) || (gTskPlayer[id].winLastRect.s32Height != gTskPlayer[id].winRect.s32Height))
@@ -438,17 +439,21 @@ WV_S32  TSK_PLAYER_Creat(WV_S32 id)
 
 
         }
+        //开始播放
         WV_CHECK_RET(  HIS_PLAYER_Create(&(gTskPlayer[id].playerHandl) ,&(gTskPlayer[id].avPlayHandl)));
-        //清除黑场
+        TSK_PLAYER_Start(id);
+        //sleep(2);
+        //printf("----------sleep 2--------------\n");
+        //清除窗口冻结
         HI_BOOL bEnable;
         HIS_DIS_GetWinFreezeStatus(&(gTskPlayer[id].winHandl),&bEnable);
-        //printf("win freez is [%d]\n",bEnable);
+        printf("start..win freez is [%d]\n",bEnable);
         if(	bEnable != HI_FALSE)
         {
-            HIS_DIS_WinFreeze(&(gTskPlayer[id].winHandl),HI_FALSE,1);
+            HIS_DIS_WinFreeze(&(gTskPlayer[id].winHandl),HI_FALSE,0);
         }
-        //开始播放
-        TSK_PLAYER_Start(id);
+
+
     }
 
     gTskPlayer[id].playerEna = 1;
@@ -479,13 +484,14 @@ WV_S32  TSK_PLAYER_Destory(WV_S32 id)
         system("echo 3 > /proc/sys/vm/drop_caches");//  echo 3 > /proc/sys/vm/drop_caches");
 
         //WV_printf(" TSK_PLAYER_Destory  %d\n",id);
-#if 0
+#if 1
         HI_BOOL bEnable;
         HIS_DIS_GetWinFreezeStatus(&(gTskPlayer[id].winHandl),&bEnable);
-        printf("win freez is [%d]\n",bEnable);
+        printf("stop .win freez is [%d]\n",bEnable);
         if(	bEnable != HI_TRUE)
         {
-            //HIS_DIS_WinFreeze(&(gTskPlayer[id].winHandl),HI_TRUE,1);
+            //设置输出定格在最后一帧画面，防止切换视频黑场
+            HIS_DIS_WinFreeze(&(gTskPlayer[id].winHandl),HI_TRUE,0);
         }
 #endif
         TSK_PLAYER_Stop(id);
@@ -549,8 +555,21 @@ WV_S32 TSK_PLAYER_CMDStart(WV_S32 argc, WV_S8 **argv, WV_S8 * prfBuff)
 
     sprintf(gTskPlayer[id].fileName, "%s",argv[1]);
 
-    TSK_PLAYER_Stop(id);
-    TSK_PLAYER_Start(id);
+       TSK_PLAYER_Start(id);
+        //sleep(2);
+        //printf("----------sleep 2--------------\n");
+        //清除窗口冻结
+        HI_BOOL bEnable;
+        HIS_DIS_GetWinFreezeStatus(&(gTskPlayer[id].winHandl),&bEnable);
+        printf("start..win freez is [%d]\n",bEnable);
+        if(	bEnable != HI_FALSE)
+        {
+            HIS_DIS_WinFreeze(&(gTskPlayer[id].winHandl),HI_FALSE,0);
+        }
+
+
+    //TSK_PLAYER_Stop(id);
+    //TSK_PLAYER_Start(id);
 
     prfBuff += sprintf(prfBuff,"Player[%d] start %s \r\n",id,gTskPlayer[id].fileName);
     return WV_SOK;
@@ -679,8 +698,18 @@ WV_S32 TSK_PLAYER_CMDStop(WV_S32 argc, WV_S8 **argv, WV_S8 * prfBuff)
         return WV_SOK;
     }
 
-    TSK_PLAYER_Stop(id);
-    prfBuff += sprintf(prfBuff,"Player[%d] Stop  %s \r\n",id,gTskPlayer[id].fileName);
+
+    //prfBuff += sprintf(prfBuff,"Player[%d] Stop  %s \r\n",id,gTskPlayer[id].fileName);
+
+            HI_BOOL bEnable;
+        HIS_DIS_GetWinFreezeStatus(&(gTskPlayer[id].winHandl),&bEnable);
+        printf("stop .win freez is [%d]\n",bEnable);
+        if(	bEnable != HI_TRUE)
+        {
+            //设置输出定格在最后一帧画面，防止切换视频黑场
+            HIS_DIS_WinFreeze(&(gTskPlayer[id].winHandl),HI_TRUE,0);
+        }
+        TSK_PLAYER_Stop(id);
     return WV_SOK;
 
 }
@@ -813,6 +842,47 @@ WV_S32 TSK_PLAYER_CMDGetVol(WV_S32 argc, WV_S8 **argv, WV_S8 * prfBuff)
     return WV_SOK;
 }
 /***********************************************************************
+WV_S32  TSK_PLAYER_CMDCreate(WV_S32 argc, WV_S8 **argv, WV_S8 * prfBuff);
+***********************************************************************/
+WV_S32 TSK_PLAYER_CMDCreate(WV_S32 argc, WV_S8 **argv, WV_S8 * prfBuff)
+{
+    WV_S32 ret = -1;
+    WV_S32 id = 0 ;
+   if(argc <2 )
+    {
+        prfBuff += sprintf(prfBuff,"player create <playerID> \r\n");
+        return WV_SOK;
+    }
+    //prfBuff += sprintf(prfBuff,"player_0 vol[%d],player_1 vol[%d] ,player_2 vol[%d]\r\n",vol0,vol1,vol2);
+    ret = WV_STR_S2v(argv[0],&id);
+    if(ret != 0 ) return WV_EFAIL;
+
+    TSK_PLAYER_Creat(id);
+    
+    return WV_SOK;
+}
+
+/***********************************************************************
+WV_S32  TSK_PLAYER_CMDDesctory(WV_S32 argc, WV_S8 **argv, WV_S8 * prfBuff);
+***********************************************************************/
+WV_S32 TSK_PLAYER_CMDDesctory(WV_S32 argc, WV_S8 **argv, WV_S8 * prfBuff)
+{
+    WV_S32 ret = -1;
+    WV_S32 id = 0 ;
+   if(argc <2 )
+    {
+        prfBuff += sprintf(prfBuff,"player create <playerID> \r\n");
+        return WV_SOK;
+    }
+    //prfBuff += sprintf(prfBuff,"player_0 vol[%d],player_1 vol[%d] ,player_2 vol[%d]\r\n",vol0,vol1,vol2);
+    ret = WV_STR_S2v(argv[0],&id);
+    if(ret != 0 ) return WV_EFAIL;
+
+    TSK_PLAYER_Destory(id);
+    return WV_SOK;
+}
+
+/***********************************************************************
 WV_S32  TSK_PLAYER_Open();
 ***********************************************************************/
 
@@ -830,7 +900,9 @@ WV_S32  TSK_PLAYER_Open()
     WV_CMD_Register("player","mode","palyer comand mode",TSK_PLAYER_CMDChangeMode);
     WV_CMD_Register("player","setvol","palyer comand set vol",TSK_PLAYER_CMDSetVol);
     WV_CMD_Register("player","getvol","palyer comand get vol",TSK_PLAYER_CMDGetVol);
-
+    WV_CMD_Register("player","create","palyer comand create",TSK_PLAYER_CMDCreate);
+    WV_CMD_Register("player","destory","palyer comand destory",TSK_PLAYER_CMDDesctory);
+    
     return WV_SOK;
 }
 

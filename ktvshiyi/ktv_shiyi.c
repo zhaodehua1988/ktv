@@ -31,7 +31,7 @@
 
 #define TIMEOUT 1
 
-#define KTV_SHIYI_DEBUG_MODE 
+//#define KTV_SHIYI_DEBUG_MODE 
 #ifdef  KTV_SHIYI_DEBUG_MODE 
 #define KTV_SHIYI_printf(...) \
   				 do {\
@@ -48,7 +48,7 @@
 
 
 
-#define TEST_DEBUG 1
+#define TEST_DEBUG 0
 typedef struct KTV_SHIYI_HEAD_E 
 {
 	WV_U8  identification[6];

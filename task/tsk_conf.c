@@ -1589,6 +1589,7 @@ WV_S32 TSK_CONF_GetSceneConfByID(WV_U32 sceneID ,TSK_CONF_SCENE_CONF *pScene)
         sprintf(name, "Scene%dMov%dId",sceneID,j);
         SYS_ENV_GetU32(name,&data);
         memcpy(pScene->ucSceneMovName[j].ucVideoFileName,pMovInfoDev->movFile[data].name,TSK_CONF_SCENE_NAME_MAX_LEN);
+       // printf("id:%d,movName:%s\n",sceneID,pScene->ucSceneMovName[j].ucVideoFileName);
     }
     //get scene win info
     winNum = 0;

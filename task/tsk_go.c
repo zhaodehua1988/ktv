@@ -294,7 +294,8 @@ WV_S32 TSK_GO_DrawGrid_Start()
 	for(i=0;i<3;i++)
 	{
 		TSK_PLAYER_setWin(i,0,0,0,0);
-	}	
+	}
+	TSK_SCENE_SetWinChange(1);
 	TSK_SCENE_SceneClose();
 	FPGA_SPLIT_INFO_S Info ;
 	FPGA_CONF_GetSplitDefault(&Info);

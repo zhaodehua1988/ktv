@@ -964,6 +964,7 @@ WV_S32 TSK_SCENE_SceneClose()
         return 0;
     }
 
+
     WV_S32 ret = 0,i;
 
  
@@ -979,9 +980,9 @@ WV_S32 TSK_SCENE_SceneClose()
         }
         FPGA_CONF_SetWin (0 ,gCurScene.scene.win);
     }
-    gCurScene.sceneOpen = 0;
-    WV_printf("\n****scene close ***********\n");
 
+    WV_printf("\n****scene close ***********\n");
+    gCurScene.sceneOpen = 0;
     return ret;
 
 }
@@ -1112,6 +1113,16 @@ WV_S32 TSK_SCENE_GetChangeTimeOut()
     }
 }
 /*******************************************************************
+WV_S32 TSK_SCENE_SetWinChange(WV_S32 ena)
+功能：查看开窗和图片位置是否变化
+返回值：0-位置无变化，其他-位置变化
+*******************************************************************/
+WV_S32 TSK_SCENE_SetWinChange(WV_S32 ena)
+{
+    gCurScene.winChange = ena;
+    return WV_SOK;
+}
+/*******************************************************************
 WV_S32 TSK_SCENE_GetWinChange();
 功能：查看开窗和图片位置是否变化
 返回值：0-位置无变化，其他-位置变化
@@ -1120,9 +1131,12 @@ WV_S32 TSK_SCENE_GetWinChange()
 {
     WV_S32 change,i;
     change  = 0;
+  //printf("111+++++++++++++++cu win num = %d,sceneid[%d],lastid[%d]  \n",gCurScene.scene.winNum,gCurScene.scene.win[i].outId,gCurScene.lastScene.win[i].outId);
+         printf("111+++++++++++++++cu win num   \n");
+ 
     if(gCurScene.scene.winNum == gCurScene.lastScene.winNum && gCurScene.scene.animationNum == gCurScene.lastScene.animationNum){
         
-        printf("+++++++++++++++cu win num = %d,sceneid[%d],lastid[%d]  \n",gCurScene.scene.winNum,gCurScene.scene.win[i].outId,gCurScene.lastScene.win[i].outId);
+        //printf("+++++++++++++++cu win num = %d,sceneid[%d],lastid[%d]  \n",gCurScene.scene.winNum,gCurScene.scene.win[i].outId,gCurScene.lastScene.win[i].outId);
         for(i=0;i<gCurScene.scene.winNum;i++){
             if(gCurScene.scene.win[i].outId != gCurScene.lastScene.win[i].outId || \
             gCurScene.scene.win[i].videoId != gCurScene.lastScene.win[i].videoId || \
@@ -1152,6 +1166,7 @@ WV_S32 TSK_SCENE_GetWinChange()
         printf("+++++++++++++++win num is not eq \n");
         change ++;
     }
+    printf("end of TSK_SCENE_GetWinChange\n");
     return change;
 
 }
@@ -1177,10 +1192,7 @@ WV_S32 TSK_SCENE_Change(WV_U32 DataType, WV_U32  id)
     }
     gCurScene.id = id;
     WV_CHECK_RET(TSK_SCENE_GetScene(gCurScene.id,&gCurScene.scene));
-    printf("--------------winid[%d]\n",gCurScene.scene.win[0].outId);
-    printf("1111111111111111111\n");
     gCurScene.winChange = TSK_SCENE_GetWinChange();
-    printf("+++++++++++win change = %d \n",gCurScene.winChange);
     gCurScene.lastScene = gCurScene.scene;
     WV_S32 i;
     for(i=0;i<TSK_SCENE_MOV_USE_NUM;i++)
@@ -1227,6 +1239,7 @@ WV_S32 TSK_SCENE_Change(WV_U32 DataType, WV_U32  id)
     {
         return WV_EFAIL;
     }
+
     return WV_SOK;
 } 
 
@@ -1474,10 +1487,10 @@ WV_S32 TSK_SCENE_DeletLastWin()
 {
 
     //if(gCurScene.scene.winNum == 0 )  return  WV_EFAIL;
-    
+    printf("delete last win\n");
     if(gCurScene.addOutline == 1 && gCurScene.scene.winNum >=1)
     {
-        gCurScene.scene.winNum --;
+        //gCurScene.scene.winNum --;
         TSK_SCENE_ConfWin();
         gCurScene.addOutline = 0;
     }
@@ -1497,6 +1510,7 @@ WV_S32 TSK_SCENE_AddLastWin();
 *******************************************************************/
 WV_S32 TSK_SCENE_AddLastWin()
 {
+    printf("add last win\n");
     TSK_GO_MOV_PIC_POS_S pos;
     WV_U16 chn;
     WV_U16 id;
