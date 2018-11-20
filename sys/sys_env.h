@@ -12,6 +12,6 @@ WV_S32  SYS_ENV_Save();
 
 WV_S32  SYS_ENV_GetVersion(WV_U16 *pVer);
 
-#define  SYS_ENV_VERSION_NO       "1.6.3.1"       //版本号
+#define  SYS_ENV_VERSION_NO       "1.6.3.2"       //版本号
 
 #endif

@@ -28,6 +28,15 @@ TSK_SCENE_DEV_E   gCurScene;
 
 struct timeval SceneChangeTimeStart;
 WV_U32 SceneChangeDataType;
+//视频和场景锁
+typedef struct TSK_SCENE_MOV_MUTEX
+{
+    pthread_mutex_t mutex[3];
+    WV_U32 mutex_ena;
+}TSK_SCENE_MOV_MUTEX;
+
+static TSK_SCENE_MOV_MUTEX gScene_mov_mutex;
+
 
 /*******************************************************************
 WV_S32 TSK_SCENE_GetLightEna();
@@ -1129,23 +1138,19 @@ WV_S32 TSK_SCENE_GetWinChange();
 *******************************************************************/
 WV_S32 TSK_SCENE_GetWinChange()
 {
-    WV_S32 change,i;
-    change  = 0;
-  //printf("111+++++++++++++++cu win num = %d,sceneid[%d],lastid[%d]  \n",gCurScene.scene.winNum,gCurScene.scene.win[i].outId,gCurScene.lastScene.win[i].outId);
-         printf("111+++++++++++++++cu win num   \n");
- 
+    WV_S32 winChange,i;
+    winChange  = 0; 
     if(gCurScene.scene.winNum == gCurScene.lastScene.winNum && gCurScene.scene.animationNum == gCurScene.lastScene.animationNum){
         
-        //printf("+++++++++++++++cu win num = %d,sceneid[%d],lastid[%d]  \n",gCurScene.scene.winNum,gCurScene.scene.win[i].outId,gCurScene.lastScene.win[i].outId);
-        for(i=0;i<gCurScene.scene.winNum;i++){
+       for(i=0;i<gCurScene.scene.winNum;i++){
             if(gCurScene.scene.win[i].outId != gCurScene.lastScene.win[i].outId || \
             gCurScene.scene.win[i].videoId != gCurScene.lastScene.win[i].videoId || \
             gCurScene.scene.win[i].x != gCurScene.lastScene.win[i].x || \
             gCurScene.scene.win[i].y != gCurScene.lastScene.win[i].y || \
             gCurScene.scene.win[i].w != gCurScene.lastScene.win[i].w || \
             gCurScene.scene.win[i].h != gCurScene.lastScene.win[i].h ){
-                change++;
-                return change;
+                winChange++;
+                return winChange;
             }
         }
 
@@ -1156,18 +1161,15 @@ WV_S32 TSK_SCENE_GetWinChange()
             gCurScene.scene.animation[i].y !=  gCurScene.lastScene.animation[i].y || \
             gCurScene.scene.animation[i].w !=  gCurScene.lastScene.animation[i].w || \
             gCurScene.scene.animation[i].h !=  gCurScene.lastScene.animation[i].h ){
-                change++;
-                return change;;
+                winChange++;
+                return winChange;
             }
             
         }
     }else{
-
-        printf("+++++++++++++++win num is not eq \n");
-        change ++;
+        winChange ++;
     }
-    printf("end of TSK_SCENE_GetWinChange\n");
-    return change;
+    return winChange;
 
 }
 /*******************************************************************
@@ -1183,6 +1185,24 @@ WV_S32 TSK_SCENE_Change(WV_U32 DataType, WV_U32  id)
             return WV_SOK;
         }
     }
+    //防止场景和视频同时切换，这里加锁
+    if(gScene_mov_mutex.mutex_ena == 1 ){
+        WV_S32 mutex_ret;
+        mutex_ret = pthread_mutex_trylock(&gScene_mov_mutex.mutex[0]);/*lock the mutex*/
+        if(mutex_ret != 0 ){
+            WV_printf("get scene mutex[%d] err !\n",0);
+            return WV_SOK;
+        }
+        mutex_ret = pthread_mutex_trylock(&gScene_mov_mutex.mutex[1]);/*lock the mutex*/
+        if(mutex_ret != 0 ){
+            pthread_mutex_unlock(&gScene_mov_mutex.mutex[0]);
+            WV_printf("get scene mutex[%d] err !\n",1);
+            return WV_SOK;
+        }
+       
+        WV_printf("get scene mutex .ok \n");
+    }
+
     SceneChangeDataType = DataType;
     gettimeofday(&SceneChangeTimeStart, NULL);
 
@@ -1232,14 +1252,21 @@ WV_S32 TSK_SCENE_Change(WV_U32 DataType, WV_U32  id)
             WV_CHECK_RET(TSK_SCENE_SceneClose());
             WV_CHECK_RET(TSK_SCENE_SceneOpen());
         }
-        printf("TSK_SCENE_Change--------------------------\n");
+        //printf("TSK_SCENE_Change--------------------------\n");
         TSK_SCENE_SetDefault(id);
     }
-    else
+ 
+    //释放锁
+    if(gScene_mov_mutex.mutex_ena == 1 ){
+            pthread_mutex_unlock(&gScene_mov_mutex.mutex[1]);
+            pthread_mutex_unlock(&gScene_mov_mutex.mutex[0]);
+    }
+
+    if(gCurScene.scene.sceneEna != 1)
     {
         return WV_EFAIL;
     }
-
+   
     return WV_SOK;
 } 
 
@@ -1352,17 +1379,26 @@ WV_S32 TSK_SCENE_GetMovArea(WV_U32 num,WV_U32 *pEna,WV_U32* pX,WV_U32* pY,WV_U32
     return WV_SOK;
 } 
 /*******************************************************************
- WV_S32 TSK_SCENE_ConfMov();
+WV_S32 TSK_SCENE_ConfMov(WV_U32 num);
 *******************************************************************/
 WV_S32 TSK_SCENE_ConfMov(WV_U32 num)
 {
+    if(gScene_mov_mutex.mutex_ena == 1 && num <= 2){
+        WV_S32 mutex_ret;
+        mutex_ret = pthread_mutex_trylock(&gScene_mov_mutex.mutex[num]);/*lock the mutex*/
+        if(mutex_ret != 0 ){
+            WV_printf("get mov mutex[%d] err !\n",num);
+            return WV_SOK;
+        }
+        WV_printf("get mov mutex[%d] .ok \n",num);
+    }
     WV_S32 i;
     WV_S8  name[WV_CONF_NAME_MAX_LEN];
     //for movi
     sprintf(name, "./mov/mov%d.mp4",gCurScene.scene.mov[num].id);
     if(access(name,0)!=0){
 
-        return WV_SOK;
+        goto confMovEnd;
     }
 
     TSK_PLAYER_setWin(num,gCurScene.scene.mov[num].x,gCurScene.scene.mov[num].y,gCurScene.scene.mov[num].w,gCurScene.scene.mov[num].h);
@@ -1402,6 +1438,12 @@ WV_S32 TSK_SCENE_ConfMov(WV_U32 num)
     }
     TSK_PLAYER_ReadVolume();
     //printf("in TSK_SCENE_ConfMov under  TSK_PLAYER_ReadVolume +++++++++++++\n");
+confMovEnd:
+    if(gScene_mov_mutex.mutex_ena == 1)
+    {
+        pthread_mutex_unlock(&gScene_mov_mutex.mutex[num]);
+    }
+
     return WV_SOK;
 }
 
@@ -1487,8 +1529,8 @@ WV_S32 TSK_SCENE_DeletLastWin()
 {
 
     //if(gCurScene.scene.winNum == 0 )  return  WV_EFAIL;
-    printf("delete last win\n");
-    if(gCurScene.addOutline == 1 && gCurScene.scene.winNum >=1)
+    printf("delete last win,\n");
+    if(gCurScene.addOutline == 1 )
     {
         //gCurScene.scene.winNum --;
         TSK_SCENE_ConfWin();
@@ -1958,11 +2000,20 @@ WV_S32  TSK_SCENE_Init()
     TSK_CONF_MovInfo_Init();
     TSK_CONF_SceneInfo_Init();
 
-    //memset(&gPlayerSync,0,sizeof(gPlayerSync));
 
-    //WV_CHECK_RET( WV_THR_Create(&(gPlayerSync.thrHndl),TSK_SCENE_PlaySync_Proc, WV_THR_PRI_DEFAULT, WV_THR_STACK_SIZE_DEFAULT, (void *)&gPlayerSync));
     gettimeofday(&SceneChangeTimeStart, NULL);
     SceneChangeDataType = TSK_SCENE_TYPE_NETDATA;
+
+    //scene_mov_mutex
+
+    if(pthread_mutex_init(&gScene_mov_mutex.mutex[0],NULL) != 0 || pthread_mutex_init(&gScene_mov_mutex.mutex[1],NULL) != 0 || pthread_mutex_init(&gScene_mov_mutex.mutex[2],NULL) != 0 )
+    {
+        WV_printf("Init scene_mov_metux error.\n");
+        gScene_mov_mutex.mutex_ena = 0;
+    }else{
+         WV_printf("Init scene_mov_metux ok.\n");
+        gScene_mov_mutex.mutex_ena = 1;
+    }
 
     return ret;
 }

@@ -103,7 +103,7 @@ WV_S32 TSK_SCENE_Save(WV_U32 id);
 
 WV_S32 TSK_SCENE_SetMov(WV_U32 num,WV_U32 id);
 WV_S32 TSK_SCENE_SetMovArea(WV_U32 num,WV_U32 ena,WV_U32 x,WV_U32 y,WV_U32 w,WV_U32 h);
-WV_S32 TSK_SCENE_ConfMov();
+WV_S32 TSK_SCENE_ConfMov(WV_U32 num);
 
 WV_S32 TSK_SCENE_SetAniNum(WV_U32    num);
 WV_S32 TSK_SCENE_SetAni(WV_U32    num,WV_U32    id,WV_U32    x,WV_U32    y,WV_U32    w,WV_U32 h);

@@ -64,9 +64,9 @@ WV_S32  TSK_PLAYER_Init();
 ***********************************************************************/
 WV_S32  TSK_PLAYER_Init()
 {
-    WV_S32 chl;
+    //WV_S32 chl;
     //获取FPGA输出通道号
-    chl=FPGA_CONF_GetOutChl_Num();
+    //chl=FPGA_CONF_GetOutChl_Num();
     //set screenMode //0:3840*1080
     u32PlayerScreenMode = 2;
 

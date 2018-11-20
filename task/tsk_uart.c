@@ -21,9 +21,9 @@
 #define TASK_UART_MAX_LEN  256  
 #define TSK_UART_SCENE_NUM (TSK_SCENE_MAX_NUM) 
 #define TSK_UART_WAG_NUM   2
-#define TSK_UART_DEBUG_MODE 
+//#define TSK_UART_DEBUG_MODE 
 #ifdef  TSK_UART_DEBUG_MODE 
-  #define TSK_UART_printf(...) \
+#define TSK_UART_printf(...) \
   				 do {\
   				  printf("\n\rUART:" __VA_ARGS__);\
   				  fflush(stdout); \
@@ -639,7 +639,7 @@ WV_S32 TSK_UART_RecvCmd();
 WV_S32 TSK_UART_RecvCmd(TSK_UART_DEV_E * pDev,WV_U8  *pBuf,WV_S32 *pLen)
 { 
 
-		printf("TSK_UART_RecvCmd\n");
+		//printf("TSK_UART_RecvCmd\n");
 		WV_S32  recvLen,len,i;
 		 struct  termios opt;
 		if(pDev-> fd < 0 )
@@ -1610,7 +1610,6 @@ void * TSK_UART_Proc ( void * prm)
 		pDev ->runTime = tv.tv_sec; 
 				
 		ret  = TSK_UART_RecvCmd(pDev, recvBuf,&cmdLen);
-		//printf("uart recv cmd \n");
 		ret = TSK_UART_SceneCheck(pDev,recvBuf,cmdLen);
 		ret = TSK_UART_SceneCmd(pDev,recvBuf,cmdLen);
         ret = TSK_UART_WagCheck(pDev, recvBuf, cmdLen);

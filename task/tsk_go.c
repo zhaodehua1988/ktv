@@ -252,12 +252,13 @@ WV_S32 TSK_GO_DrawGrid_EXIT()
 	HI_RECT Rect;
 	WV_S32 chl,i;
 	chl=FPGA_CONF_GetOutChl_Num();
-	Rect.x = 0;
-	Rect.y = 0;
-	Rect.w = RECT_W;
-	Rect.h = RECT_H;
+	//Rect.x = 0;
+	//Rect.y = 0;
+	//Rect.w = RECT_W;
+	//Rect.h = RECT_H+4;
 	FPGA_CONF_SetOutput(0);
-	WV_CHECK_RET( HI_GO_FillRect(gGoDev.goDev.layerSurfHndl, &Rect, 0, HIGO_COMPOPT_NONE) );   		
+	//WV_CHECK_RET( HI_GO_FillRect(gGoDev.goDev.layerSurfHndl, &Rect, 0, HIGO_COMPOPT_NONE) );   		
+	HI_GO_FillRect(gGoDev.goDev.layerSurfHndl, NULL, 0, HIGO_COMPOPT_NONE);
 	HIS_GO_RefreshLayer(&gGoDev.goDev);
 		
 	if(gGoDev.drawState  == FILL_FREC_STATE){
@@ -274,13 +275,14 @@ WV_S32 TSK_GO_DrawGrid_EXIT()
 	TSK_PLAYER_ChangeMode(TSK_PLAYER_MODE_1920_1080);
 	gGoDev.playerMode = TSK_PLAYER_MODE_1920_1080;
 
- 	//HIS_FB_ClrFpga();
+ 	HIS_FB_ClrFpga();
 	//scene open
 	TSK_SCENE_SceneOpen();
 	outPutEna = TSK_FPGA_GetOutConf();
 	FPGA_CONF_SetOutput(outPutEna);
 	//FPGA_CONF_ResetA();
 	//TSK_SCENE_Restart();
+
 	return WV_SOK;
 }
 /*****************************************************************************
