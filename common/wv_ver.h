@@ -1,4 +1,4 @@
 #define SOFTVER_DATE "2018:11:20"
-#define SOFTVER_TIME "10:48:02"
+#define SOFTVER_TIME "10:50:27"
 #define SOFTVER_MAIN "1.4.2.0"
 #define SOFTVER_NAME "DEC-MINE"
