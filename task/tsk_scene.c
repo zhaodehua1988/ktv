@@ -909,19 +909,6 @@ WV_S32 TSK_SCENE_SceneOpen()
         }
     }
 
-    /*
-    if((TSK_USB_GetShowFlag() == 0) && (TSK_Mobile_GetShowFlag()==0))
-    {
-
-        //for win
-        FPGA_CONF_SetWin (gCurScene.scene.winNum ,gCurScene.scene.win);
-
-        // for animation
-        TSK_SCENE_ConfAni();
-//        HIS_FB_ClrFpga();
-
-    }*/
-    
     //for player
     for(i=0;i<TSK_SCENE_MOV_USE_NUM;i++)
     {
@@ -1603,7 +1590,10 @@ WV_S32 TSK_SCENE_AddLastWin()
         gCurScene.scene.animation[gCurScene.scene.animationNum].ena = 1;
         gCurScene.scene.animationNum ++;
         TSK_SCENE_ConfAni();
+        //gCurScene.scene.animationNum --;
         gCurScene.addAni = 1;
+    }else{
+        TSK_SCENE_ConfAni();
     }
 
     return WV_SOK;

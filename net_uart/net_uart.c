@@ -395,9 +395,17 @@ WV_S32 NET_UART_GetNetUartConf(NET_UART_DEV_E  * pDev)
 		}
 
 	}
+	fclose(fp);
+	//获取投影开关命令
+	fp = fopen(NET_UART_CMDFILE,"rb+");
+	if(fp == NULL)
+	{
+		NET_UART_printf("fopen file [%s] error\n",NET_UART_CMDFILE);
+		return -1;
+	}
 
 	//get projector open/close cmd 
-	while(1)
+	while(fgets(buf,sizeof(buf),fp))
 	{
 		if(buf[0] == '#')
 			continue;
@@ -418,7 +426,16 @@ WV_S32 NET_UART_GetNetUartConf(NET_UART_DEV_E  * pDev)
 			
 		}
 	}
-	while(1)
+	
+	fclose(fp);
+	//获取切换场景命令
+	fp = fopen(NET_UART_CMDFILE,"rb+");
+	if(fp == NULL)
+	{
+		NET_UART_printf("fopen file [%s] error\n",NET_UART_CMDFILE);
+		return -1;
+	}
+	while(fgets(buf,sizeof(buf),fp))
 	{
 		if(buf[0] == '#')
 			continue;
@@ -917,18 +934,15 @@ WV_S32 NET_UART_Open()
 	if (NET_UART_GetNetUartConf(pgNetUartDev) != 0 ){
 		return WV_EFAIL;
 	}
-
 	
 	if(NET_UART_SvrInit(pgNetUartDev) == WV_EFAIL){
 		return WV_EFAIL;
 	}
-	
 	if(NET_UART_CliInit(pgNetUartDev) == WV_EFAIL){
 		return WV_EFAIL;	
 	}
-	
 	WV_CHECK_RET( WV_THR_Create(&(pgNetUartDev->thrHndl),NET_UART_Proc, WV_THR_PRI_DEFAULT, WV_THR_STACK_SIZE_DEFAULT, (void *)pgNetUartDev));
-
+NET_UART_printf("NET_UART open ok\n");
 	return WV_SOK;		
 	
 }

@@ -59,7 +59,7 @@ WV_S32  main()
 	TSK_TEXT_Open();
 	NET_UART_Open();
 	KTV_SHIYI_Open();
-    	KTV_LEISHI_Open();
+    KTV_LEISHI_Open();
 	TSK_SCENE_ConfAni();//解决开机背景图片显示不全的问题
 	rowNum =0;
     while(1)
