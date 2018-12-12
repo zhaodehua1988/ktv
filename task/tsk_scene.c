@@ -859,11 +859,14 @@ WV_S32 TSK_SCENE_SceneInit()
     usleep(300000);
     HIS_FB_ClrFpga();
 
-    TSK_SCENE_ConfAni();
-    //for win
+    if(TSK_UART_GetWindowMode() == 0){
 
-    WV_ASSERT_RET ( FPGA_CONF_SetWin (gCurScene.scene.winNum ,gCurScene.scene.win));
-    //usleep(3000000);
+        TSK_SCENE_ConfAni();
+        //for win
+        WV_ASSERT_RET ( FPGA_CONF_SetWin (gCurScene.scene.winNum ,gCurScene.scene.win));
+    }else{
+        WV_ASSERT_RET ( FPGA_CONF_SetWin (0 ,gCurScene.scene.win));
+    }
     HIS_FB_ClrFpga();//
     //FPGA_CONF_RqMcu();
     FPGA_CONF_ClrBuf();
@@ -899,16 +902,17 @@ WV_S32 TSK_SCENE_SceneOpen()
     WV_S8  name[WV_CONF_NAME_MAX_LEN];
     TSK_PLAYER_ChangeMode(TSK_PLAYER_MODE_1920_1080);//virture screen	size 1920*1080
 
-    if(gCurScene.winChange != 0 ){
-        if(gCurScene.addOutline == 1){
-            gCurScene.addOutline = 0;
-            TSK_SCENE_AddLastWin();
-        }else{
-            FPGA_CONF_SetWin(gCurScene.scene.winNum ,gCurScene.scene.win);
-            TSK_SCENE_ConfAni();
+    if(TSK_UART_GetWindowMode() == 0){
+        if(gCurScene.winChange != 0 ){
+            if(gCurScene.addOutline == 1){
+                gCurScene.addOutline = 0;
+                TSK_SCENE_AddLastWin();
+            }else{
+                FPGA_CONF_SetWin(gCurScene.scene.winNum ,gCurScene.scene.win);
+                TSK_SCENE_ConfAni();
+            }
         }
     }
-
     //for player
     for(i=0;i<TSK_SCENE_MOV_USE_NUM;i++)
     {
@@ -969,12 +973,16 @@ WV_S32 TSK_SCENE_SceneClose()
 
         TSK_PLAYER_Destory(i);
     }
-    if (gCurScene.winChange != 0){
-        for(i = 0;i< HIS_HIGO_GODEC_NUM ; i++ )
-        {
-            TSK_GO_DecClose(i);
+
+    if(TSK_UART_GetWindowMode() == 0){
+
+        if (gCurScene.winChange != 0){
+            for(i = 0;i< HIS_HIGO_GODEC_NUM ; i++ )
+            {
+                TSK_GO_DecClose(i);
+            }
+            FPGA_CONF_SetWin (0 ,gCurScene.scene.win);
         }
-        FPGA_CONF_SetWin (0 ,gCurScene.scene.win);
     }
 
     WV_printf("\n****scene close ***********\n");
@@ -1490,6 +1498,9 @@ WV_S32 TSK_SCENE_CleanWinFram();
 *******************************************************************/
 WV_S32 TSK_SCENE_CleanWinFram()
 {
+    if(TSK_UART_GetWindowMode() == 1){
+        return WV_SOK;
+    }
 
     TSK_SCENE_ConfWin();
 
@@ -1515,6 +1526,28 @@ WV_S32 TSK_SCENE_DeletLastWin();
 WV_S32 TSK_SCENE_DeletLastWin()
 {
 
+    if(TSK_UART_GetWindowMode() == 1){
+    
+        FPGA_WIN_INFO_S win;
+        if(gCurScene.addOutline == 1)
+        {
+            FPGA_CONF_SetWin (0,&win);
+            gCurScene.addOutline = 0;
+        }
+
+
+        //添加开窗背景图片
+        if(gCurScene.addAni == 1 ){
+            WV_S32 i;
+            for(i = 0;i< HIS_HIGO_GODEC_NUM ; i++ )
+            {
+                TSK_GO_DecClose(i);
+            }
+            gCurScene.addAni = 0;
+        }
+        return WV_SOK;
+    }
+
     //if(gCurScene.scene.winNum == 0 )  return  WV_EFAIL;
     printf("delete last win,\n");
     if(gCurScene.addOutline == 1 )
@@ -1539,6 +1572,24 @@ WV_S32 TSK_SCENE_AddLastWin();
 *******************************************************************/
 WV_S32 TSK_SCENE_AddLastWin()
 {
+    //开关所有窗口和图片
+    if(TSK_UART_GetWindowMode() == 1){
+        
+        if(gCurScene.addOutline == 0)
+        {
+            TSK_SCENE_ConfWin();
+            gCurScene.addOutline = 1;
+        }
+
+
+        //添加开窗背景图片
+        if(gCurScene.addAni == 0 ){
+            TSK_SCENE_ConfAni();
+            gCurScene.addAni = 1;
+        }
+        return WV_SOK;
+    }
+
     printf("add last win\n");
     TSK_GO_MOV_PIC_POS_S pos;
     WV_U16 chn;
@@ -1629,6 +1680,7 @@ WV_S32 TSK_SCENE_ConWin();
 *******************************************************************/
 WV_S32 TSK_SCENE_ConfWin()
 {
+
     WV_ASSERT_RET ( FPGA_CONF_SetWin (gCurScene.scene.winNum ,gCurScene.scene.win));
     return WV_SOK;
 }  

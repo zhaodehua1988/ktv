@@ -6,7 +6,7 @@ SUBDIR   := common his extdev task server sys net_uart ktvdev ktvshiyi ktvleishi
 
 
 ##############################################################################################
-SOFT_VER  := "1.4.2.0"
+SOFT_VER  := "1.6.3.4"
 SOFT_NAME := "DEC-MINE"
 
 ##############################################################################################
@@ -60,7 +60,7 @@ $(TARGET):%:%.o $(COMM_OBJ)
 
 ver:
 	@echo "generate date and ver"
-	@date +'#define SOFTVER_DATE "%Y:%m:%d"' > ../common/wv_ver.h
+	@date +'#define SOFTVER_DATE "%Y-%m-%d"' > ../common/wv_ver.h
 	@date +'#define SOFTVER_TIME "%T"' >> ../common/wv_ver.h
 	@echo '#define SOFTVER_MAIN $(SOFT_VER)' >> ../common/wv_ver.h
 	@echo  '#define SOFTVER_NAME $(SOFT_NAME)'  >> ../common/wv_ver.h

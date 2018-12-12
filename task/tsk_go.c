@@ -1464,6 +1464,54 @@ WV_S32 TSK_GO_CmdSetText(WV_S32 argc, WV_S8 **argv,WV_S8 *prfBuff)
  
 }
 
+
+/****************************************************************************
+
+WV_S32 TSK_GO_SetBank(WV_S32 argc, WV_S8 **argv,WV_S8 *prfBuff)
+
+****************************************************************************/
+WV_S32 TSK_GO_SetBack(WV_S32 argc, WV_S8 **argv, WV_S8 *prfBuff)
+{
+	WV_U32 color;
+	WV_U32 devAddr;
+	WV_U8 buf[255] = {0};
+	WV_S32 ret, i;
+
+	HI_RECT Rect;
+	Rect.x = 0;
+	Rect.y = 0;
+	Rect.w = 3840;
+	Rect.h = 2160;
+
+	if (argc < 1)
+	{
+
+		prfBuff += sprintf(prfBuff, "set back <cmd> //cmd like:color/clear\r\n");
+		return 0;
+	}
+	if (strcmp(argv[0], "color") == 0)
+	{
+		if (argc < 2)
+		{
+			prfBuff += sprintf(prfBuff, "set back color <val>//val like:0xffff0000\r\n");
+		}
+
+		ret = WV_STR_S2v(argv[1], &color);
+		if (ret != WV_SOK)
+		{
+
+			prfBuff += sprintf(prfBuff, "input erro!\r\n");
+		}
+		color = color | 0xff000000;
+		HI_GO_FillRect(gGoDev.goDev.layerSurfHndl, &Rect, color, HIGO_COMPOPT_NONE);
+		HIS_GO_RefreshLayer(&gGoDev.goDev);
+	}else 	if (strcmp(argv[0], "clear") == 0)
+	{
+		HI_GO_FillRect(gGoDev.goDev.layerSurfHndl, &Rect, 0, HIGO_COMPOPT_NONE);
+		HIS_GO_RefreshLayer(&gGoDev.goDev);
+	}
+
+}
   
 /***************************************************************
 
@@ -1479,6 +1527,7 @@ WV_S32 TSK_GO_Open()
 	WV_CMD_Register("get","higo","get higo mode info ",TSK_GO_CmdGet);
 	WV_CMD_Register("set","higo","set higo mode  ",TSK_GO_CmdSet);
 	WV_CMD_Register("set","text","set higo mode  ",TSK_GO_CmdSetText);
+	WV_CMD_Register("set","back","set higo mode  ",TSK_GO_SetBack);
 
 	gGoDev.drawState = DRAW_EXIT_STATE;
 	gGoDev.colorKeyEna = 1;

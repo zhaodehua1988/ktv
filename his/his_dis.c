@@ -537,7 +537,7 @@ WV_S32  HIS_DIS_SetCustomTiming(WV_U32 mode)
 	custTiming.HPW = 88; 
 	custTiming.DataWidth = HI_UNF_DISP_INTF_DATA_WIDTH24; 
 	custTiming.ItfFormat = HI_UNF_DISP_INTF_DATA_FMT_RGB888;
-   custTiming.VertFreq = 30000;
+    custTiming.VertFreq = 30000;
           
 	ret = HI_UNF_DISP_SetCustomTiming(HI_UNF_DISPLAY1,&custTiming);
 	if (ret != HI_SUCCESS)

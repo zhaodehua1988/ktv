@@ -40,11 +40,12 @@ WV_S32  main()
 	
 	TSK_PLAYER_Open();
 	TSK_FPGA_Open();
-	TSK_GO_Open();	
+	TSK_GO_Open();
+	TSK_UART_Open();	
 	TSK_SCENE_Init();
 	SVR_Open();
 	SVR_UDP_Open();
-	TSK_UART_Open();
+	//TSK_UART_Open();
 	TSK_CheckOut_Open();	
 	//sleep(1);
 	TSK_USB_ShowOpen();
@@ -60,7 +61,10 @@ WV_S32  main()
 	NET_UART_Open();
 	KTV_SHIYI_Open();
     KTV_LEISHI_Open();
-	TSK_SCENE_ConfAni();//解决开机背景图片显示不全的问题
+	if(TSK_UART_GetWindowMode() == 0){
+		TSK_SCENE_ConfAni();//解决开机背景图片显示不全的问题
+	}
+
 	rowNum =0;
     while(1)
     {
@@ -79,10 +83,11 @@ WV_S32  main()
 	TSK_USB_ShowClose();
 	TSK_USB_Close();
 	TSK_CheckOut_Close();
-	TSK_UART_Close();
+	//TSK_UART_Close();
 	SVR_UDP_Close();
 	SVR_Close();
 	TSK_SCENE_DeInit();
+	TSK_UART_Close();
 	TSK_GO_Close(); 
 	TSK_FPGA_Close();
 	TSK_PLAYER_Close();

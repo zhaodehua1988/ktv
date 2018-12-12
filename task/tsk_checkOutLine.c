@@ -48,6 +48,7 @@ void * TSK_CheckOut_Proc(void * prm)
 		}
 		dataOld = dataNew & 0x0003;
 		TSK_SCENE_CleanWinFram();
+		usleep(500000);
 		//FPGA_CONF_CleanWinFram();
 		
 	} 
