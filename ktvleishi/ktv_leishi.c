@@ -310,7 +310,7 @@ int KTV_LEISHI_ExecutiveCommand(int client)
     if(strcmp(UseOrder.the_order_get,"OPEN") == 0)
     {
         //因为open设备函数，最终调用了“reboot”系统命令，所以，应该先开投影仪，再open设备
-        if(((NET_UART_ProjectorCmd(1) ==0) && (TSK_SCENE_StartingUP() == 0)))
+        if(((NET_UART_ProjectorCmd(1) ==0) && (TSK_SCENE_StartingUP(TSK_SCENE_TYPE_NETDATA) == 0)))
             KTV_LEISHI_RecvOk(client);
         else
         {
@@ -320,7 +320,7 @@ int KTV_LEISHI_ExecutiveCommand(int client)
     }
     else if(strcmp(UseOrder.the_order_get,"CLOSE") == 0)
     {
-        if((TSK_SCENE_Standby() == 0) && (NET_UART_ProjectorCmd(0) == 0))
+        if((TSK_SCENE_Standby(TSK_SCENE_TYPE_NETDATA) == 0) && (NET_UART_ProjectorCmd(0) == 0))
             KTV_LEISHI_RecvOk(client);
         else
         {

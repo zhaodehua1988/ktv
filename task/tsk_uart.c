@@ -21,6 +21,7 @@
 #define TASK_UART_MAX_LEN  256  
 #define TSK_UART_SCENE_NUM (TSK_SCENE_MAX_NUM) 
 #define TSK_UART_WAG_NUM   2
+#define TSK_UART_SCENE_CTRLCMD_NUM 10
 #define TSK_UART_WIN_CMD_NUM 2
 //#define TSK_UART_DEBUG_MODE 
 #ifdef  TSK_UART_DEBUG_MODE 
@@ -70,6 +71,7 @@ typedef struct TSK_UART_DEV_E
 	WV_U32      dataBit;
 	WV_U32      stopBit;
 	WV_U32      windowMode; //mode 0 :正常模式， mode 1：串口控制所有窗口开关
+	WV_U32      openDev;    //0：串口控制开关机无效  1：串口控制开关机有效
 	WV_U32      rcvEroNum;
 	WV_U32      checkEroNum;
 	WV_U32      procEroNum;
@@ -81,6 +83,7 @@ typedef struct TSK_UART_DEV_E
 	
 	TSK_UART_SCENE_CMD_S sceneCmd[TSK_UART_SCENE_NUM]; 
 	TSK_UART_SCENE_CMD_S wagCmd[TSK_UART_WAG_NUM];
+	TSK_UART_SCENE_CMD_S sceneCtrl[TSK_UART_SCENE_CTRLCMD_NUM];
 	
 }TSK_UART_DEV_E;
 
@@ -98,15 +101,26 @@ static TSK_UART_LOOP_E gSceneLoop;
 
 static TSK_UART_DEV_E gUartDev;
 static WV_S32 gWagShow = -1;
+static WV_S32 gSceneCtrlCmd = -1;
 
 /*******************************************************************
  WV_S32 TSK_UART_GetWindowMode();
 *******************************************************************/
 WV_S32 TSK_UART_GetWindowMode()
 {
-	printf("winmode = %d \n",gUartDev.windowMode);
+	//printf("winmode = %d \n",gUartDev.windowMode);
 	return gUartDev.windowMode;
 }
+
+/*******************************************************************
+ WV_S32 TSK_UART_GetWindowMode();
+*******************************************************************/
+WV_S32 TSK_UART_GetOpenDevMode()
+{
+	//printf("winmode = %d \n",gUartDev.windowMode);
+	return gUartDev.openDev;
+}
+
 /*******************************************************************
  WV_S32 TSK_UART_RegisterConf();
 *******************************************************************/
@@ -733,6 +747,61 @@ WV_S32 TSK_UART_WagCmd(TSK_UART_DEV_E  *pDev, WV_U8 *pBuf, WV_S32 len)
 
 /******************************************************************************
 
+WV_S32 TSK_UART_SceneStrlCmd(TSK_UART_DEV_E  *pDev,WV_U8 *pBuf,WV_S32 len);
+//具体scenestrl命令的应用：播放/暂停/上个场景/下个场景/音量+/音量-/停止/开机/待机/
+******************************************************************************/
+WV_S32 TSK_UART_SceneStrlApp(WV_S32 cmd)
+{
+	WV_printf("TSK_UART_SceneStrlApp[%d]\n",cmd);
+	switch (cmd){
+		case 0:TSK_SCENE_PlayerPlay();break;
+		case 1:TSK_SCENE_PlayerPause();break;
+		case 2:TSK_SCENE_PreScene();break;
+		case 3:TSK_SCENE_NextScene();break;
+		case 4:TSK_SCENE_PlayerVolUp();break;
+		case 5:TSK_SCENE_PlayerVolDown();break;
+		case 6:TSK_SCENE_PlayerStop();break;
+		case 7:TSK_SCENE_StartingUP(TSK_SCENE_TYPE_NETDATA);break;
+		case 8:TSK_SCENE_Standby(TSK_SCENE_TYPE_UARTDATA);break;
+		default:break;
+	}
+
+}
+
+/******************************************************************************
+
+WV_S32 TSK_UART_SceneStrlCmd(TSK_UART_DEV_E  *pDev,WV_U8 *pBuf,WV_S32 len);
+
+******************************************************************************/
+WV_S32 TSK_UART_SceneStrlCmd(TSK_UART_DEV_E  *pDev, WV_U8 *pBuf, WV_S32 len)
+{
+    WV_S32 i, j;
+
+    for (i = 0; i < TSK_UART_SCENE_CTRLCMD_NUM; i++)
+    {
+        if (pDev->sceneCtrl[i].CmdLen == len)
+        {
+            for (j = 0; j < len; j++)
+            {
+                if (pDev->sceneCtrl[i].ScenceCmd[j] != pBuf[j])
+                {
+                    TSK_UART_printf("\nwag cmd error \n");
+                    break;
+                }
+            }
+            if (j == len )
+            {
+                TSK_UART_SceneStrlApp(i);
+                //pDev->sceneCtrl[i].CmdEna = 1;
+                break;
+            }
+        }
+    }
+    return WV_SOK;
+}
+
+/******************************************************************************
+
 WV_S32 TSK_UART_SceneCheck(TSK_UART_DEV_E  *pDev,WV_U8 *pBuf,WV_S32 len);
 
 ******************************************************************************/
@@ -828,7 +897,54 @@ WV_S32 TSK_UART_WagCheck(TSK_UART_DEV_E  *pDev, WV_U8 *pBuf, WV_S32 len)
     }
     return WV_SOK;
 }
+/******************************************************************************
 
+WV_S32 TSK_UART_WagCheck(TSK_UART_DEV_E  *pDev,WV_U8 *pBuf,WV_S32 len);
+
+******************************************************************************/
+WV_S32 TSK_UART_SceneCtrlCheck(TSK_UART_DEV_E  *pDev, WV_U8 *pBuf, WV_S32 len)
+{
+    WV_S32 i, j;
+
+    for (i = 0; i < TSK_UART_WAG_NUM; i++)
+    {
+        if (pDev->sceneCtrl[i].CmdLen == len)
+        {
+            for (j = 0; j < len; j++)
+            {
+                if (pDev->sceneCtrl[i].ScenceCmd[j] != pBuf[j])
+                {
+                    break;
+                }
+            }
+            if ((j == len) && (pDev->sceneCtrl[i].CmdEna == 0))
+            {
+                return WV_SOK;
+            }
+        }
+    }
+    if (i == TSK_UART_WAG_NUM)
+    {
+        for (i = 0; i < TSK_UART_WAG_NUM; i++)
+        {
+            if (pDev->sceneCtrl[i].CmdLen == len)
+            {
+                for (j = 0; j < len; j++)
+                {
+                    if (pDev->sceneCtrl[i].ScenceCmd[j] != pBuf[j])
+                    {
+                        break;
+                    }
+                }
+                if (j == len && pDev->sceneCtrl[i].CmdEna == 1)
+                {
+                    pDev->sceneCtrl[i].CmdEna = 0;
+                }
+            }
+        }
+    }
+    return WV_SOK;
+}
 
 /****************************************************************************************
 
@@ -863,11 +979,13 @@ void * TSK_UART_Proc ( void * prm)
 		gettimeofday(&tv,&tz);
 		pDev ->runTime = tv.tv_sec; 
 				
-		ret  = TSK_UART_RecvCmd(pDev, recvBuf,&cmdLen);
-		ret = TSK_UART_SceneCheck(pDev,recvBuf,cmdLen);
-		ret = TSK_UART_SceneCmd(pDev,recvBuf,cmdLen);
-        ret = TSK_UART_WagCheck(pDev, recvBuf, cmdLen);
-        ret = TSK_UART_WagCmd(pDev, recvBuf, cmdLen);
+		ret += TSK_UART_RecvCmd(pDev, recvBuf,&cmdLen);
+		ret += TSK_UART_SceneCheck(pDev,recvBuf,cmdLen);
+		ret += TSK_UART_SceneCmd(pDev,recvBuf,cmdLen);
+        ret += TSK_UART_WagCheck(pDev, recvBuf, cmdLen);
+        ret += TSK_UART_WagCmd(pDev, recvBuf, cmdLen);
+		//ret += TSK_UART_SceneCtrlCheck(pDev, recvBuf, cmdLen);
+		ret += TSK_UART_SceneStrlCmd(pDev, recvBuf, cmdLen);
 		pDev ->runNum ++;  
 		if(ret != WV_SOK)
 		{ 
@@ -1181,6 +1299,90 @@ WV_S32 TSK_UART_AnalyzeWagCmd(WV_S8 *buf)
 
 /********************************************************
 
+WV_S32 TSK_UART_AnalyzeSceneCtrl(WV_S8 *buf)
+
+*********************************************************/
+WV_S32 TSK_UART_AnalyzeSceneCtrl(WV_S8 *buf)
+{
+    //char buf[128]="0f | F1 02 03 04 05 | 06 07 08 9f";
+    int a, id, i, k = 0, j = 0;
+    char temp[3];
+
+    memset(temp, 0, sizeof(temp));
+    //************get wag id****************
+    for (i = 0; i < strlen(buf); i++)
+    {
+        if (buf[i] != ' ')
+        {
+            if (buf[i] == '|')
+            {
+                break;
+            }
+            temp[j] = buf[i];
+            j++;
+            if (j >= 3)
+            {
+                return -1;
+            }
+        }
+    }
+    sscanf(temp, "%x", &a);
+    id = a;
+    if (id >TSK_UART_SCENE_CTRLCMD_NUM)
+    {
+        return -1;
+    }
+    //*****************get wag cmd ********************
+    memset(temp, 0, sizeof(temp));
+    j = 0;
+    for (i = i + 1; i < strlen(buf); i++)
+    {
+        if (buf[i] == '|')
+        {
+            gUartDev.sceneCtrl[id].CmdLen = k;
+            gUartDev.sceneCtrl[id].AckEna = 1;
+            break;
+        }
+        if (buf[i] != ' ' && buf[i] != 0x0a)
+        {
+            temp[j] = buf[i];
+            j++;
+            if (j == 2)
+            {
+                j = 0;
+                sscanf(temp, "%x", &a);
+                gUartDev.sceneCtrl[id].ScenceCmd[k] = (WV_U8)a;//get sceneCmd
+                k++;
+                memset(temp, 0, sizeof(temp));
+            }
+        }
+        if (i == strlen(buf) - 1)
+        {
+            gUartDev.sceneCtrl[id].CmdLen = k;
+            gUartDev.sceneCtrl[id].AckEna = 0;
+        }
+    }
+
+#if 1
+	for(i=0;i<TSK_UART_SCENE_CTRLCMD_NUM;i++)
+	{
+		if(gUartDev.sceneCtrl[i].CmdLen >0){
+			WV_printf("[%d]=",i);
+			for(j=0;j<gUartDev.sceneCtrl[i].CmdLen;j++){
+				WV_printf("%02x ",gUartDev.sceneCtrl[i].ScenceCmd[j]);
+			}
+			WV_printf("\n");
+		}
+	}
+
+#endif
+
+
+    return 0;
+}
+
+/********************************************************
+
 WV_S32 TSK_UART_SetSerialConf(WV_S8 * buf);
 
 *********************************************************/ 
@@ -1228,6 +1430,10 @@ WV_S32 TSK_UART_SetSerialConf(WV_S8 * buf)
 	{
 		//printf("********SetSerialConf [%s]=%d *************\n ",name,data);
 		gUartDev.windowMode = data;
+	}	else if(strcmp(name,"OpenDev") == 0)
+	{
+		//printf("********SetSerialConf [%s]=%d *************\n ",name,data);
+		gUartDev.openDev = data;
 	}
 
 	printf("********SetSerialConf [%s]=%d *************\n ",name,data);
@@ -1311,7 +1517,8 @@ WV_S32 TSK_UART_GetSceneCmd(TSK_UART_DEV_E  * pDev)
         TSK_UART_AnalyzeSceneCmd(buf);
     }
     fclose(fp);
-    fp = NULL;
+    ////////////////////////////////////////
+	fp = NULL;
     fp = fopen(TSK_SCENE_CMDFILE, "rb+");
     if (fp == NULL)
     {
@@ -1346,6 +1553,48 @@ WV_S32 TSK_UART_GetSceneCmd(TSK_UART_DEV_E  * pDev)
                         }
                     }
                     TSK_UART_AnalyzeWagCmd(buf);
+                }
+                break;
+            }
+        }
+    }
+    fclose(fp);
+	//获取场景控制命令/播放/暂停/上个场景/下个场景/音量+/音量-/停止/开机/待机/
+    fp = NULL;
+    fp = fopen(TSK_SCENE_CMDFILE, "rb+");
+    if (fp == NULL)
+    {
+        WV_printf("fopen file [%s] error\n", TSK_SCENE_CMDFILE);
+        return -1;
+    }
+    while (fgets(buf, sizeof(buf), fp))
+    {
+        if (buf[0] == '#')
+        {
+            continue;
+        }
+        if (buf[0] == '<')
+        {
+            if (strncmp(buf, "<sceneCtrl>", 11) == 0)
+            {
+                while (fgets(buf, sizeof(buf), fp))
+                {
+                    if (buf[0] == '#')
+                    {
+                        continue;
+                    }
+                    if (buf[0] == '<')
+                    {
+                        break;
+                    }
+                    for (i = 0; i < 1024; i++)
+                    {
+                        if (buf[i] == 0x0d)
+                        {
+                            buf[i] = 0x0a;
+                        }
+                    }
+                    TSK_UART_AnalyzeSceneCtrl(buf);
                 }
                 break;
             }
@@ -1564,7 +1813,7 @@ WV_S32 TSK_UART_Open()
 
 	WV_RET_ADD( WV_THR_Create(&gUartDev.thrHndl, TSK_UART_Proc , WV_THR_PRI_DEFAULT, WV_THR_STACK_SIZE_DEFAULT, &gUartDev),ret);
 	 
-return ret;  
+	return ret;  
 }
  
 /****************************************************************************************
@@ -1572,7 +1821,6 @@ return ret;
 WV_S32  TSK_UART_Close();
 
 ****************************************************************************************/
-
 WV_S32  TSK_UART_Close()
 { 
 

@@ -266,8 +266,6 @@ WV_S32  TSK_PLAYER_SetHiPlayNext(WV_U32 ena,HI_HANDLE playerHandl);
 ***********************************************************************/
 WV_S32  TSK_PLAYER_SetHiPlayNext(WV_U32 ena,HI_HANDLE playerHandl)
 {
-
-
     if(gTskPlayer[2].playerHandl == playerHandl)
     {
         //printf("set hiplaye next ret=0\n");
@@ -307,7 +305,7 @@ WV_S32  TSK_PLAYER_SetVolume(WV_S32 volume,WV_U32 playerID);
 ***********************************************************************/
 WV_S32  TSK_PLAYER_SetVolume(WV_S32 volume,WV_U32 playerID)
 {
-
+    WV_printf("set player[%d] vol = %d\n",playerID,volume);
     HIS_AVP_SetVolume(playerID,volume);
     gPlayerVolume[playerID]=volume;
     TSK_PLAYER_SaveVolume();

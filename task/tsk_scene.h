@@ -135,8 +135,16 @@ WV_S32 TSK_SCENE_GetAngle(WV_U32 *pDataLen,WV_U8 *pData);
 WV_S32 TSK_SCENE_GetLightEna();
 WV_S32 TSK_SCENE_SetLightEna(WV_U32 ena);
 
-WV_S32 TSK_SCENE_Standby() ;
-WV_S32 TSK_SCENE_StartingUP();
+void TSK_SCENE_PlayerPlay();
+void TSK_SCENE_PlayerPause();
+void TSK_SCENE_PreScene();
+void TSK_SCENE_NextScene();
+void TSK_SCENE_PlayerVolUp();
+void TSK_SCENE_PlayerVolDown();
+void TSK_SCENE_PlayerStop();
+
+WV_S32 TSK_SCENE_Standby(WV_S32 mode);
+ WV_S32 TSK_SCENE_StartingUP(WV_S32 mode);
 
 WV_S32 TSK_SCENE_AddLastWin();
 WV_S32 TSK_SCENE_DeletLastWin();

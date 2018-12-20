@@ -4,6 +4,7 @@
 #include "svr_control_cmd.h"
 #include "sys_ip.h"
    #include <sys/socket.h>
+#define KTV_SHIYI_LOCALPORT 7320
 #define KTV_SHIYI_LOADBUF_MAX_LEN 1024*4
 #define KTV_SHIYI_LOCAL_PORT   3790
 #define KTV_SHIYI_RE_REGIST_TIME  10
@@ -31,7 +32,7 @@
 
 #define TIMEOUT 1
 
-//#define KTV_SHIYI_DEBUG_MODE 
+#define KTV_SHIYI_DEBUG_MODE 
 #ifdef  KTV_SHIYI_DEBUG_MODE 
 #define KTV_SHIYI_printf(...) \
   				 do {\
@@ -48,7 +49,7 @@
 
 
 
-#define TEST_DEBUG 0
+#define TEST_DEBUG 1
 typedef struct KTV_SHIYI_HEAD_E 
 {
 	WV_U8  identification[6];
@@ -66,6 +67,7 @@ typedef struct KTV_SHIYI_DEV_E
 	WV_U32      close; 
 	WV_S32      mSocket;
 	WV_U32      svrPort;
+	//WV_U32      localPort;
 	WV_S8       svrIp[24];
 	KTV_SHIYI_HEAD_E  headBuf;
 	WV_U8      *pBuf;
@@ -306,6 +308,7 @@ WV_S32 KTV_SHIYI_Recv(WV_S32 mSockfd,WV_U8 *pData,WV_U32 *pLen)
 		return WV_SOK;
 	}	
 
+	KTV_SHIYI_printf("recv palode() start...\n");
 	dataLen=recv(pShiyiDev->mSocket,(WV_S8*)&pData[sizeof(KTV_SHIYI_HEAD_E)],KTV_SHIYI_LOADBUF_MAX_LEN,0);
 	//if(dataLen != ntohl(headBuf.msgLen))
 	if(dataLen != headBuf.msgLen)    
@@ -393,11 +396,11 @@ WV_S32 KTV_SHIYI_GetCmd(WV_U8 *pBuf)
 	
 	if(strstr(p,"opened") != NULL){
 		//opened dev
-		TSK_SCENE_StartingUP();
+		TSK_SCENE_StartingUP(TSK_SCENE_TYPE_NETDATA);
 		NET_UART_ProjectorCmd(1);
 		//
 	}else if(strstr(p,"closed") != NULL){
-		TSK_SCENE_Standby();
+		TSK_SCENE_Standby(TSK_SCENE_TYPE_NETDATA);
 		NET_UART_ProjectorCmd(0);	
 		//closed dev	
 	}else if((p=strstr(p,"start")) != NULL){
@@ -682,6 +685,16 @@ WV_S32 KTV_SHIYI_Init(KTV_SHIYI_DEV_E  * pDev)
 		return WV_EFAIL;   
 	}
 
+	//设置本地端口号
+	/*
+	struct sockaddr_in client;
+	client.sin_family = AF_INET;
+	client.sin_addr.s_addr = htonl(INADDR_ANY);
+	client.sin_port = htons(KTV_SHIYI_LOCALPORT);
+	if(bind(pDev->mSocket,(struct sockaddr *)&client,sizeof(client)) != 0 ){
+		KTV_SHIYI_printf("socket bind err\n");
+		return WV_EFAIL;
+	}*/
 
 	struct sockaddr_in server;
    
@@ -689,6 +702,7 @@ WV_S32 KTV_SHIYI_Init(KTV_SHIYI_DEV_E  * pDev)
 	server.sin_family= AF_INET;  
 	server.sin_port = htons(pDev->svrPort);  
 	server.sin_addr.s_addr =inet_addr(pDev->svrIp);  
+
 
 	if(connect(pDev->mSocket,(struct sockaddr *)&server,sizeof(server))==-1){  
 	   KTV_SHIYI_printf("connect()error,errno=%d\n",errno);
@@ -698,9 +712,38 @@ WV_S32 KTV_SHIYI_Init(KTV_SHIYI_DEV_E  * pDev)
 	struct timeval timeout={10,0};//5s
 	setsockopt(pDev->mSocket,SOL_SOCKET,SO_RCVTIMEO,(const char*)&timeout,sizeof(timeout));	
 	setsockopt(pDev->mSocket,SOL_SOCKET,SO_SNDTIMEO,(const char*)&timeout,sizeof(timeout));	
-
+	//KTV_SHIYI_printf("KTV_SHIYI_Connect ok\n");
 	KTV_SHIYI_printf("KTV_SHIYI_Init ok\n");
+
 	return WV_SOK;
+}
+/********************************************************
+
+WV_S32 KTV_SHIYI_Connect(KTV_SHIYI_DEV_E  * pDev);
+
+*********************************************************/ 
+WV_S32 KTV_SHIYI_Connect(KTV_SHIYI_DEV_E  * pDev)
+{
+
+	struct sockaddr_in server;
+   
+	bzero(&server,sizeof(server));  
+	server.sin_family= AF_INET;  
+	server.sin_port = htons(pDev->svrPort);  
+	server.sin_addr.s_addr =inet_addr(pDev->svrIp);  
+
+
+	if(connect(pDev->mSocket,(struct sockaddr *)&server,sizeof(server))==-1){  
+	   KTV_SHIYI_printf("connect()error,errno=%d\n",errno);
+	   return WV_EFAIL;
+	}
+	//set time out
+	struct timeval timeout={10,0};//5s
+	setsockopt(pDev->mSocket,SOL_SOCKET,SO_RCVTIMEO,(const char*)&timeout,sizeof(timeout));	
+	setsockopt(pDev->mSocket,SOL_SOCKET,SO_SNDTIMEO,(const char*)&timeout,sizeof(timeout));	
+	KTV_SHIYI_printf("KTV_SHIYI_Connect ok\n");
+	return WV_SOK;
+
 }
 /********************************************************
 
@@ -731,8 +774,10 @@ void * KTV_SHIYI_Proc(void * prm)
 	WV_S32 ret;
 	while(pDev -> open  == 1)
 	{
+		
 		if(KTV_SHIYI_Init(pDev) != 0 ){
 			sleep(KTV_SHIYI_RE_REGIST_TIME); //延时10秒重新注册
+			KTV_SHIYI_DeInit();
 			continue;
 		}
 		

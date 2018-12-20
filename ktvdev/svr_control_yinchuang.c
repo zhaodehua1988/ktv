@@ -249,12 +249,12 @@ WV_S32 SVR_CONTROL_YinChuang_controlDev(WV_S8 *pData,WV_S32 len)
 				{
 					case SVR_CONTROL_YINCHUANG_STARTING_CMD: 
 						SVR_CONTROL_printf("**********get cmd: starting up dev ***************\n");
-						TSK_SCENE_StartingUP();
+						TSK_SCENE_StartingUP(TSK_SCENE_TYPE_NETDATA);
 						ret = 0;
 						break;
 					case SVR_CONTROL_YINCHUANG_STANDBY_CMD:
 						SVR_CONTROL_printf("**********get cmd: standby dev***************\n");
-						TSK_SCENE_Standby();
+						TSK_SCENE_Standby(TSK_SCENE_TYPE_NETDATA);
 						ret = 0;
 						break;
 					case SVR_CONTROL_YINCHUANG_OPEN_PROJECTOR_CMD:

@@ -13,6 +13,7 @@ WV_S32 TSK_UART_AnalyzeCmd(WV_S8 *buf);
 WV_S32 TSK_UART_SceneLoopOpen();
 WV_S32 TSK_UART_SceneLoopClose();
 WV_S32 TSK_UART_GetWindowMode();
+WV_S32 TSK_UART_GetOpenDevMode();
 WV_S32 TSK_UART_Send(WV_U8  *pBuf ,WV_U32  len);
 
 #endif

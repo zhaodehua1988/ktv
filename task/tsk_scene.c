@@ -5,6 +5,7 @@
 #include "tsk_conf.h"
 #include "tsk_fpga.h"
 #include "sys_info.h"
+#include "svr_udp.h"
 #include "svr_control_cmd.h"
 #define TSK_SCENE_OUTPUT_ANGLE_FILE "./env/angle.txt"
 #define TSK_SCENE_SETALPHA_SLEEP 35000
@@ -28,6 +29,15 @@ TSK_SCENE_DEV_E   gCurScene;
 
 struct timeval SceneChangeTimeStart;
 WV_U32 SceneChangeDataType;
+typedef enum CURRENT_SCENE_MODE{
+    SCENE_STOP,
+    SCENE_PAUSE,
+    SCENE_PLAYING,
+    SCENE_STANDAY,
+    SCENE_STARTUP
+}CURRENT_SCENE_MODE;
+
+static CURRENT_SCENE_MODE CurrentSceneMode;//0 stop/1 pause 2/playing
 //视频和场景锁
 typedef struct TSK_SCENE_MOV_MUTEX
 {
@@ -37,6 +47,7 @@ typedef struct TSK_SCENE_MOV_MUTEX
 
 static TSK_SCENE_MOV_MUTEX gScene_mov_mutex;
 
+pthread_mutex_t mutex_sceneContral; //场景播放/暂停/上个/下个/音量+/音量-/停止/开机/待机/
 
 /*******************************************************************
 WV_S32 TSK_SCENE_GetLightEna();
@@ -160,15 +171,15 @@ WV_S32 TSK_SCENE_GetCascading(WV_U8 cascadeInfo,WV_U16 cascadeNum,WV_U8 *pSlaveI
 WV_S32 TSK_SCENE_GetCascading(WV_U8 *pCascadeInfo,WV_U16 *pCascadeNum,WV_U8 *pSlaveIp)
 {	
     WV_S32 i;
-    WV_U32 data,num;
-    WV_S8  name[WV_CONF_NAME_MAX_LEN],value[WV_CONF_VALUE_MAX_LEN];
+    WV_U32 data;
+    WV_S8  name[WV_CONF_NAME_MAX_LEN];//
 
     i = 0;
-    sprintf(name, "DevCascading",i);
+    sprintf(name, "DevCascading");
     SYS_ENV_GetU32(name,&data);
     *pCascadeInfo = data;
 
-    sprintf(name, "cascadeNum",i);
+    sprintf(name, "cascadeNum");
     SYS_ENV_GetU32(name,&data);
     *pCascadeNum = data;
 
@@ -330,7 +341,7 @@ WV_S32 TSK_SCENE_RegisterConf()
     sprintf(value, "%d",0);
     SYS_ENV_Register(1 ,name,value,"scene sync cmd");
 
-    sprintf(name, "cascadeNum",i);
+    sprintf(name, "cascadeNum");
     sprintf(value, "%d",0);
     SYS_ENV_Register(1 ,name,value,"sync client num");//0:unEna ip;1:Ena
 
@@ -591,16 +602,6 @@ WV_S32 TSK_SCENE_Save(WV_U32  id)
 }
 
 /*******************************************************************
- WV_S32 TSK_SCENE_SaveCustom(WV_U32  id );
-*******************************************************************/
-
-WV_S32 TSK_SCENE_SaveCustom(WV_U32  id,TSK_CONF_SCENE_CONF *pScene)
-{
-    WV_ASSERT_RET ( TSK_SCENE_SaveSceneCustom(id ,&gCurScene.scene,pScene));
-    return WV_SOK;
-}
-
-/*******************************************************************
  WV_S32 TSK_SCENE_SaveScene(WV_U32  id ,TSK_SCENE_INFO_S  * pDev);
 *******************************************************************/
 WV_S32 TSK_SCENE_SaveSceneCustom(WV_U32  id ,TSK_SCENE_INFO_S  * pDev,TSK_CONF_SCENE_CONF *pScene)
@@ -709,6 +710,16 @@ WV_S32 TSK_SCENE_SaveSceneCustom(WV_U32  id ,TSK_SCENE_INFO_S  * pDev,TSK_CONF_S
         SYS_ENV_SetU32(name, data);
     }
     SYS_ENV_Save();
+    return WV_SOK;
+}
+
+/*******************************************************************
+ WV_S32 TSK_SCENE_SaveCustom(WV_U32  id );
+*******************************************************************/
+
+WV_S32 TSK_SCENE_SaveCustom(WV_U32  id,TSK_CONF_SCENE_CONF *pScene)
+{
+    WV_ASSERT_RET ( TSK_SCENE_SaveSceneCustom(id ,&gCurScene.scene,pScene));
     return WV_SOK;
 }
 
@@ -872,6 +883,7 @@ WV_S32 TSK_SCENE_SceneInit()
     FPGA_CONF_ClrBuf();
     //open player volume
     TSK_PLAYER_ReadVolume();
+    CurrentSceneMode = SCENE_PLAYING;
     return WV_SOK;
 
 } 
@@ -898,7 +910,7 @@ WV_S32 TSK_SCENE_SceneOpen()
         return 0;
     }
     WV_printf("*********scene open *************** \n");
-    WV_S32 i,j;
+    WV_S32 i;
     WV_S8  name[WV_CONF_NAME_MAX_LEN];
     TSK_PLAYER_ChangeMode(TSK_PLAYER_MODE_1920_1080);//virture screen	size 1920*1080
 
@@ -986,76 +998,22 @@ WV_S32 TSK_SCENE_SceneClose()
     }
 
     WV_printf("\n****scene close ***********\n");
+    
     gCurScene.sceneOpen = 0;
     return ret;
 
 }
-/*******************************************************************
- WV_S32 TSK_SCENE_Standby();
-设备待机
-*******************************************************************/
-WV_S32 TSK_SCENE_Standby() 
-{
-    //开关机命令不生效，直接返回
-    if(SVR_CONTROL_GetOpenDev() != 1){
-        return WV_SOK;
-    }
 
-    if(gCurScene.standby  == 1 )
-    {
-        return WV_SOK;
-    }
-    gCurScene.standby = 1;
-
-    WV_S32 ret = 0,i;
-    // for animation
-    for(i = 0;i< HIS_HIGO_GODEC_NUM ; i++ )
-    {
-        TSK_GO_DecClose(i);
-    }
-    sleep(1);
-    //gCurScene.scene.winNum = 0;
-    FPGA_CONF_SetWin (0 ,gCurScene.scene.win);
-    // for movi
-    for(i=0;i<TSK_SCENE_MOV_USE_NUM-1;i++)
-    {
-
-        TSK_PLAYER_Destory(i);
-    }
-
-    TSK_PLAYER_FreezeWindowBlack();
-    gCurScene.standby = 1;
-    return WV_SOK;
-}
-/*******************************************************************
- WV_S32 TSK_SCENE_StartingUP();
-设备启动
-*******************************************************************/
-WV_S32 TSK_SCENE_StartingUP() 
-{
-        //开关机命令不生效，直接返回
-    if(SVR_CONTROL_GetOpenDev() != 1){
-        return WV_SOK;
-    }
-    if(gCurScene.standby  == 0 )
-    {
-        return WV_SOK;
-    }
-
-    SYS_INFO_DevReset();
-    gCurScene.standby = 0;
-    return WV_SOK;
-}
 
 /*******************************************************************
-WV_S32 TSK_SCENE_Sync();
+void* TSK_SCENE_Sync();
 *******************************************************************/
-WV_S32 TSK_SCENE_Sync()
+void * TSK_SCENE_Sync()
 {
-    WV_S32 ret=0;
+    //WV_S32 ret=0;
     pthread_detach(pthread_self());
-    ret = SVR_UDP_PlayerSync();
-    return ret;
+    SVR_UDP_PlayerSync();
+    return NULL;
 } 
 
 /*******************************************************************
@@ -1249,6 +1207,7 @@ WV_S32 TSK_SCENE_Change(WV_U32 DataType, WV_U32  id)
         }
         //printf("TSK_SCENE_Change--------------------------\n");
         TSK_SCENE_SetDefault(id);
+        CurrentSceneMode = SCENE_PLAYING;
     }
  
     //释放锁
@@ -1261,6 +1220,7 @@ WV_S32 TSK_SCENE_Change(WV_U32 DataType, WV_U32  id)
     {
         return WV_EFAIL;
     }
+
    
     return WV_SOK;
 } 
@@ -1284,9 +1244,9 @@ WV_S32 TSK_SCENE_PlayMovUrl(WV_U8 cmd,WV_U8 *url,WV_S32 len)
 {
     WV_printf("url:%s\n",url);
 
-    WV_U8 name[64];
+    WV_S8 name[64];
     memset(name,0,sizeof(name));
-    sprintf(name,"%s",url);
+    sprintf(name,"%s",(WV_S8 *)url);
     TSK_GO_MOV_PIC_POS_S movPos,picPos;
     TSK_GO_GetUsb_PicAndMov_Pos(&movPos,&picPos);
 
@@ -1303,7 +1263,7 @@ WV_S32 TSK_SCENE_PlayMovUrl(WV_U8 cmd,WV_U8 *url,WV_S32 len)
     }
 
     TSK_PLAYER_Destory(2);
-    TSK_PLAYER_SetFile(2,url);
+    TSK_PLAYER_SetFile(2,(WV_S8 *)url);
     TSK_PLAYER_setWin(2,movPos.startX,movPos.startY,movPos.endX-movPos.startX,movPos.endY-movPos.startY);
     TSK_PLAYER_Creat(2);
     TSK_PLAYER_ReadVolume();
@@ -1387,7 +1347,6 @@ WV_S32 TSK_SCENE_ConfMov(WV_U32 num)
         }
         WV_printf("get mov mutex[%d] .ok \n",num);
     }
-    WV_S32 i;
     WV_S8  name[WV_CONF_NAME_MAX_LEN];
     //for movi
     sprintf(name, "./mov/mov%d.mp4",gCurScene.scene.mov[num].id);
@@ -1594,7 +1553,7 @@ WV_S32 TSK_SCENE_AddLastWin()
     TSK_GO_MOV_PIC_POS_S pos;
     WV_U16 chn;
     WV_U16 id;
-    WV_U16 backAniEna;
+    
     if(gCurScene.scene.winNum >= TSK_SCENE_WIN_MAX_NUM )  return  WV_EFAIL;
 
 
@@ -1708,7 +1667,6 @@ WV_S32 TSK_SCENE_OpenWinAndAni();
 *******************************************************************/
 WV_S32 TSK_SCENE_OpenWinAndAni()
 {
-    WV_S32 i;
     WV_S8 name[20];
     WV_U32 data;
 
@@ -1783,6 +1741,332 @@ WV_S32 TSK_SCENE_GetAngle(WV_U32 *pDataLen,WV_U8 *pData)
 
     fclose(fp);
     //system("sync");
+    return WV_SOK;
+}
+/*******************************************************************
+
+void TSK_SCENE_PlayerPlay()
+//scene play
+*******************************************************************/
+void TSK_SCENE_PlayerPlay()
+{
+    if(gCurScene.sceneOpen != 1) return ;
+    WV_S32 mutex_ret;
+    mutex_ret = pthread_mutex_trylock(&mutex_sceneContral);/*lock the mutex*/
+    if(mutex_ret != 0 ){
+        WV_printf("get scene mutex[%d] err !\n",0);
+        return ;
+    }
+    if(CurrentSceneMode == SCENE_PAUSE || CurrentSceneMode == SCENE_STOP){
+        WV_S32 i;
+        for(i=0;i<2;i++){
+            if(gCurScene.scene.mov[i].ena == 1 ){
+                if(CurrentSceneMode == SCENE_PAUSE){
+                    TSK_PLAYER_Resume(i);
+                }else if(CurrentSceneMode == SCENE_STOP){
+                    TSK_PLAYER_Creat(i);
+
+                } 
+            }
+        }
+
+        CurrentSceneMode = SCENE_PLAYING;
+         WV_printf("TSK_SCENE_PlayerPlay()\n");
+    }
+
+    pthread_mutex_unlock(&mutex_sceneContral);
+}
+/*******************************************************************
+
+void TSK_SCENE_PlayerPause()
+//scene pause
+*******************************************************************/
+void TSK_SCENE_PlayerPause()
+{
+    if(gCurScene.sceneOpen != 1) return ;
+    WV_S32 mutex_ret;
+    mutex_ret = pthread_mutex_trylock(&mutex_sceneContral);/*lock the mutex*/
+    if(mutex_ret != 0 ){
+        WV_printf("get scene mutex[%d] err !\n",0);
+        return ;
+    }
+   if(CurrentSceneMode == SCENE_PLAYING || CurrentSceneMode == SCENE_STARTUP){
+        WV_S32 i;
+        for(i=0;i<2;i++){
+            if(gCurScene.scene.mov[i].ena == 1 ){
+                TSK_PLAYER_Pause(i);    
+            }
+        }
+        CurrentSceneMode = SCENE_PAUSE;
+        WV_printf("TSK_SCENE_PlayerPause()\n");
+    }
+    pthread_mutex_unlock(&mutex_sceneContral);
+
+}
+/*******************************************************************
+
+void TSK_SCENE_PreScene();
+//上一个场景
+*******************************************************************/
+void TSK_SCENE_PreScene()
+{
+    if(gCurScene.sceneOpen != 1) return ;
+    WV_S32 mutex_ret;
+    mutex_ret = pthread_mutex_trylock(&mutex_sceneContral);/*lock the mutex*/
+    if(mutex_ret != 0 ){
+        WV_printf("get scene mutex[%d] err !\n",0);
+        return ;
+    }
+    if(CurrentSceneMode != SCENE_STANDAY){
+        WV_S32 i,id;
+        WV_S8 name[20]={0};
+        WV_U32 data;
+        id = gCurScene.id;
+        for(i=0;i<64;i++){
+            if(id == 0){
+                id=64;
+            }
+            id--;
+            sprintf(name, "Scene%dEnable",id);
+            SYS_ENV_GetU32(name, & data);
+            if(data == 1){
+                if(id != gCurScene.id){
+                    TSK_SCENE_Change(TSK_SCENE_TYPE_UARTDATA,id);
+                    CurrentSceneMode = SCENE_PLAYING;
+                    WV_printf("TSK_SCENE_NextScene()\n");
+                    break;
+                }
+            }
+
+        }
+    }
+    //CurrentSceneMode = SCENE_PLAYING;
+    pthread_mutex_unlock(&mutex_sceneContral);
+
+}
+/*******************************************************************
+
+void TSK_SCENE_NextScene();
+//下一个场景
+*******************************************************************/
+void TSK_SCENE_NextScene()
+{
+    if(gCurScene.sceneOpen != 1) return ;
+    WV_S32 mutex_ret;
+    mutex_ret = pthread_mutex_trylock(&mutex_sceneContral);/*lock the mutex*/
+    if(mutex_ret != 0 ){
+        WV_printf("get scene mutex[%d] err !\n",0);
+        return ;
+    }
+  
+    if(CurrentSceneMode !=SCENE_STANDAY){
+        WV_S32 i,id;
+        WV_S8 name[20]={0};
+        WV_U32 data;
+        id = gCurScene.id;
+        for(i=0;i<64;i++){
+            if(id == 63){
+                id=-1;
+            }
+            id++;
+            sprintf(name, "Scene%dEnable",id);
+            SYS_ENV_GetU32(name, & data);
+            if(data == 1){
+                if(id != gCurScene.id){
+                    TSK_SCENE_Change(TSK_SCENE_TYPE_UARTDATA,id);
+                    CurrentSceneMode = SCENE_PLAYING;
+                    WV_printf("TSK_SCENE_NextScene()\n");
+                    break;
+                } 
+            }
+
+        }       
+    }
+    pthread_mutex_unlock(&mutex_sceneContral);
+
+}
+
+/*******************************************************************
+void TSK_SCENE_VolUp();
+//音量++
+*******************************************************************/
+void TSK_SCENE_PlayerVolUp(){
+    if(gCurScene.sceneOpen != 1) return ;
+    WV_S32 mutex_ret;
+    mutex_ret = pthread_mutex_trylock(&mutex_sceneContral);/*lock the mutex*/
+    if(mutex_ret != 0 ){
+        WV_printf("get scene mutex[%d] err !\n",0);
+        return ;
+    }
+
+    if(CurrentSceneMode !=SCENE_STANDAY && CurrentSceneMode != SCENE_STOP){
+        WV_S32 i,vol=0;
+        for(i=0;i<2;i++){
+            if(gCurScene.scene.mov[i].ena == 0) continue;
+            TSK_PLAYER_GetVolume(&vol,i);
+            if(vol>=95){
+                vol=100;
+            }else{
+                vol = vol+5 ;
+            }
+            TSK_PLAYER_SetVolume(vol,i);
+        }
+        WV_printf("TSK_SCENE_PlayerVolUp()\n");
+    }
+    pthread_mutex_unlock(&mutex_sceneContral);
+
+}
+/*******************************************************************
+void TSK_SCENE_PlayerVolDown();
+//音量--
+*******************************************************************/
+void TSK_SCENE_PlayerVolDown(){
+
+    if(gCurScene.sceneOpen != 1) return ;
+    WV_S32 mutex_ret;
+    mutex_ret = pthread_mutex_trylock(&mutex_sceneContral);/*lock the mutex*/
+    if(mutex_ret != 0 ){
+        WV_printf("get scene mutex[%d] err !\n",0);
+        return ;
+    } 
+    if(CurrentSceneMode !=SCENE_STANDAY && CurrentSceneMode != SCENE_STOP){
+        WV_S32 i,vol=0;
+        for(i=0;i<2;i++){
+            if(gCurScene.scene.mov[i].ena == 0) continue;
+            TSK_PLAYER_GetVolume(&vol,i);
+            if(vol>=5){
+                vol=vol-5;
+            }else{
+                vol = 0 ;
+            }
+            //WV_printf("set vol ");
+            TSK_PLAYER_SetVolume(vol,i);
+        }
+        WV_printf("TSK_SCENE_PlayerVolDown()\n");
+    }
+    pthread_mutex_unlock(&mutex_sceneContral);
+
+}
+/*******************************************************************
+void TSK_SCENE_PlayerStop();
+//mov 停止
+*******************************************************************/
+void TSK_SCENE_PlayerStop()
+{
+
+
+if(gCurScene.sceneOpen != 1) return ;
+
+    WV_S32 mutex_ret;
+    mutex_ret = pthread_mutex_trylock(&mutex_sceneContral);/*lock the mutex*/
+    if(mutex_ret != 0 ){
+        WV_printf("get scene mutex[%d] err !\n",0);
+        return ;
+    } 
+    if(CurrentSceneMode != SCENE_STANDAY && CurrentSceneMode != SCENE_STOP)
+    {
+        WV_S32 i;
+        for(i=0;i<2;i++){
+            if(gCurScene.scene.mov[i].ena == 0) continue;
+            if(CurrentSceneMode == SCENE_PLAYING || CurrentSceneMode == SCENE_PAUSE )
+                TSK_PLAYER_Destory(i);
+            //CurrentSceneMode = SCENE_STOP;
+        }
+        TSK_PLAYER_FreezeWindowBlack();
+        CurrentSceneMode = SCENE_STOP;
+        WV_printf("TSK_SCENE_PlayerStop()\n");
+    }
+    
+    pthread_mutex_unlock(&mutex_sceneContral);    
+}
+/*******************************************************************
+WV_S32 TSK_SCENE_Standby(WV_S32 mode) ;
+设备待机
+*******************************************************************/
+WV_S32 TSK_SCENE_Standby(WV_S32 mode) 
+{
+
+    if(mode == TSK_SCENE_TYPE_UARTDATA){
+        //串口开关机命令不生效，直接返回
+        if(TSK_UART_GetOpenDevMode() != 1){ 
+        }
+    }else if(mode == TSK_SCENE_TYPE_NETDATA){
+          //网络开关机命令不生效，直接返回
+        if(SVR_CONTROL_GetOpenDev() != 1){ 
+        }      
+    }
+
+
+    if(gCurScene.standby  == 1 || CurrentSceneMode == SCENE_STANDAY)
+    {
+        return WV_SOK;
+    }
+
+    WV_S32 mutex_ret;
+    mutex_ret = pthread_mutex_trylock(&mutex_sceneContral);/*lock the mutex*/
+    if(mutex_ret != 0 ){
+        WV_printf("get scene mutex[%d] err !\n",0);
+        return WV_SOK;
+    } 
+
+    gCurScene.standby = 1;
+
+    WV_S32 i;
+    // for animation
+    for(i = 0;i< HIS_HIGO_GODEC_NUM ; i++ )
+    {
+        TSK_GO_DecClose(i);
+    }
+    sleep(1);
+    //gCurScene.scene.winNum = 0;
+    FPGA_CONF_SetWin (0 ,gCurScene.scene.win);
+    // for movi
+    for(i=0;i<TSK_SCENE_MOV_USE_NUM-1;i++)
+    {
+
+        TSK_PLAYER_Destory(i);
+    }
+
+    TSK_PLAYER_FreezeWindowBlack();
+    gCurScene.standby = 1;
+    CurrentSceneMode = SCENE_STANDAY;
+    WV_printf("TSK_SCENE_Standby()\n");
+    pthread_mutex_unlock(&mutex_sceneContral);  
+    return WV_SOK;
+}
+/*******************************************************************
+ WV_S32 TSK_SCENE_StartingUP(WV_S32 mode);
+设备启动
+*******************************************************************/
+WV_S32 TSK_SCENE_StartingUP(WV_S32 mode) 
+{
+
+    if(mode == TSK_SCENE_TYPE_UARTDATA){
+        //串口开关机命令不生效，直接返回
+        if(TSK_UART_GetOpenDevMode() != 1){ 
+        }
+    }else if(mode == TSK_SCENE_TYPE_NETDATA){
+          //网络开关机命令不生效，直接返回
+        if(SVR_CONTROL_GetOpenDev() != 1){ 
+        }      
+    }
+    if(gCurScene.standby  == 0 || CurrentSceneMode != SCENE_STANDAY )
+    {
+        return WV_SOK;
+    }
+
+    WV_S32 mutex_ret;
+    mutex_ret = pthread_mutex_trylock(&mutex_sceneContral);/*lock the mutex*/
+    if(mutex_ret != 0 ){
+        WV_printf("get scene mutex[%d] err !\n",0);
+        return WV_SOK;
+    }
+
+    SYS_INFO_DevReset();
+    gCurScene.standby = 0;
+    CurrentSceneMode = SCENE_STARTUP;
+    WV_printf("TSK_SCENE_StartingUP()\n");
+    pthread_mutex_unlock(&mutex_sceneContral);      
     return WV_SOK;
 }
 /****************************************************************************
@@ -1986,15 +2270,12 @@ WV_S32 TSK_SCENE_CMDSet(WV_S32 argc, WV_S8 **argv, WV_S8 * prfBuff)
     {
         if(strcmp(argv[1],"0") == 0)
         {
-            WV_S8 url[64];
-            //sprintf(url,"http://192.168.1.20/mov1.mp4");
-            //TSK_SCENE_PlayMovUrl(2,url,28);
         }
         else if(strcmp(argv[1],"1") == 0)
         {
             WV_S8 url[64];
             sprintf(url,"./mov/mov0.mp4");
-            TSK_SCENE_PlayMovUrl(2,url,14);
+            TSK_SCENE_PlayMovUrl(2,(WV_U8 *)url,14);
         }
 
         return WV_SOK;
@@ -2056,6 +2337,7 @@ WV_S32  TSK_SCENE_Init()
          WV_printf("Init scene_mov_metux ok.\n");
         gScene_mov_mutex.mutex_ena = 1;
     }
+    pthread_mutex_init(&mutex_sceneContral,NULL);
 
     return ret;
 }

@@ -52,4 +52,5 @@ WV_S32 TSK_GO_GetOutline_Pos(TSK_GO_MOV_PIC_POS_S * pOutlinePos,WV_U16 *pChn,WV_
 WV_S32 TSK_GO_ShowText( WV_U32 x,WV_U32 y,WV_U32 w,WV_U32 h,WV_U32 color,WV_U32 size,WV_S8 *pText,WV_U32 codeType,WV_U32 border);
 WV_S32 TSK_GO_CleanRect( WV_U32 x,WV_U32 y,WV_U32 w,WV_U32 h);
 WV_S32 TSK_GO_RefreshLayerForPic();
+WV_S32 TSK_GO_GetBackAni_Pos(TSK_GO_MOV_PIC_POS_S * pBackAniPos,WV_U16 *pChn,WV_U16 *pID);
 #endif

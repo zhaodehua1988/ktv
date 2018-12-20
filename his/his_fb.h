@@ -13,4 +13,5 @@ WV_S32  HIS_FB_clrFillRect();
 WV_S32  HIS_FB_SetColorKey(WV_U32 ena,WV_U32 colorKey);
 WV_S32  HIS_FB_SurfGetForPic( HI_HANDLE * pScreenSurf);
 WV_S32 HIS_FB_SetAlpha(WV_U8 alpha);
+WV_S32 HIS_FB_clrDisPlayBmp();
 #endif

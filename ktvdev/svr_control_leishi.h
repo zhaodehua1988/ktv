@@ -41,7 +41,7 @@ SVR_CONTROL_LEISHI_DEV gSvrLeishiDev;
 
 WV_S32 SVR_CONTROL_Leishi_ControlCmd(WV_S8 *buf);
 WV_S32 SVR_CONTROL_LeiShi_controlDev(WV_S8 *pData,WV_S32 len);
-WV_S32 SVR_CONTROL_Leishi_MapSongType(WV_U8 *pName,WV_U8 *pOut);
+WV_S32 SVR_CONTROL_Leishi_MapSongType(WV_S8 *pName,WV_S8 *pOut);
 WV_S32 SVR_CONTROL_Leishi_callback_DB(void* data, int ncols, char** values, char** headers);
 WV_S32 SVR_CONTROL_LeiShi_ChangeMovByCmd(WV_S8 *pID,WV_S8 *pName);
 WV_S32 SVR_CONTROL_LeiShi(WV_S8 *pData,WV_S32 len);

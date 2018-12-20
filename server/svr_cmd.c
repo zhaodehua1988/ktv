@@ -1595,11 +1595,11 @@ WV_S32  SVR_CMD_DEV_On_Off(SVR_FRAME_HEAD_E * pHead ,WV_U8 *pData)
 	WV_S32 ret = 0;
 	//arg1 == 0 dev standby 待机 ,关投影
 	if(pHead->arg1 == 0){
-		TSK_SCENE_Standby(); 
+		TSK_SCENE_Standby(TSK_SCENE_TYPE_NETDATA); 
 		NET_UART_ProjectorCmd(0);
 	}else if(pHead->arg1 == 1){  //开机 ,开投影
 		
-		TSK_SCENE_StartingUP();
+		TSK_SCENE_StartingUP(TSK_SCENE_TYPE_NETDATA);
 		NET_UART_ProjectorCmd(1);
 	}
 	SVR_CMD_Ack(pHead,ret);

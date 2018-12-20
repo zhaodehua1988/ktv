@@ -18,5 +18,5 @@ WV_S32 SVR_UDP_Open();
 WV_S32 SVR_UDP_Close();
 WV_S32 SVR_UDP_SyncScene(WV_U32 id);
 WV_S32 SVR_UDP_SearchDev();
-WV_S32 SVR_UDP_PlaySync();
+WV_S32 SVR_UDP_PlayerSync();
 #endif

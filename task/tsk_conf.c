@@ -1287,14 +1287,17 @@ WV_S32 TSK_CONF_ChangeScene(WV_U8 *pData ,WV_U32 dataLen)
 
     for(i=0;i<TSK_CONF_SCENE_COUNT;i++)
     {
-
-        ret = strncmp(pData,pSceneNameDev->sceneNameId[i].name,dataLen);
-        if(ret == 0)
+        
+        if(strlen(pSceneNameDev->sceneNameId[i].name) == dataLen)
         {
+            ret = strncmp(pData,pSceneNameDev->sceneNameId[i].name,dataLen);
+            if(ret == 0)
+            {
 
-            TSK_CONF_GetSceneConfByID(pSceneInfoDev->currentID,&pSceneInfoDev->Scene[pSceneInfoDev->currentID]);
-            TSK_SCENE_Change(TSK_SCENE_TYPE_NETDATA, i);
-            break;
+                TSK_CONF_GetSceneConfByID(pSceneInfoDev->currentID,&pSceneInfoDev->Scene[pSceneInfoDev->currentID]);
+                TSK_SCENE_Change(TSK_SCENE_TYPE_NETDATA, i);
+                break;
+            }
         }
     }
 
@@ -1573,6 +1576,12 @@ WV_S32 TSK_CONF_GetSceneConfByID(WV_U32 sceneID ,TSK_CONF_SCENE_CONF *pScene)
     SYS_ENV_GetU32(name,&data);
     if(data == 0)return WV_SOK;// get scene enable status ,if sceneEnable ==0,continue;
     //get scene name
+    if(strlen(pSceneNameDev->sceneNameId[sceneID].name) == 0)
+    {
+        sprintf(name,"Scene%dEnable",sceneID);
+        SYS_ENV_SetU32(name,0);
+        return WV_SOK;
+    }
     pScene->ucSceneId = sceneID;
 
     sprintf(name,"Scene%dType",sceneID);
@@ -2149,7 +2158,7 @@ WV_S32 TSK_CONF_cpVideoToLocal(WV_S8 *srcFilePath,WV_S8 *desFilePath)
 
 /********************************************************************
 
-WV_S32 TSK_CONF_Mov_GetIDByName(WV_U32 id,WV_S8 *pFileName); 
+WV_S32 TSK_CONF_Mov_GetIDByName(WV_U32 *pid,WV_S8 *pFileName); 
 
 ********************************************************************/
 WV_S32 TSK_CONF_Mov_GetIDByName(WV_U32 *pid,WV_S8 *pFileName)

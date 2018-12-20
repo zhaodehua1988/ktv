@@ -176,12 +176,12 @@ WV_S32 SVR_CONTROL_LeiShi_controlDev(WV_S8 *pData,WV_S32 len)
                 {
                 case SVR_CONTROL_LEISHI_STARTING_CMD:
                     SVR_CONTROL_printf("**********get cmd: starting up dev ***************\n");
-                    TSK_SCENE_StartingUP();
+                    TSK_SCENE_StartingUP(TSK_SCENE_TYPE_NETDATA);
                     ret = 0;
                     break;
                 case SVR_CONTROL_LEISHI_STANDBY_CMD:
                     SVR_CONTROL_printf("**********get cmd: standby dev***************\n");
-                    TSK_SCENE_Standby();
+                    TSK_SCENE_Standby(TSK_SCENE_TYPE_NETDATA);
                     ret = 0;
                     break;
                 case SVR_CONTROL_LEISHI_OPEN_PROJECTOR_CMD:
@@ -246,14 +246,14 @@ WV_S32 SVR_CONTROL_Leishi_MapSongType_DB() ;
 歌颂祖国              歌颂祖国
 disco                 disco   
 ******************************************************************************/  
-WV_S32 SVR_CONTROL_Leishi_MapSongType(WV_U8 *pName,WV_U8 *pOut)  
+WV_S32 SVR_CONTROL_Leishi_MapSongType(WV_S8 *pName,WV_S8 *pOut)  
 {
     //printf("goto SVR_CONTROL_Leishi_MapSongType\n");
     WV_S32 ret;
 
-    WV_U8 nameToUtf8[16]={0};
-    WV_U8 nameMap[16]={0};
-    WV_U32 len=strlen(pName);
+    WV_S8 nameToUtf8[16]={0};
+    WV_S8 nameMap[16]={0};
+    WV_U32 len=strlen((WV_S8 *)pName);
     //if(len > 8) return WV_EFAIL;
     //printf("the len is %d\n",len);
     if(len > 12)
@@ -262,17 +262,17 @@ WV_S32 SVR_CONTROL_Leishi_MapSongType(WV_U8 *pName,WV_U8 *pOut)
     char watch[16];
     //char *watch;
     int watchNum;
-    strcpy(watch,pName);
+    strcpy(watch,(WV_S8 *)pName);
     watchNum = is_utf8_string(watch);
     if(watchNum)
     {
         //printf("the pName is utf8\n");
-        strcpy(nameToUtf8,pName);
+        strcpy(nameToUtf8,(WV_S8 *)pName);
     }
     else
     {
         //printf("the pName is not utf8\n");
-        ret = gb2312toutf8(pName,len,nameToUtf8,sizeof(nameToUtf8));
+        ret = gb2312toutf8((WV_S8 *)pName,len,nameToUtf8,sizeof(nameToUtf8));
         if(ret != 0 )
         {
             WV_ERROR(" Map song type is error \n");
@@ -334,7 +334,7 @@ WV_S32 SVR_CONTROL_Leishi_MapSongType(WV_U8 *pName,WV_U8 *pOut)
     }else{
         return WV_EFAIL;
     }
-    if(utf8togb2312(nameMap,strlen(nameMap),pOut,8) != 0)
+    if(utf8togb2312(nameMap,strlen(nameMap),(WV_S8 *)pOut,8) != 0)
     {
         WV_ERROR(" Map song type is error \n");
         return WV_EFAIL;
@@ -351,12 +351,12 @@ WV_S32 SVR_CONTROL_Leishi_callback_DB(void* data, int ncols, char** values, char
 WV_S32 SVR_CONTROL_Leishi_callback_DB(void* data, int ncols, char** values, char** headers)  
 {
     //printf("goto SVR_CONTROL_Leishi_callback_DB\n");
-    WV_S32 i,j;
+    WV_S32 i;
     WV_S32 len =0;
     WV_S32 ll=0;
     SVR_CONTROL_KTV_CHANGEMODE_E ChangeMode = SVR_CONTROL_CHANGE_NULL;
-    WV_U8 destbuf[16];
-    WV_U8 srcbuf[16];
+    WV_S8 destbuf[16];
+    WV_S8 srcbuf[16];
     memset(destbuf,0,sizeof(destbuf));
     memset(srcbuf,0,sizeof(srcbuf));
     for(i=0; i < ncols; i++)
@@ -384,10 +384,10 @@ WV_S32 SVR_CONTROL_Leishi_callback_DB(void* data, int ncols, char** values, char
         ChangeMode = SVR_CONTROL_GetKtvChangeMode();
         if(SVR_CONTROL_CHANGE_MOV == ChangeMode )     //1:背景视频随动
         {
-            TSK_CONF_changeMovByType(destbuf);
+            TSK_CONF_changeMovByType((WV_U8 *)destbuf);
         }else if(ChangeMode == SVR_CONTROL_CHANGE_SCENE )//2:场景随动
         {
-            TSK_CONF_changeSceneByType(destbuf);
+            TSK_CONF_changeSceneByType((WV_U8 *)destbuf);
         }
         gSvrLeishiDev.movChangeByID = 1;
         return WV_SOK;
@@ -428,8 +428,8 @@ WV_S32 SVR_CONTROL_LeiShi_ChangeMovByCmd(WV_S8 *pID,WV_S8 *pName)
 
     //map 雷石歌曲类别到背景视频类别
     //WV_U8 mapName[9]={0};
-    WV_U8 mapName[9]={0};
-    printf("no change move by id \n");
+    WV_S8 mapName[9]={0};
+    //printf("no change move by id \n");
     if(SVR_CONTROL_Leishi_MapSongType(pName,mapName) != 0 )
     {
         printf("MapSongType error!!!\n");
@@ -439,10 +439,10 @@ WV_S32 SVR_CONTROL_LeiShi_ChangeMovByCmd(WV_S8 *pID,WV_S8 *pName)
     //根据歌曲类别查找视频
     if(movChangeMode == SVR_CONTROL_CHANGE_MOV )     //1:背景视频随动 ;
     {
-        TSK_CONF_changeMovByType(mapName);
+        TSK_CONF_changeMovByType((WV_U8 *)mapName);
     }else if(movChangeMode == SVR_CONTROL_CHANGE_SCENE )//2:场景随动
     {
-        TSK_CONF_changeSceneByType(mapName);
+        TSK_CONF_changeSceneByType((WV_U8 *)mapName);
     }
 
     return WV_SOK;
@@ -468,8 +468,8 @@ WV_S32 SVR_CONTROL_LeiShi(WV_S8 *pData,WV_S32 len)
 
 
     WV_S32 ret;
-    WV_U8 id[16];
-    WV_U8 name[8+1];
+    WV_S8 id[16];
+    WV_S8 name[8+1];
     WV_U32 lightIndex;
     WV_S32 i=0,j=0;
     WV_S8 *p;
