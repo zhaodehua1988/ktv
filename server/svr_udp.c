@@ -32,9 +32,18 @@
 #define SVR_UDP_CMD_PLAY          0x03
 #define SVR_UDP_CMD_SCENE_CHANGE  0x04
 
+#define SVR_UDP_CMD_SCENE_PAUSE   0x05
+#define SVR_UDP_CMD_SCENE_PLAY    0x06
+#define SVR_UDP_CMD_SCENE_STOP    0x07
+
+
 #define SVR_UDP_CMD_ASK_SEARCH_SLAVE 0x82
 #define SVR_UDP_CMD_ASK_PLAY         0x83
 #define SVR_UDP_CMD_ASK_SCENE_CHANGE  0x84
+
+#define SVR_UDP_CMD_ASK_SCENE_PAUSE   0x85
+#define SVR_UDP_CMD_ASK_SCENE_PLAY    0x86
+#define SVR_UDP_CMD_ASK_SCENE_STOP    0x87
 
 static long long svr_udp_startTime[10];
 static long long svr_udp_endTime[10];
@@ -230,6 +239,115 @@ WV_S32 SVR_UDP_SyncScene(WV_U32 id)
 			pSvrUdp->headBuf.dataNum = 0;
 			pSvrUdp->headBuf.cmdL0 = SVR_UDP_CMD_SCENE_CHANGE;
 			pSvrUdp->headBuf.arg1 = id;
+			ret|=SVR_UDP_Send(pSvrUdp,SVR_UDP_RECV_PORT,ipString);
+			
+		}
+			
+	}
+
+	return ret;
+	
+}
+
+/****************************************************************************
+
+WV_S32 SVR_UDP_SyncScenePause();
+主机发送暂停命令
+****************************************************************************/
+WV_S32 SVR_UDP_SyncScenePause()
+{
+	
+	WV_S32 ret=0;
+
+	WV_S32 i;
+	WV_U8 cascadeInfo;
+	WV_U16 cascadeNum;
+	WV_U8 ipInt[30];
+	WV_S8 ipString[20];
+	TSK_SCENE_GetCascading(&cascadeInfo,&cascadeNum,ipInt);
+	for(i=0;i<cascadeNum;i++)
+	{
+
+		if(pSvrUdp->slaveDevEna[i] == 1)
+		{
+			sprintf(ipString,"%d.%d.%d.%d",ipInt[i*4],ipInt[i*4+1],ipInt[i*4+2],ipInt[i*4+3]);
+			memset(&pSvrUdp->headBuf,0,sizeof(pSvrUdp->headBuf));
+			pSvrUdp->headBuf.sync = UDP_CMD_SYNC_WORD;
+			pSvrUdp->headBuf.dataNum = 0;
+			pSvrUdp->headBuf.cmdL0 = SVR_UDP_CMD_SCENE_PAUSE;
+			pSvrUdp->headBuf.arg1 = 0;
+			ret|=SVR_UDP_Send(pSvrUdp,SVR_UDP_RECV_PORT,ipString);
+			
+		}
+			
+	}
+
+	return ret;
+	
+}
+/****************************************************************************
+
+WV_S32 SVR_UDP_SyncSceneStop();
+主机发送停止
+****************************************************************************/
+WV_S32 SVR_UDP_SyncSceneStop()
+{
+	
+	WV_S32 ret=0;
+
+	WV_S32 i;
+	WV_U8 cascadeInfo;
+	WV_U16 cascadeNum;
+	WV_U8 ipInt[30];
+	WV_S8 ipString[20];
+	TSK_SCENE_GetCascading(&cascadeInfo,&cascadeNum,ipInt);
+	for(i=0;i<cascadeNum;i++)
+	{
+
+		if(pSvrUdp->slaveDevEna[i] == 1)
+		{
+			sprintf(ipString,"%d.%d.%d.%d",ipInt[i*4],ipInt[i*4+1],ipInt[i*4+2],ipInt[i*4+3]);
+			memset(&pSvrUdp->headBuf,0,sizeof(pSvrUdp->headBuf));
+			pSvrUdp->headBuf.sync = UDP_CMD_SYNC_WORD;
+			pSvrUdp->headBuf.dataNum = 0;
+			pSvrUdp->headBuf.cmdL0 = SVR_UDP_CMD_SCENE_STOP;
+			pSvrUdp->headBuf.arg1 = 0;
+			ret|=SVR_UDP_Send(pSvrUdp,SVR_UDP_RECV_PORT,ipString);
+			
+		}
+			
+	}
+
+	return ret;
+	
+}
+/****************************************************************************
+
+WV_S32 SVR_UDP_SyncScenePlay();
+主机发送 场景开始命令
+****************************************************************************/
+WV_S32 SVR_UDP_SyncScenePlay()
+{
+	
+	WV_S32 ret=0;
+
+	WV_S32 i;
+	WV_U8 cascadeInfo;
+	WV_U16 cascadeNum;
+	WV_U8 ipInt[30];
+	WV_S8 ipString[20];
+	TSK_SCENE_GetCascading(&cascadeInfo,&cascadeNum,ipInt);
+	for(i=0;i<cascadeNum;i++)
+	{
+
+		if(pSvrUdp->slaveDevEna[i] == 1)
+		{
+			sprintf(ipString,"%d.%d.%d.%d",ipInt[i*4],ipInt[i*4+1],ipInt[i*4+2],ipInt[i*4+3]);
+			memset(&pSvrUdp->headBuf,0,sizeof(pSvrUdp->headBuf));
+			pSvrUdp->headBuf.sync = UDP_CMD_SYNC_WORD;
+			pSvrUdp->headBuf.dataNum = 0;
+			pSvrUdp->headBuf.cmdL0 = SVR_UDP_CMD_SCENE_PLAY;
+			pSvrUdp->headBuf.arg1 = 0;
 			ret|=SVR_UDP_Send(pSvrUdp,SVR_UDP_RECV_PORT,ipString);
 			
 		}
@@ -741,6 +859,37 @@ WV_S32 SVR_UDP_ChangeScene(SVR_UDP_HEAD_E *pHead,WV_U8 *pBuf)
 	id = pHead->arg1;
 	return TSK_SCENE_Change(TSK_SCENE_TYPE_NETDATA, id);
 }
+
+/****************************************************************************
+
+WV_S32 SVR_UDP_ChangeScenePause(SVR_UDP_HEAD_E *pHead,WV_U8 *pBuf)
+//切换场景暂停
+****************************************************************************/
+WV_S32 SVR_UDP_ChangeScenePause(SVR_UDP_HEAD_E *pHead,WV_U8 *pBuf)
+{	
+	TSK_SCENE_PlayerPause();
+	return WV_SOK;
+}
+/****************************************************************************
+
+WV_S32 SVR_UDP_ChangeSceneStop(SVR_UDP_HEAD_E *pHead,WV_U8 *pBuf)
+//切换场景暂停
+****************************************************************************/
+WV_S32 SVR_UDP_ChangeSceneStop(SVR_UDP_HEAD_E *pHead,WV_U8 *pBuf)
+{	
+	TSK_SCENE_PlayerStop();
+	return WV_SOK;
+}
+/****************************************************************************
+
+WV_S32 SVR_UDP_ChangeScenePlay(SVR_UDP_HEAD_E *pHead,WV_U8 *pBuf)
+//切换场景暂停
+****************************************************************************/
+WV_S32 SVR_UDP_ChangeScenePlay(SVR_UDP_HEAD_E *pHead,WV_U8 *pBuf)
+{	
+	TSK_SCENE_PlayerPlay();
+	return WV_SOK;
+}
 /****************************************************************************
 
 WV_S32 SVR_UDP_CMD_Porc(SVR_UDP_DEV_E *pDev)
@@ -787,11 +936,26 @@ WV_S32 SVR_UDP_CMD_Porc(SVR_UDP_DEV_E *pDev)
 			if(TSK_SCENE_GetSyncEna() == 2)
 			{
 				ret = SVR_UDP_ChangeScene(&pDev->headBuf,pDev->pBuf);
+			}		
+			break;
+		case SVR_UDP_CMD_SCENE_PAUSE:
+			if(TSK_SCENE_GetSyncEna() == 2)
+			{
+				ret = SVR_UDP_ChangeScenePause(&pDev->headBuf,pDev->pBuf);
+				//ret = SVR_UDP_ChangeScene(&pDev->headBuf,pDev->pBuf);
 			}
-			//port = SVR_UDP_RECV_PORT;
-			//pDev->headBuf.cmdL0 |= 0x80;
-			//sprintf(ip,"%s",inet_ntoa(pDev->recvAddr.sin_addr));
-			//ret = SVR_UDP_Send(pDev,port,ip);				
+			break;
+		case SVR_UDP_CMD_SCENE_STOP:
+			if(TSK_SCENE_GetSyncEna() == 2)
+			{
+				ret = SVR_UDP_ChangeSceneStop(&pDev->headBuf,pDev->pBuf);
+			}
+			break;
+		case SVR_UDP_CMD_SCENE_PLAY:
+			if(TSK_SCENE_GetSyncEna() == 2)
+			{
+				ret = SVR_UDP_ChangeScenePlay(&pDev->headBuf,pDev->pBuf);
+			}						
 			break;
 		case SVR_UDP_CMD_ASK_SEARCH_SLAVE:
 			ret = SVR_UDP_SlaveAskOK(pDev->headBuf.arg1);

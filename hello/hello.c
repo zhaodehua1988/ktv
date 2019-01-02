@@ -19,6 +19,10 @@
 #include "wv_file.h"
 #include "sys_env.h"
 #include "wv_file.h"
+#include "sys_date.h"
+#include "tsk_player.h"
+#include "tsk_checkOutLine.h"
+#include "tsk_usbShow.h"
 WV_S32  main()
 {
 	WV_S32 ret;

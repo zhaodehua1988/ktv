@@ -442,7 +442,7 @@ WV_S32  TSK_PLAYER_Creat(WV_S32 id)
         TSK_PLAYER_Start(id);
         HI_BOOL bEnable;
         HIS_DIS_GetWinFreezeStatus(&(gTskPlayer[id].winHandl),&bEnable);
-        printf("start..win freez is [%d]\n",bEnable);
+        //printf("start..win freez is [%d]\n",bEnable);
         if(	bEnable != HI_FALSE)
         {
             HIS_DIS_WinFreeze(&(gTskPlayer[id].winHandl),HI_FALSE,0);
@@ -482,7 +482,7 @@ WV_S32  TSK_PLAYER_Destory(WV_S32 id)
 #if 1
         HI_BOOL bEnable;
         HIS_DIS_GetWinFreezeStatus(&(gTskPlayer[id].winHandl),&bEnable);
-        printf("stop .win freez is [%d]\n",bEnable);
+        //printf("stop .win freez is [%d]\n",bEnable);
         if(	bEnable != HI_TRUE)
         {
             //设置输出定格在最后一帧画面，防止切换视频黑场

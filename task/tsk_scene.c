@@ -124,6 +124,7 @@ WV_S32 TSK_SCENE_GetSyncEna();
 *******************************************************************/
 WV_S32 TSK_SCENE_GetSyncEna()
 {
+    printf("11111111111111111--TSK_SCENE_GetSyncEna \n");
     return gCurScene.DevCascading;
 }
 /*******************************************************************
@@ -835,12 +836,6 @@ WV_S32 TSK_SCENE_SceneInit()
             }
         }
 
-        //	if(j>127)
-        //	{
-        //		break;
-        //	}
-
-
         if(gCurScene.scene.mov[i].ena == 1)
         {
 
@@ -1021,8 +1016,7 @@ void * TSK_SCENE_Sync()
 *******************************************************************/
 WV_S32 TSK_SCENE_SendSync()
 {
-
-
+    printf("scene send sync \n");
     if(gCurScene.DevCascading != 1)
     {
         return WV_SOK;
@@ -1130,6 +1124,9 @@ WV_S32 TSK_SCENE_GetWinChange()
 *******************************************************************/
 WV_S32 TSK_SCENE_Change(WV_U32 DataType, WV_U32  id)
 {
+
+
+
       //printf("change scene to [%d]\n",id);
     if ((DataType == TSK_SCENE_TYPE_UARTDATA) && (SceneChangeDataType == TSK_SCENE_TYPE_NETDATA))
     {
@@ -1138,6 +1135,13 @@ WV_S32 TSK_SCENE_Change(WV_U32 DataType, WV_U32  id)
             return WV_SOK;
         }
     }
+
+    if(gCurScene.DevCascading == 1 )
+    {
+        SVR_UDP_SyncScene(id);
+        usleep(500000);
+    }
+
     //防止场景和视频同时切换，这里加锁
     if(gScene_mov_mutex.mutex_ena == 1 ){
         WV_S32 mutex_ret;
@@ -1159,10 +1163,7 @@ WV_S32 TSK_SCENE_Change(WV_U32 DataType, WV_U32  id)
     SceneChangeDataType = DataType;
     gettimeofday(&SceneChangeTimeStart, NULL);
 
-    if(gCurScene.DevCascading == 1 )
-    {
-        SVR_UDP_SyncScene(id);
-    }
+
     gCurScene.id = id;
     WV_CHECK_RET(TSK_SCENE_GetScene(gCurScene.id,&gCurScene.scene));
     gCurScene.winChange = TSK_SCENE_GetWinChange();
@@ -1750,6 +1751,14 @@ void TSK_SCENE_PlayerPlay()
 *******************************************************************/
 void TSK_SCENE_PlayerPlay()
 {
+
+    printf("TSK_SCENE_PlayerPlay play");
+    if(gCurScene.DevCascading == 1 )
+    {
+        SVR_UDP_SyncScenePlay();
+    }
+
+
     if(gCurScene.sceneOpen != 1) return ;
     WV_S32 mutex_ret;
     mutex_ret = pthread_mutex_trylock(&mutex_sceneContral);/*lock the mutex*/
@@ -1764,12 +1773,18 @@ void TSK_SCENE_PlayerPlay()
                 if(CurrentSceneMode == SCENE_PAUSE){
                     TSK_PLAYER_Resume(i);
                 }else if(CurrentSceneMode == SCENE_STOP){
+                    if(gCurScene.scene.mov[i].y==0 && gCurScene.scene.mov[i].x==0 && gCurScene.scene.mov[i].w==0 && gCurScene.scene.mov[i].h == 0 )
+                    {
+                        //gCurScene.scene.mov[i].ena = 0;
+                        continue;
+                    }
+                    printf("tsk player create -----=(%d)\n",i);
                     TSK_PLAYER_Creat(i);
 
                 } 
             }
         }
-
+        SVR_UDP_PlayNotifySlave();
         CurrentSceneMode = SCENE_PLAYING;
          WV_printf("TSK_SCENE_PlayerPlay()\n");
     }
@@ -1783,7 +1798,14 @@ void TSK_SCENE_PlayerPause()
 *******************************************************************/
 void TSK_SCENE_PlayerPause()
 {
+    printf("TSK_SCENE_PlayerPause  pause\n");
+
+    if(gCurScene.DevCascading == 1 )
+    {
+        SVR_UDP_SyncScenePause();
+    }
     if(gCurScene.sceneOpen != 1) return ;
+
     WV_S32 mutex_ret;
     mutex_ret = pthread_mutex_trylock(&mutex_sceneContral);/*lock the mutex*/
     if(mutex_ret != 0 ){
@@ -1953,8 +1975,13 @@ void TSK_SCENE_PlayerStop();
 *******************************************************************/
 void TSK_SCENE_PlayerStop()
 {
+    printf("TSK_SCENE_PlayerStop stop\n");
 
+    if(gCurScene.DevCascading == 1 )
+    {
+        SVR_UDP_SyncSceneStop();
 
+    }
 if(gCurScene.sceneOpen != 1) return ;
 
     WV_S32 mutex_ret;
@@ -1967,6 +1994,7 @@ if(gCurScene.sceneOpen != 1) return ;
     {
         WV_S32 i;
         for(i=0;i<2;i++){
+
             if(gCurScene.scene.mov[i].ena == 0) continue;
             if(CurrentSceneMode == SCENE_PLAYING || CurrentSceneMode == SCENE_PAUSE )
                 TSK_PLAYER_Destory(i);
