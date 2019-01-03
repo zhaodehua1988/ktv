@@ -1,4 +1,6 @@
 #include"tsk_update.h"
+#include "sys_ip.h"
+#include "tsk_usb.h"
 #include<stdio.h>
 #define  TSK_UP_PATH_NAME	 "/usb/update/"
 #define  TSK_UP_AUDIOLIB_PATH    "/usb/Audiolib/"	
@@ -86,9 +88,6 @@ WV_S32  TSK_UP_ResgistConf32(WV_S8 *pName ,WV_U32 * pValue);
 ******************************************************************************/
 WV_S32  TSK_UP_ResgistConf()
 {
-	WV_S8 srcFile[20];
-	WV_S8 desFile[20];
-	WV_S32 i;
 
 	WV_CHECK_FAIL( WV_CONF_Register(pUpEnv,1,"UpdateFlag","0","UpdateFlag"));
 	WV_CHECK_FAIL( WV_CONF_Register(pUpEnv,1,"UpdateInfo","0","UpdateInfo"));
@@ -113,10 +112,6 @@ WV_S32  TSK_UP_GetConf();
 ******************************************************************************/
 WV_S32  TSK_UP_GetConf()
 {
-	WV_S32 i;
-	WV_S8 *pTemp;
-	WV_S8 srcFile[20];
-	WV_S8 desFile[20];
 
 	TSK_UP_GetU32("UpdateFlag",&upInfo.updateFlag);
 	TSK_UP_Get("UpdateInfo",upInfo.updateInfo);
@@ -334,6 +329,7 @@ WV_S32 TSK_UP_UpHello()
 	}else{
 		WV_printf("\r\n-------->don't updata hello \n");
 	}
+	return WV_SOK;
 		
 }
 
@@ -413,7 +409,6 @@ WV_S32 TSK_UP_UpPng()
 	WV_S8 scrFile[64];
 	WV_S8 desFile[64];
 	WV_S8 scrPath[64];
-	WV_S8 desPath[64];
 	WV_S32  i,j;
 
 	if(upInfo.upPngFlag == 1){
@@ -487,7 +482,7 @@ WV_S32 TSK_UP_UpPng()
 	}else{
 		WV_printf("\r\n-------->don't updata png \n");	
 	}
-	
+	return WV_SOK;
 }
 
 /******************************************************************************
@@ -592,7 +587,6 @@ WV_S32 TSK_UP_UpdateInit();
 ******************************************************************************/
 WV_S32 TSK_UP_UpdateInit()
 {
-	WV_S32 i;
 	
 	WV_S32 ret;
 
@@ -612,13 +606,13 @@ WV_S32 TSK_UP_UpdateDeInit();
 ******************************************************************************/
 WV_S32 TSK_UP_UpdateDeInit()
 {
-	WV_S32 i;
 	WV_CONF_Destry(pUpEnv);
 	free(pUpEnv);
 	pUpEnv = NULL; 
 	
 	//sys "reset"	
 	//WV_CMD_GetReset(); 
+	return WV_SOK;
 }
 
 /******************************************************************************

@@ -83,7 +83,7 @@ WV_S32  TSK_FILE_CpyMovDecrypt(WV_S8 *filenameScr,WV_S8 *filenameDst)
 	if(fpDst == NULL)
 	{ 
 		WV_ERROR(" open  %s wb ERROR!! [%d]\r\n",filenameDst,errno); 
-		fclose(filenameScr);
+		fclose(fpScr);
 		return WV_EFAIL; 
 	} 
 
@@ -204,7 +204,7 @@ WV_S32 TSK_USBIMPROT_ParseConfFile(const WV_S8 *pCmd,WV_S32 cmdLen,WV_S32 (*pCmd
 {
 	
 	WV_S8 buf[1024];
-	WV_S32 i,typeID,ret;
+	WV_S32 i,ret;
 	ret = access(TSK_USBIMPORT_UPDATE_LOCAL_FILE,W_OK);
 	if(ret != 0){
 		WV_printf("access file [%s] error\n",TSK_USBIMPORT_UPDATE_LOCAL_FILE);
@@ -301,10 +301,10 @@ WV_S32 TSK_USBIMPROT_AnalyzeDeletMovCmd(WV_S8 *buf)
 	}
 	if(nameLen == 0 || nameLen >=256) return WV_EFAIL;
 
-	WV_U8 name[256+8]={0};
+	WV_S8 name[256+8]={0};
 	sprintf(name,"%s?",temp);
 
-	TSK_CONF_DeleteMov(name,nameLen+1);
+	TSK_CONF_DeleteMov((WV_U8*)name,nameLen+1);
 	return WV_SOK;	
 }
 
@@ -357,7 +357,6 @@ WV_S32 TSK_USBIMPROT_Proc()
 	WV_printf("start to  update video info\n");
 
 
-	WV_S32 ret = 0;
 	TSK_USBIMPORT_SongClassFile();
 	//ret |= TSK_USBIMPROT_MovConf();
 	TSK_USBIMPROT_UpdateConf();	

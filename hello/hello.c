@@ -23,6 +23,13 @@
 #include "tsk_player.h"
 #include "tsk_checkOutLine.h"
 #include "tsk_usbShow.h"
+#include "sys_licences.h"
+#include "sys_info.h"
+#include "svr_control.h"
+#include "wv_sqlite3.h"
+#include "ktv_shiyi.h"
+#include "ktv_leishi.h"
+
 WV_S32  main()
 {
 	WV_S32 ret;
@@ -59,7 +66,7 @@ WV_S32  main()
 	SYS_INFO_Open();
 	TSK_SCENE_SendSync();   //场景同步
 	SVR_CONTROL_Open();
-	TSK_UPDATE_FPGA_Open();
+	//TSK_UPDATE_FPGA_Open();
 	WV_SQLITE3_Init();
 	TSK_TEXT_Open();
 	NET_UART_Open();

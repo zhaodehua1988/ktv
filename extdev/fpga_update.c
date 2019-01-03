@@ -126,8 +126,7 @@ WV_S32 FPGA_UPDATE_WriteLen(WV_U8 fpgaID,WV_U16 dataLen)
 {
 		
 	WV_U16 data=0;	
-	WV_S32 ret;
-	WV_S32 i;
+	WV_S32 ret=0;
 	if(fpgaID == 0 )
 	{
 		WV_RET_ADD(	HIS_SPI_FpgaWd(0x5d,dataLen),ret);	
@@ -345,12 +344,10 @@ WV_S32 FPGA_UPDATE_getFpgaBin(WV_U8 fpgaID);
 WV_S32 FPGA_UPDATE_getFpgaBin(WV_U8 fpgaID)
 {
 
-	WV_S32 i;
 	FILE *fp;
-	WV_U8 fpgaBinFile[32];
+	WV_S8 fpgaBinFile[32];
 	WV_U16 buf[FPGA_UPDATE_DATABUF_LEN];
 	WV_S32 readLen=0;	
-	WV_S32 ret;
 	sprintf(fpgaBinFile,"./fpga%d.bin",fpgaID);
 	
 	fp = fopen(fpgaBinFile,"rb");
@@ -390,7 +387,7 @@ void *TSK_UPDATE_update();
 ****************************************************************************/
 void *TSK_UPDATE_update(void *prm)
 {
-	WV_S32 ret=0;	
+	
 	pthread_detach(pthread_self());
 	WV_U8 *pID = (WV_U8 *)prm;
 	WV_U8 fpgaID = *pID;
@@ -400,7 +397,7 @@ void *TSK_UPDATE_update(void *prm)
 	FPGA_UPDATE_getFpgaBin(fpgaID);
 
 	WV_printf("***********fpga[%d] update ok*********\n",fpgaID);
-
+	return NULL;
 }
 
 /***********************************************************************
@@ -437,7 +434,7 @@ WV_S32  TSK_UPDATE_FPGA_RecvBin(WV_U8 fpgaPort,WV_U32 len,WV_U8 *pData)
 	if(fpgaPort != 1 && fpgaPort != 2) return WV_EFAIL;
 
 	FILE *fp= NULL;
-	WV_U8 fpgaName[16]={0};
+	WV_S8 fpgaName[16]={0};
 	WV_S32 writeLen=0;
 	sprintf(fpgaName,"./fpga%d.bin",fpgaPort-1);
 	fp = fopen(fpgaName,"wb");
@@ -470,9 +467,8 @@ WV_S32 TSK_UPDATE_CMDStart(WV_S32 argc, WV_S8 **argv, WV_S8 * prfBuff)
 {
 
 
-   WV_U16 data,addr;
-   WV_U32  temp;
-   WV_S32 id,ret = 0; 
+   WV_U32  id;
+   WV_S32 ret = 0; 
    
    if(argc < 1)
 	{
@@ -503,9 +499,6 @@ WV_S32 TSK_UPDATE_CMDFpgaPackAdd(WV_S32 argc, WV_S8 **argv,WV_S8 *prfBuff)
 WV_S32 TSK_UPDATE_CMDFpgaPackAdd(WV_S32 argc, WV_S8 **argv, WV_S8 * prfBuff)
 {
 
-
-   WV_U16 data,addr;
-   WV_U32  temp;
    WV_U32 id,pack,ret = 0; 
    
    if(argc < 2)

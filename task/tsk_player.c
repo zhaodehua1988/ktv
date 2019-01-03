@@ -222,7 +222,7 @@ WV_S32  TSK_PLAYER_DevCascade(WV_S32 id,WV_U32 DevCascading)
     default:
         break;
     }
-
+    return WV_SOK;
 }
 
 /***********************************************************************
@@ -231,7 +231,7 @@ WV_S32  TSK_PLAYER_GetStatus(WV_S32 id);
 WV_S32  TSK_PLAYER_GetStatus(WV_S32 id)
 {
     WV_S32 ret=0;
-    WV_U32 status;
+    WV_U32 status=0;
     ret = HIS_PLAYER_GetStatus(&(gTskPlayer[id].playerHandl),&status);
 
     return status;
@@ -298,19 +298,7 @@ WV_S32  TSK_PLAYER_SetUsbPlayNext(WV_U32 ena,WV_U32 playerID)
     return WV_SOK;
 }
 
-/***********************************************************************
 
-WV_S32  TSK_PLAYER_SetVolume(WV_S32 volume,WV_U32 playerID);
-设置声音音量
-***********************************************************************/
-WV_S32  TSK_PLAYER_SetVolume(WV_S32 volume,WV_U32 playerID)
-{
-    WV_printf("set player[%d] vol = %d\n",playerID,volume);
-    HIS_AVP_SetVolume(playerID,volume);
-    gPlayerVolume[playerID]=volume;
-    TSK_PLAYER_SaveVolume();
-    return WV_SOK;
-}
 /***********************************************************************
 
 WV_S32  TSK_PLAYER_GetVolume(WV_S32 *pVolume,WV_U32 playerID);
@@ -350,6 +338,19 @@ WV_S32  TSK_PLAYER_SaveVolume()
 
     fclose(fp);
 
+    return WV_SOK;
+}
+/***********************************************************************
+
+WV_S32  TSK_PLAYER_SetVolume(WV_S32 volume,WV_U32 playerID);
+设置声音音量
+***********************************************************************/
+WV_S32  TSK_PLAYER_SetVolume(WV_S32 volume,WV_U32 playerID)
+{
+    WV_printf("set player[%d] vol = %d\n",playerID,volume);
+    HIS_AVP_SetVolume(playerID,volume);
+    gPlayerVolume[playerID]=volume;
+    TSK_PLAYER_SaveVolume();
     return WV_SOK;
 }
 /***********************************************************************
@@ -412,7 +413,7 @@ WV_S32  TSK_PLAYER_Creat(WV_S32 id)
         //usleep(100000);
     }
 #endif
-    WV_S32 ret = 0;
+    //WV_S32 ret = 0;
     //usleep(100);
     if(gTskPlayer[id].playerEna == 0)
     {
@@ -529,9 +530,9 @@ WV_S32 TSK_PLAYER_CMDStart(WV_S32 argc, WV_S8 **argv, WV_S8 * prfBuff)
 {
 
 
-    WV_U16 data,addr;
-    WV_U32  temp;
-    WV_S32 id,ret = 0;
+
+    WV_U32  id;
+    WV_S32 ret = 0;
 
     if(argc < 2)
     {
@@ -580,9 +581,8 @@ WV_S32 TSK_PLAYER_CMDPlay(WV_S32 argc, WV_S8 **argv,WV_S8 *prfBuff)
 WV_S32 TSK_PLAYER_CMDPlay(WV_S32 argc, WV_S8 **argv, WV_S8 * prfBuff)
 {
 
-    WV_U16 data,addr;
-    WV_U32  temp;
-    WV_S32 id,ret = 0;
+    WV_U32  id;
+    WV_S32 ret = 0;
 
     if(argc <1)
     {
@@ -611,10 +611,8 @@ WV_S32 TSK_PLAYER_CMDPause(WV_S32 argc, WV_S8 **argv,WV_S8 *prfBuff)
 ****************************************************************************/
 WV_S32 TSK_PLAYER_CMDPause(WV_S32 argc, WV_S8 **argv, WV_S8 * prfBuff)
 {
-
-    WV_U16 data,addr;
-    WV_U32  temp;
-    WV_S32 id,ret = 0;
+    WV_U32 id;
+    WV_S32 ret = 0;
 
     if(argc < 1)
     {
@@ -644,9 +642,9 @@ WV_S32 TSK_PLAYER_CMDResume(WV_S32 argc, WV_S8 **argv,WV_S8 *prfBuff)
 WV_S32 TSK_PLAYER_CMDResume(WV_S32 argc, WV_S8 **argv, WV_S8 * prfBuff)
 {
 
-    WV_U16 data,addr;
-    WV_U32  temp;
-    WV_S32 id,ret = 0;
+ 
+    WV_U32  id;
+    WV_S32 ret = 0;
 
     if(argc < 1)
     {
@@ -675,8 +673,8 @@ WV_S32 TSK_PLAYER_CMDStop(WV_S32 argc, WV_S8 **argv,WV_S8 *prfBuff)
 WV_S32 TSK_PLAYER_CMDStop(WV_S32 argc, WV_S8 **argv, WV_S8 * prfBuff)
 {
 
-
-    WV_S32 id,ret = 0;
+    WV_U32 id;
+    WV_S32 ret = 0;
 
     if(argc <1 )
     {
@@ -717,8 +715,8 @@ WV_S32 TSK_PLAYER_CMDChangeMode(WV_S32 argc, WV_S8 **argv,WV_S8 *prfBuff)
 WV_S32 TSK_PLAYER_CMDChangeMode(WV_S32 argc, WV_S8 **argv, WV_S8 * prfBuff)
 {
 
-
-    WV_S32 mode,ret = 0;
+    WV_U32 mode;
+    WV_S32 ret = 0;
 
     if(argc <1 )
     {
@@ -777,8 +775,10 @@ WV_S32 TSK_Player_Replay(WV_U32 id);
 WV_S32 TSK_Player_Replay(WV_S32 id)
 {
     
+    if(TSK_PLAYER_GetStatus(id) == 2) return WV_SOK;
+
     if (gTskPlayer[id].playerEna == 1){
-        printf("***********player replay[%d] ********* \n",id);
+        //printf("***********player replay[%d] ********* \n",id);
       HIS_PLAYER_Replay(&(gTskPlayer[id].playerHandl));      
     }
     return WV_SOK;
@@ -801,8 +801,8 @@ WV_S32  TSK_PLAYER_CMDSetVol(WV_S32 argc, WV_S8 **argv, WV_S8 * prfBuff);
 ***********************************************************************/
 WV_S32 TSK_PLAYER_CMDSetVol(WV_S32 argc, WV_S8 **argv, WV_S8 * prfBuff)
 {
-    WV_S32 vol,id,ret = 0;
-
+    WV_S32 ret = 0;
+    WV_U32 id,vol;
     if(argc <2 )
     {
         prfBuff += sprintf(prfBuff,"player setVol <playerID> <val> (0~100)\r\n");
@@ -826,7 +826,7 @@ WV_S32  TSK_PLAYER_CMDGetVol(WV_S32 argc, WV_S8 **argv, WV_S8 * prfBuff);
 ***********************************************************************/
 WV_S32 TSK_PLAYER_CMDGetVol(WV_S32 argc, WV_S8 **argv, WV_S8 * prfBuff)
 {
-    WV_S32 vol0=-1,vol1=-1,vol2=-1,id;
+    WV_S32 vol0=-1,vol1=-1,vol2=-1;
 
     TSK_PLAYER_GetVolume(&vol0,0);
     TSK_PLAYER_GetVolume(&vol1,1);
@@ -842,7 +842,7 @@ WV_S32  TSK_PLAYER_CMDCreate(WV_S32 argc, WV_S8 **argv, WV_S8 * prfBuff);
 WV_S32 TSK_PLAYER_CMDCreate(WV_S32 argc, WV_S8 **argv, WV_S8 * prfBuff)
 {
     WV_S32 ret = -1;
-    WV_S32 id = 0 ;
+    WV_U32 id = 0 ;
    if(argc <2 )
     {
         prfBuff += sprintf(prfBuff,"player create <playerID> \r\n");
@@ -863,7 +863,7 @@ WV_S32  TSK_PLAYER_CMDDesctory(WV_S32 argc, WV_S8 **argv, WV_S8 * prfBuff);
 WV_S32 TSK_PLAYER_CMDDesctory(WV_S32 argc, WV_S8 **argv, WV_S8 * prfBuff)
 {
     WV_S32 ret = -1;
-    WV_S32 id = 0 ;
+    WV_U32 id = 0 ;
    if(argc <2 )
     {
         prfBuff += sprintf(prfBuff,"player create <playerID> \r\n");
@@ -883,7 +883,6 @@ WV_S32  TSK_PLAYER_Open();
 
 WV_S32  TSK_PLAYER_Open()
 { 
-    WV_S32 id;
     TSK_PLAYER_Init();      //player初始化
     //注册一些跟player相关的终端命令
     WV_CMD_Register("player",NULL,"palyer comand ",NULL);

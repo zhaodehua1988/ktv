@@ -32,7 +32,7 @@ static SVR_SERVER_DEV_E  * pSvrDev;
 
 WV_S32 SVR_PORT_RegisterConf()
 { 
-    WV_U8 value[20];
+    WV_S8 value[20];
     sprintf(value, "%d",2323);
     SYS_ENV_Register(1 ,"SVR_PORT",value,"server port");
 
@@ -45,7 +45,7 @@ WV_S32 SVR_PORT_RegisterConf()
 
 WV_S32 SVR_PORT_GetConf()
 { 
-    WV_U8 name[20];
+    WV_S8 name[20];
     WV_U32 data;
     sprintf(name, "SVR_PORT");
     SYS_ENV_GetU32(name, & data);
@@ -71,7 +71,7 @@ WV_S32 SVR_PORT_SetConf(WV_U16 data)
 WV_S32 SVR_PORT_SaveConf()
 { 
 
-    WV_U8 name[20];
+    WV_S8 name[20];
     WV_U32 data;
     sprintf(name, "SVR_PORT");
     data = pSvrDev-> port;
@@ -166,7 +166,22 @@ WV_S32 SVR_DeInit(SVR_SERVER_DEV_E *pDev)
     return  WV_SOK;
 }
 
+/*********************************************************
 
+WV_S32 SVR_SERVER_SelectSocket( );
+
+*********************************************************/
+WV_S32 SVR_SERVER_SelectSocket(WV_S32 sock )
+{
+    WV_S32 ret,maxfdp;
+    struct timeval timeout = {0,0};
+    fd_set fds;
+    FD_ZERO(&fds);
+    FD_SET(sock,&fds);
+    maxfdp = sock +1;
+    ret = select(maxfdp,&fds,&fds,NULL,&timeout);
+    return ret;
+}
 
 /********************************************************
 
@@ -228,22 +243,7 @@ WV_S32 SVR_SERVER_Recv(WV_S32 socket,WV_U8 * pBuf, WV_S32 len)
     return ret;
 }
 
-/*********************************************************
 
-WV_S32 SVR_SERVER_SelectSocket( );
-
-*********************************************************/
-WV_S32 SVR_SERVER_SelectSocket(WV_S32 sock )
-{
-    WV_S32 ret,maxfdp;
-    struct timeval timeout = {0,0};
-    fd_set fds;
-    FD_ZERO(&fds);
-    FD_SET(sock,&fds);
-    maxfdp = sock +1;
-    ret = select(maxfdp,&fds,&fds,NULL,&timeout);
-    return ret;
-}
 /*********************************************************
 
 void * SVR_SERVER_GetCmd( );
@@ -377,7 +377,6 @@ WV_S32 SVR_SERVER_SendCmd2(SVR_SERVER_DEV_E * pDev)
     //send frame head
     
     WV_S32 i;
-    WV_U8 buf[1024];
     WV_printf("ack cmd head:");
 
     for(i=0;i< sizeof(SVR_FRAME_HEAD_E);i++)
@@ -458,7 +457,7 @@ void * SVR_SERVER_Proc(void * prm)
         pDev -> sendCnt = 0;
         //get sen buff
         WV_S32   nSendBufLen;
-        socklen_t optlen = sizeof(int);
+        //socklen_t optlen = sizeof(int);
         nSendBufLen = 0;
 
         //getsockopt(pDev->cSocket, SOL_SOCKET, SO_SNDBUF,(char*)&nSendBufLen, &optlen);

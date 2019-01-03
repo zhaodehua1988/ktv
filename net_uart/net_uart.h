@@ -15,6 +15,8 @@
 #else 
   #define NET_UART_printf(...) 
 #endif
-
+WV_S32 NET_UART_Open();
+WV_S32 NET_UART_Close();
 WV_S32  NET_UART_ProjectorCmd(WV_U32 openProjector);
+WV_S32 NET_UART_InfraredCmd(WV_U8 disable);
 #endif

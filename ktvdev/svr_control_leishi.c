@@ -384,7 +384,7 @@ WV_S32 SVR_CONTROL_Leishi_callback_DB(void* data, int ncols, char** values, char
         ChangeMode = SVR_CONTROL_GetKtvChangeMode();
         if(SVR_CONTROL_CHANGE_MOV == ChangeMode )     //1:背景视频随动
         {
-            TSK_CONF_changeMovByType((WV_U8 *)destbuf);
+            TSK_CONF_changeMovByType((WV_S8 *)destbuf);
         }else if(ChangeMode == SVR_CONTROL_CHANGE_SCENE )//2:场景随动
         {
             TSK_CONF_changeSceneByType((WV_U8 *)destbuf);
@@ -439,7 +439,7 @@ WV_S32 SVR_CONTROL_LeiShi_ChangeMovByCmd(WV_S8 *pID,WV_S8 *pName)
     //根据歌曲类别查找视频
     if(movChangeMode == SVR_CONTROL_CHANGE_MOV )     //1:背景视频随动 ;
     {
-        TSK_CONF_changeMovByType((WV_U8 *)mapName);
+        TSK_CONF_changeMovByType((WV_S8 *)mapName);
     }else if(movChangeMode == SVR_CONTROL_CHANGE_SCENE )//2:场景随动
     {
         TSK_CONF_changeSceneByType((WV_U8 *)mapName);

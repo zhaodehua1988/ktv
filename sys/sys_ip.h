@@ -2,7 +2,7 @@
 #define  _SYS_IP_ENV_H_H_
 #include "wv_common.h"  
 WV_S32 SYS_IP_Init();
-WV_S32 SYS_IP_Deint(); 
+ WV_S32 SYS_IP_DeInit();
 WV_S32 SYS_IP_SetMac(WV_S8 * pMac);
 WV_S32 SYS_IP_SetIp(WV_S8 * pIp);
 WV_S32 SYS_IP_SetMask(WV_S8 * pMsk);

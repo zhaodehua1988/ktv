@@ -9,6 +9,7 @@
 #include "tsk_go.h"
 #include "tsk_player.h"
 #include "tsk_mobileShow.h"
+#include "tsk_scene.h"
 #define TSK_USBSHOW_PATH_PIC   "/usb/pic"
 #define TSK_USBSHOW_PATH_MOV   "/usb/mov"
 
@@ -135,7 +136,7 @@ WV_S32 TSK_USB_SetShowEna()
 					continue;
 				}	
 			    if( NULL == strstr(ptr->d_name,".mov") && NULL == strstr(ptr->d_name,".mp4") &&   NULL == strstr(ptr->d_name,".avi") && \
-					NULL == strstr(ptr->d_name,".rm") && NULL == NULL == strstr(ptr->d_name,".rmvb")  && NULL == strstr(ptr->d_name,".wmv") && NULL == strstr(ptr->d_name,".flv") )
+					NULL == strstr(ptr->d_name,".rm") && NULL == strstr(ptr->d_name,".rmvb")  && NULL == strstr(ptr->d_name,".wmv") && NULL == strstr(ptr->d_name,".flv") )
 				{
 					continue;
 				}                               
@@ -222,8 +223,7 @@ WV_S32 TSK_USB_ShowPicProc(void *prm);
 void* TSK_USB_ShowPicProc(void *prm)
 {
 
-    DIR    *dir;
-    WV_S8  dirPath[30];
+    //DIR    *dir;
     WV_S8 filePath[TSK_USBSHOW_NAME_MAXLEN+20];
 	WV_S32 i;
 	TSK_USB_SHOW_E    * pDev; 
@@ -290,8 +290,6 @@ void* TSK_USB_ShowMovProc(void *prm)
 void* TSK_USB_ShowMovProc(void *prm)
 {
 
-    DIR    *dir;
-    WV_S8  dirPath[30];
     WV_S8 filePath[TSK_USBSHOW_NAME_MAXLEN+20];
 	WV_S32 i=0,volume;
 	TSK_USB_SHOW_E    * pDev; 

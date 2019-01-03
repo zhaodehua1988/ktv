@@ -130,7 +130,7 @@ WV_S32 HIS_GO_Close(HIS_DEV_HIGO_E * pDev);
 
 WV_S32 HIS_GO_Close(HIS_DEV_HIGO_E * pDev)
 {
-  WV_S32 i;
+  //WV_S32 i;
   /*
   for(i=0;i<HIS_HIGO_GODEC_NUM;i++)
   {
@@ -230,17 +230,14 @@ WV_S32 HIS_GODEC_render(HIS_DEV_HIDEC_E * pDev);
 WV_S32 HIS_GODEC_Render(HIS_DEV_GODEC_E * pDev)
 {
     HIGO_DEC_ATTR_S SrcDesc; 
-    HI_RECT Rect, DstRect, LastRect,BKRect;
-    HI_U32  BKColor,index; 
-    HIGO_DEC_IMGINFO_S 		*pImgInfo,*pLastImgInfo;
-    HI_S32   disposal ,lastDisposal; 
+    HI_RECT DstRect, LastRect;
+    //HI_U32  BKColor,index; 
+    HIGO_DEC_IMGINFO_S 		*pImgInfo;
+    //HI_S32   disposal ,lastDisposal; 
     HIGO_BLTOPT_S BltOpt = {0};
-    HIGO_BLTOPT_S BltOptKey = {0};
-   // HI_HANDLE ImgSurface;
+    //HIGO_BLTOPT_S BltOptKey = {0};
+    // HI_HANDLE ImgSurface;
     HI_U32  curStamp;
-     HI_S32 ret;
-	//printf("pDev->ena = %d \n",pDev->ena);  
-
      // judge  ena
      if(pDev-> ena  == 0)
       {
@@ -320,8 +317,7 @@ WV_S32 HIS_GODEC_Render(HIS_DEV_GODEC_E * pDev)
    // pos change 
     if(pDev->disX != pDev->bkDisX || pDev->disY != pDev->bkDisY ||  pDev->disW != pDev->bkDisW || pDev->disH != pDev->bkDisH)
     {
-     // WV_printf("%s pos change from [%d:%d:%d:%d] to [%d:%d:%d:%d]\r\n",\
-       pDev-> decFileName,pDev->disX ,pDev->disY ,pDev->disW ,pDev->disH ,pDev->bkDisX ,pDev->bkDisY,pDev->bkDisW ,pDev->bkDisH  );
+     // WV_printf("%s pos change from [%d:%d:%d:%d] to [%d:%d:%d:%d]\r\n",pDev-> decFileName,pDev->disX ,pDev->disY ,pDev->disW ,pDev->disH ,pDev->bkDisX ,pDev->bkDisY,pDev->bkDisW ,pDev->bkDisH  );
 		LastRect.x = pDev->disX;
 		LastRect.y = pDev->disY;
 		LastRect.w = pDev->disW;

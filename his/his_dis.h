@@ -24,5 +24,4 @@ WV_S32  HIS_DIS_SetCustomTiming(WV_U32 mode);
 
 WV_S32  HIS_DIS_WinFreeze(HI_HANDLE *  pHndlWin,HI_BOOL bEnable,WV_S32 mode);
 WV_S32  HIS_DIS_GetWinFreezeStatus(HI_HANDLE * pHndlWin,HI_BOOL *pbEnable);
-WV_S32  HIS_DIS_GetWinFreezeStatus(HI_HANDLE * pHndlWin,HI_BOOL *pbEnable);
 #endif

@@ -82,13 +82,12 @@ WV_S32 SVR_CONTROL_Recv(WV_S32 socket,WV_U8 * pBuf, WV_S32 len)
 WV_S32 SVR_CONTROL_Recv(WV_S32 socket,SVR_CONTROL_DEV_E * pDev, WV_S32 len)
 {
 
-  WV_S32 recvLen,recvToal,reqLen,ret =0;
+  WV_S32 recvLen,recvToal,ret =0;
 
   recvToal = 0; 
    WV_U8 pRevBuf[SVR_CONTROL_BUF_MAXLEN];
 	socklen_t addrLen = sizeof(struct sockaddr_in);
 	recvLen = recvfrom(socket,pRevBuf,len,0,(struct sockaddr*)&(gSvrControl.cliAddr),&addrLen );
-	int i;
 	if(recvLen >0)
 	{ 	  
 
@@ -129,7 +128,7 @@ WV_S32 SVR_CONTROL_Send(WV_U8 *pData,WV_U32 dataLen)
 	}	
 	printf("\r\n");
 	socklen_t addrLen = sizeof(struct sockaddr_in);
-	sendto(gSvrControl.mSocket, pData, dataLen, 0, &gSvrControl.cliAddr, addrLen);
+	sendto(gSvrControl.mSocket, pData, dataLen, 0, (struct sockaddr *)&gSvrControl.cliAddr, addrLen);
 	return WV_SOK;	
 }
 
@@ -141,7 +140,7 @@ WV_S32 SVR_CONTROL_Get_Cmd(SVR_CONTROL_DEV_E * pDev)
 WV_S32 SVR_CONTROL_Get_Cmd(SVR_CONTROL_DEV_E * pDev)
 {
 	//get 
-	WV_S32 len,i;
+	WV_S32 len;
 	
 	len = SVR_CONTROL_Recv(pDev ->mSocket,pDev,SVR_CONTROL_BUF_MAXLEN);
 
@@ -158,9 +157,6 @@ WV_S32 SVR_CONTROL_CMD_Porc(SVR_CONTROL_DEV_E *pDev,WV_S32 cmdLen)
 {
 
 	WV_S32 ret=0;
-	WV_U32 port;
-	WV_S8 ip[20];
-	WV_S32 i;
 #if 0
 	printf("get cmd:");
 	for(i=0;i<cmdLen;i++)
@@ -173,13 +169,13 @@ WV_S32 SVR_CONTROL_CMD_Porc(SVR_CONTROL_DEV_E *pDev,WV_S32 cmdLen)
 	switch(SVR_CONTROL_GetKtvDev())
 	{
 		case 0:
-			ret = SVR_CONTROL_LeiShi(pDev->pBuf,cmdLen);
+			ret = SVR_CONTROL_LeiShi((WV_S8 *)pDev->pBuf,cmdLen);
 			break;
 		case 1:
-			ret = SVR_CONTROL_ShiYi(pDev->pBuf,cmdLen);
+			ret = SVR_CONTROL_ShiYi((WV_S8 *)pDev->pBuf,cmdLen);
 			break;
 		case 2:
-			ret = SVR_CONTROL_YinChuang(pDev->pBuf,cmdLen);
+			ret = SVR_CONTROL_YinChuang((WV_S8 *)pDev->pBuf,cmdLen);
 			break;
 		default:
 			break;

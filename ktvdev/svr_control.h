@@ -17,5 +17,6 @@
 #endif
 
 WV_S32 SVR_CONTROL_Send(WV_U8 *pData,WV_U32 dataLen);
-
+WV_S32 SVR_CONTROL_Open();
+WV_S32 SVR_CONTROL_Close();
 #endif

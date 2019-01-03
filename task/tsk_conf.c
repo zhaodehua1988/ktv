@@ -127,7 +127,7 @@ typedef struct TSK_MOV_UPDATA_E
 typedef struct TSK_MOV_TYPE_INFO
 {
     WV_U8  typeEna;
-    WV_U8  ucTypeName[TSK_CONF_MOV_TYPE_NAME_LEN];
+    WV_S8  ucTypeName[TSK_CONF_MOV_TYPE_NAME_LEN];
     WV_S32 u32TotalNum;
     WV_S32 u32LocalNum;
 }TSK_MOV_TYPE_INFO;
@@ -136,14 +136,14 @@ typedef struct TSK_MOV_TYPE_INFO
 #pragma pack(pop)
 static TSK_MOV_TYPE_INFO gMovTypeInfo[TSK_CONF_MOV_TYPE_MAX_NUM];
 
-static TSK_MOV_TYPE_INFO gSceneTypeInfo[TSK_CONF_SCENE_TYPE_MAX_NUM];
+//static TSK_MOV_TYPE_INFO gSceneTypeInfo[TSK_CONF_SCENE_TYPE_MAX_NUM];
 
 static TSK_CONF_SCENE_INFO_E *pSceneInfoDev;
 static TSK_CONF_MOV_INFO_E *pMovInfoDev;
 
 static TSK_MOV_UPDATA_E gMovUpdata;
 
-static WV_U8 gCurrentTypeName[TSK_CONF_MOV_TYPE_NAME_LEN]={0};
+static WV_S8 gCurrentTypeName[TSK_CONF_MOV_TYPE_NAME_LEN]={0};
 
 /********************************************************************
 
@@ -238,10 +238,10 @@ WV_S32 TSK_CONF_saveMovType(WV_U8 *pType,WV_U32 dataLen)
 
 /********************************************************************
 
-WV_S32 TSK_CONF_changeMovByType(WV_U8 *pType); 
+WV_S32 TSK_CONF_changeMovByType(WV_S8 *pType); 
 
 ********************************************************************/
-WV_S32 TSK_CONF_changeMovByType(WV_U8 *pType)
+WV_S32 TSK_CONF_changeMovByType(WV_S8 *pType)
 {
     printf("pType is %s\n",pType);
     WV_S32 i,j=0;
@@ -249,8 +249,7 @@ WV_S32 TSK_CONF_changeMovByType(WV_U8 *pType)
 
     for(i=0;i<TSK_CONF_MOV_TYPE_MAX_NUM;i++)
     {
-        WV_U8  typeEna;
-        WV_U8  ucTypeName[TSK_CONF_MOV_TYPE_NAME_LEN];
+
         if(gMovTypeInfo[i].typeEna == 0 ) continue;
         printf("ucTypeName is %s\n",gMovTypeInfo[i].ucTypeName);
         if(strncmp(pType,gMovTypeInfo[i].ucTypeName,TSK_CONF_MOV_TYPE_NAME_LEN) == 0)
@@ -313,12 +312,7 @@ WV_S32 TSK_CONF_changeMovRollType();
 WV_S32 TSK_CONF_changeMovRollType()
 {
     WV_S32 ret=-1;
-    //	if (SVR_CONTROL_GetTypeRound() == 1)
-    //	{
     ret=TSK_CONF_changeMovByType(gCurrentTypeName);
-    //	}
-
-
     return ret;
 }
 
@@ -399,7 +393,7 @@ WV_S32 TSK_CONF_GetSplit(WV_U8 *pData,WV_U32 *pDataLen)
     WV_U32 data;
     WV_U16 *pBuf=(WV_U16 *)pData;
     // get output ena
-    WV_U8 name[20];
+    WV_S8 name[20];
     data = 0;
     SYS_ENV_GetU32("Output_ena",&data);
 
@@ -477,6 +471,103 @@ WV_S32 TSK_CONF_GetMem(WV_U16 *pTotalDisk,WV_U16 *pFreeDisk)
         *pFreeDisk = ((blocksize * (diskInfo.f_bavail)))/1024;
     }
     return 0;
+}
+
+/********************************************************************
+
+WV_S32 TSK_CONF_MovSaveConf(); 
+
+********************************************************************/
+WV_S32 TSK_CONF_MovSaveConf()
+{
+
+    WV_S32 ret;
+    WV_S8 *pBuf = (WV_S8 *)pMovInfoDev;
+    WV_U16 totalDisk=0;
+    WV_U16 freeDisk=0;
+
+
+    //access
+    ret = access(TSK_CONF_MOV_InfoFile,W_OK);
+
+    if(ret != 0){
+        WV_printf("access file [%s] error\n",TSK_CONF_MOV_InfoFile);
+        return -1;
+    }
+
+    FILE *fp;
+    //open mov.ini
+    fp = fopen(TSK_CONF_MOV_InfoFile,"wb+");
+    if(fp == NULL)
+    {
+        WV_printf("fopen file [%s] error\n",TSK_CONF_MOV_InfoFile);
+        return -1;
+    }
+
+    TSK_CONF_GetMem(&totalDisk,&freeDisk);
+    pMovInfoDev->diskTotal = totalDisk;
+    pMovInfoDev->diskFree = freeDisk;
+
+    WV_S32 writeLen=0;
+    writeLen = fwrite(pBuf,1,sizeof(TSK_CONF_MOV_INFO_E),fp);
+
+    fclose(fp);
+
+    TSK_CONF_getMovTypeNum();
+
+    return WV_SOK;
+}
+
+/********************************************************************
+
+WV_S32 TSK_CONF_MovGetConf(); 
+
+********************************************************************/
+WV_S32 TSK_CONF_MovGetConf()
+{
+
+    WV_S32 ret;
+    //WV_S8 *pBuf = (WV_S8 *)pMovInfoDev;
+    TSK_CONF_MOV_INFO_E movInfo;
+    WV_U16 totalDisk=0;
+    WV_U16 freeDisk=0;
+    FILE *fp;
+    //access
+    ret = access(TSK_CONF_MOV_InfoFile,R_OK);
+
+    if(ret != 0){
+        WV_printf("access file [%s] error\n",TSK_CONF_MOV_InfoFile);
+        return -1;
+    }
+
+    fp = fopen(TSK_CONF_MOV_InfoFile,"rb+");
+    if(fp == NULL)
+    {
+        WV_printf("fopen file [%s] error\n",TSK_CONF_MOV_InfoFile);
+        return -1;
+    }
+    //open mov.ini
+
+    WV_S32 readLen=0;
+
+    TSK_CONF_GetMem(&totalDisk,&freeDisk);
+    pMovInfoDev->diskTotal = totalDisk;
+    pMovInfoDev->diskFree = freeDisk;
+
+    readLen = fread(&movInfo,1,sizeof(TSK_CONF_MOV_INFO_E),fp);
+
+    if(readLen != sizeof(TSK_CONF_MOV_INFO_E))
+    {	//如果配置文件长度跟结构体长度不一致，则使用默认配置
+        WV_printf("error read mov.ini len[%d],struct TSK_CONF_MOV_INFO_E len[%d]\n",readLen,sizeof(TSK_CONF_MOV_INFO_E));
+        ret = -1;
+    }else {
+        memcpy(pMovInfoDev,&movInfo,sizeof(TSK_CONF_MOV_INFO_E));
+        ret = 0;
+    }
+    fclose(fp);
+
+
+    return ret;
 }
 
 
@@ -777,7 +868,7 @@ movNum：切换第几幕视频
 pData:视频名称
 dataLen：视频名字长度
 ********************************************************************/
-WV_S32 TSK_CONF_ChangeMov(WV_U32 movNum,WV_U8 *pData ,WV_U32 dataLen)
+WV_S32 TSK_CONF_ChangeMov(WV_U32 movNum,WV_S8 *pData ,WV_U32 dataLen)
 {
     WV_S32 i,ret;
 
@@ -807,13 +898,13 @@ WV_S32 TSK_CONF_ReNameMov(WV_U8 *pData ,WV_U32 dataLen);
 
 WV_S32 TSK_CONF_ReNameMov(WV_U8 *pData ,WV_U32 dataLen)
 {
-    WV_U8 nameSrc[TSK_CONF_MOV_NAME_MAX_LEN];
-    WV_U8 nameDes[TSK_CONF_MOV_NAME_MAX_LEN];
+    WV_S8 nameSrc[TSK_CONF_MOV_NAME_MAX_LEN];
+    WV_S8 nameDes[TSK_CONF_MOV_NAME_MAX_LEN];
 
     memset(nameSrc,0,TSK_CONF_MOV_NAME_MAX_LEN);
     memset(nameDes,0,TSK_CONF_MOV_NAME_MAX_LEN);
 
-    WV_S32 i=0,j=0,ret=-1,movId,nameLen=0;
+    WV_S32 i=0,j=0,ret=-1,nameLen=0;
 
     for(i=0;i<dataLen;i++)
     {
@@ -851,102 +942,7 @@ WV_S32 TSK_CONF_ReNameMov(WV_U8 *pData ,WV_U32 dataLen)
 
     return ret;
 }
-/********************************************************************
 
-WV_S32 TSK_CONF_MovSaveConf(); 
-
-********************************************************************/
-WV_S32 TSK_CONF_MovSaveConf()
-{
-
-    WV_S32 ret;
-    WV_S8 *pBuf = (WV_S8 *)pMovInfoDev;
-    WV_U16 totalDisk=0;
-    WV_U16 freeDisk=0;
-
-
-    //access
-    ret = access(TSK_CONF_MOV_InfoFile,W_OK);
-
-    if(ret != 0){
-        WV_printf("access file [%s] error\n",TSK_CONF_MOV_InfoFile);
-        return -1;
-    }
-
-    FILE *fp;
-    //open mov.ini
-    fp = fopen(TSK_CONF_MOV_InfoFile,"wb+");
-    if(fp == NULL)
-    {
-        WV_printf("fopen file [%s] error\n",TSK_CONF_MOV_InfoFile);
-        return -1;
-    }
-
-    TSK_CONF_GetMem(&totalDisk,&freeDisk);
-    pMovInfoDev->diskTotal = totalDisk;
-    pMovInfoDev->diskFree = freeDisk;
-
-    WV_S32 writeLen=0;
-    writeLen = fwrite(pBuf,1,sizeof(TSK_CONF_MOV_INFO_E),fp);
-
-    fclose(fp);
-
-    TSK_CONF_getMovTypeNum();
-
-    return WV_SOK;
-}
-
-/********************************************************************
-
-WV_S32 TSK_CONF_MovGetConf(); 
-
-********************************************************************/
-WV_S32 TSK_CONF_MovGetConf()
-{
-
-    WV_S32 ret;
-    //WV_S8 *pBuf = (WV_S8 *)pMovInfoDev;
-    TSK_CONF_MOV_INFO_E movInfo;
-    WV_U16 totalDisk=0;
-    WV_U16 freeDisk=0;
-    FILE *fp;
-    //access
-    ret = access(TSK_CONF_MOV_InfoFile,R_OK);
-
-    if(ret != 0){
-        WV_printf("access file [%s] error\n",TSK_CONF_MOV_InfoFile);
-        return -1;
-    }
-
-    fp = fopen(TSK_CONF_MOV_InfoFile,"rb+");
-    if(fp == NULL)
-    {
-        WV_printf("fopen file [%s] error\n",TSK_CONF_MOV_InfoFile);
-        return -1;
-    }
-    //open mov.ini
-
-    WV_S32 readLen=0;
-
-    TSK_CONF_GetMem(&totalDisk,&freeDisk);
-    pMovInfoDev->diskTotal = totalDisk;
-    pMovInfoDev->diskFree = freeDisk;
-
-    readLen = fread(&movInfo,1,sizeof(TSK_CONF_MOV_INFO_E),fp);
-
-    if(readLen != sizeof(TSK_CONF_MOV_INFO_E))
-    {	//如果配置文件长度跟结构体长度不一致，则使用默认配置
-        WV_printf("error read mov.ini len[%d],struct TSK_CONF_MOV_INFO_E len[%d]\n",readLen,sizeof(TSK_CONF_MOV_INFO_E));
-        ret = -1;
-    }else {
-        memcpy(pMovInfoDev,&movInfo,sizeof(TSK_CONF_MOV_INFO_E));
-        ret = 0;
-    }
-    fclose(fp);
-
-
-    return ret;
-}
 /********************************************************************
 
 WV_S32 TSK_CONF_GetMovInfo(WV_U8 * pBuf,WV_U32 *pDataLen); 
@@ -1007,11 +1003,11 @@ WV_S32 TSK_CONF_MovCompare();
 ********************************************************************/
 WV_S32 TSK_CONF_MovCompare()
 {
-    WV_S32 i,val,ret;
+    WV_S32 val,ret;
     DIR *dirptr;
     struct stat movStat;
     struct dirent *entry;
-    WV_S32 buf[300];
+    WV_S8 buf[300];
     if((dirptr = opendir(TSK_CONF_MOV_COMPARE_FILE)) == NULL)
     {
         WV_printf("opendir failed !\n");
@@ -1060,14 +1056,15 @@ WV_S32 TSK_CONF_MovInfo_movEnaInit(TSK_CONF_MOV_INFO_E *pDev);
 WV_S32 TSK_CONF_MovInfo_movEnaInit(TSK_CONF_MOV_INFO_E *pDev)
 {
 
-    WV_U8  u8FirstUse;
-    WV_U8  u8SecondUse;
+    //WV_U8  u8FirstUse;
+    //WV_U8  u8SecondUse;
     WV_S32 i;
     for(i=0;i<TSK_CONF_MOV_MAX_NUM;i++)
     {
         pDev->movFile[i].u8FirstUse = 1;
         pDev->movFile[i].u8SecondUse = 0;
     }
+    return WV_SOK;
 }
 /********************************************************************
 
@@ -1130,39 +1127,6 @@ WV_S32 TSK_CONF_Mov_GetNameByID(WV_U32 id,WV_S8 *pFileName)
 }
 
 /***************************** 场  景  ******************************/
-#if 0
-typedef struct TSK_CONF_SCENE_MOV
-{
-    WV_U8 ucVideoFileName[TSK_CONF_SCENE_NAME_MAX_LEN];      //current scene mov name:视频文件名称 256
-}TSK_CONF_SCENE_MOV;
-typedef struct TSK_CONF_SCENE_CONF
-{// 场景
-    WV_U8 ucSceneId;                                               //scene id
-    WV_U8 ucSceneName[TSK_CONF_SCENE_NAME_MAX_LEN];                        // 场景名称
-    WV_U8  ucTypeName[TSK_CONF_SCENE_TYPE_NAME_LEN];                     // 类型名称
-    TSK_CONF_SCENE_MOV   ucSceneMovName[4];            // 场景包含的视频列表
-    WV_U16 u16SceneType;                                 //场景类型
-    WV_U8 ucOutLineCount;                                    // OutLine个数
-    WV_U8 ucBKFrameCount;                                    // 背景图片个数
-    TSK_SONF_SCENE_RECT_INFO OutLine[TSK_CONF_SCENE_OUTLINE_MAX_NUM];                          // OutLine
-    TSK_SONF_SCENE_RECT_INFO BKFrame[TSK_CONF_SCENE_BKPIC_MAX_NUM];                          // 背景图片
-
-}TSK_CONF_SCENE_CONF;
-////场景类型
-typedef struct TSK_CONF_SCENE_TYPE
-{
-    WV_U8 u8TypeName[TSK_CONF_SCENE_TYPE_NAME_LEN];
-}TSK_CONF_SCENE_TYPE;
-
-typedef struct TSK_CONF_SCENE_INFO_E
-{// 场景列表
-    TSK_CONF_SCENE_CONF Scene[TSK_CONF_SCENE_COUNT];
-    WV_U8 currentID; //当前场景ID
-    TSK_CONF_SCENE_TYPE  SceneType[TSK_CONF_SCENE_TYPE_MAX_NUM];  //场景类型
-}TSK_CONF_SCENE_INFO_E;
-
-static TSK_CONF_SCENE_INFO_E *pSceneInfoDev;
-#endif
 /********************************************************************
 
 WV_S32 TSK_CONF_getSceneType(); 
@@ -1204,57 +1168,13 @@ WV_S32 TSK_CONF_changeSceneByType(WV_U8 *pType);
 ********************************************************************/
 WV_S32 TSK_CONF_changeSceneByType(WV_U8 *pType)
 {
-    /*
-        WV_S32 i,j=0;
-        for(i=0;i<TSK_CONF_SCENE_TYPE_MAX_NUM;i++)
-        {
-                if(pSceneInfoDev->Scene[i].u16SceneType == u16Type)
-                {
 
-                        if(j<gSceneTypeInfo[u16Type].u32LocalNum)
-                        {
-                                j++;
-                                continue;
-                        }
-
-                        TSK_SCENE_Change(i);
-                        gSceneTypeInfo[u16Type].u32LocalNum ++;
-                        if(gSceneTypeInfo[u16Type].u32LocalNum >=gSceneTypeInfo[u16Type].u32TotalNum)
-                        {
-                                gSceneTypeInfo[u16Type].u32LocalNum = 0 ;
-                        }
-                        break;
-                }
-        }
-*/
-    //WV_printf("\nlocalNum=%d,total=%d\n",gSceneTypeInfo[u16Type].u32LocalNum,gSceneTypeInfo[u16Type].u32TotalNum);
     WV_S32 i=0;
-
-//    for(i=0;i<TSK_CONF_SCENE_TYPE_MAX_NUM;i++)
-//    {
-//        if(strncmp(pSceneInfoDev->Scene[i].ucTypeName ,pType, TSK_CONF_SCENE_TYPE_NAME_LEN) != 0 )
-//        {
-//            continue;
-//        }
-
-//        if(pSceneInfoDev->currentID == i)
-//        {
-//            TSK_CONF_changeMovByType(pType);
-//        }
-//        else
-//        {
-//            TSK_SCENE_Change(i);
-//            pSceneInfoDev->currentID = i;
-//            printf("pSceneInfoDev->currentID = %d\n",i);
-//        }
-//        break;
-//    }
-
     i = pSceneInfoDev->currentID;
     do{
         i++;
         i = i%TSK_CONF_SCENE_TYPE_MAX_NUM;
-        if(strncmp(pSceneInfoDev->Scene[i].ucTypeName ,pType, TSK_CONF_SCENE_TYPE_NAME_LEN) == 0)
+        if(strncmp((WV_S8 *)pSceneInfoDev->Scene[i].ucTypeName ,(WV_S8 *)pType, TSK_CONF_SCENE_TYPE_NAME_LEN) == 0)
         {
             TSK_SCENE_Change(TSK_SCENE_TYPE_NETDATA, i);
             pSceneInfoDev->currentID = i;
@@ -1275,291 +1195,6 @@ WV_S32 TSK_CONF_changeSceneByType(WV_U8 *pType)
     return WV_SOK;
 }
 
-
-/********************************************************************
-
-WV_S32 TSK_CONF_ChangeScene(WV_U8 *pData ,WV_U32 dataLen); 
-
-********************************************************************/
-WV_S32 TSK_CONF_ChangeScene(WV_U8 *pData ,WV_U32 dataLen)
-{
-    WV_S32 i,ret;
-
-    for(i=0;i<TSK_CONF_SCENE_COUNT;i++)
-    {
-        
-        if(strlen(pSceneNameDev->sceneNameId[i].name) == dataLen)
-        {
-            ret = strncmp(pData,pSceneNameDev->sceneNameId[i].name,dataLen);
-            if(ret == 0)
-            {
-
-                TSK_CONF_GetSceneConfByID(pSceneInfoDev->currentID,&pSceneInfoDev->Scene[pSceneInfoDev->currentID]);
-                TSK_SCENE_Change(TSK_SCENE_TYPE_NETDATA, i);
-                break;
-            }
-        }
-    }
-
-    return ret;
-}
-
-/********************************************************************
-
-WV_S32 TSK_CONF_GetSceneName(TSK_CONF_SCENE_INFO_E *pDev); 
-
-********************************************************************/
-WV_S32 TSK_CONF_GetSceneName()
-{
-
-    WV_S32 ret,i;
-    WV_S8 *pBuf = (WV_S8 *)pSceneNameDev;
-    FILE *fp;
-
-    //access scene name file
-    ret = access(TSK_CONF_Scene_NameFile,R_OK);
-    if(ret != 0)
-    {
-        WV_U8 name[20];
-        WV_U32 data;
-        WV_printf("access file [%s] error\n",TSK_CONF_Scene_NameFile);
-        if((fp = fopen(TSK_CONF_Scene_NameFile,"a+")) == NULL){
-            WV_printf("creat file [%s] failed\n",TSK_CONF_Scene_NameFile);
-            return -1;
-        }
-        WV_printf("creat file [%s] ok\n",TSK_CONF_Scene_NameFile);
-        fclose(fp);
-        //Init conf
-        for(i=0;i<TSK_CONF_SCENE_COUNT;i++)
-        {
-
-            sprintf(name, "Scene%dEnable",i);
-            SYS_ENV_GetU32(name,&data);
-            if(data == 1 )
-            {
-                sprintf(pSceneNameDev->sceneNameId[i].name,"scene%d",i);
-            }
-        }
-
-        TSK_CONF_SaveSceneName();
-        return WV_SOK;
-
-    }
-
-    fp = fopen(TSK_CONF_Scene_NameFile,"rb+");
-    if(fp == NULL)
-    {
-        WV_printf("fopen file [%s] error\n",TSK_CONF_Scene_NameFile);
-        return -1;
-    }
-    //open mov.ini
-
-    WV_S32 readLen=0;
-
-    readLen = fread(pBuf,1,sizeof(TSK_CONF_SCENE_FILE),fp);
-
-    if(readLen != sizeof(TSK_CONF_SCENE_FILE))
-    {
-        printf("read scene.ini len[%d],struct TSK_CONF_SCENE_FILE len[%d]\n",readLen,sizeof(TSK_CONF_SCENE_FILE));
-        fclose(fp);
-        return -1;
-    }
-    fclose(fp);
-    //set scene name to dev
-
-    return ret;
-}
-
-/********************************************************************
-
-WV_S32 TSK_CONF_SaveSceneName(); 
-
-********************************************************************/
-WV_S32 TSK_CONF_SaveSceneName()
-{
-    WV_S32 ret;
-    WV_S8 *pBuf = (WV_S8 *)pSceneNameDev;
-    FILE *fp;
-    ret = access(TSK_CONF_Scene_NameFile,R_OK);
-    WV_printf("save scene name start \n");
-    if(ret != 0){
-        WV_printf("access file [%s] error\n",TSK_CONF_Scene_NameFile);
-        return -1;
-    }
-
-    fp = fopen(TSK_CONF_Scene_NameFile,"wb+");
-    if(fp == NULL)
-    {
-        WV_printf("fopen file [%s] error\n",TSK_CONF_Scene_NameFile);
-        return -1;
-    }
-    //open mov.ini
-
-    WV_S32 writeLen=0;
-
-    writeLen = fwrite(pBuf,1,sizeof(TSK_CONF_SCENE_FILE),fp);
-
-    if(writeLen != sizeof(TSK_CONF_SCENE_FILE))
-    {
-        WV_printf("[TSK_CONF_SaveSceneName()]write scene.ini len[%d],struct TSK_CONF_SCENE_INFO_E len[%d]\n",writeLen,sizeof(TSK_CONF_SCENE_FILE));
-        fclose(fp);
-        return -1;
-    }
-
-    WV_printf("save scene name ok\n");
-    fclose(fp);
-    //set scene name to dev
-    return WV_SOK;
-}
-
-/********************************************************************
-
-WV_S32 TSK_CONF_SaveSceneType(WV_U8 id,WV_U8 u8Type); 
-
-********************************************************************/
-WV_S32 TSK_CONF_SaveSceneType(WV_U8 id,WV_U8 type)
-{
-    /*
-        WV_S8 name[WV_CONF_NAME_MAX_LEN];
-        WV_U32 data = 0;
-        data = type;
-        pSceneInfoDev->Scene[id].u16SceneType = type;
-        sprintf(name,"Scene%dType",id);
-        SYS_ENV_SetU32(name,data);
-
-        SYS_ENV_Save();
-        TSK_CONF_getSceneTypeNum();
-*/
-
-    return WV_SOK;
-}
-
-/********************************************************************
-
-WV_S32  TSK_CONF_SaveNewScene(WV_U8 *pData ,WV_U32 dataLen); 
-
-********************************************************************/
-WV_S32 TSK_CONF_SaveNewScene(WV_U8 *pData ,WV_U32 dataLen)
-{
-    WV_S32 i,j,ret=0;
-    WV_U32 sceneEna;
-    WV_S8 name[WV_CONF_NAME_MAX_LEN];
-    WV_S8 srcName[TSK_CONF_SCENE_NAME_MAX_LEN];
-    WV_S8 desName[TSK_CONF_SCENE_NAME_MAX_LEN];
-    WV_U8 sceneId;
-    memset(srcName,0,sizeof(srcName));
-    memset(desName,0,sizeof(desName));
-
-    WV_S32 reName = 0,srcNameLen,desNameLen;
-    for(i=1;i<dataLen;i++)
-    {
-        if(pData[i] == '?' )
-        {
-            srcNameLen = i;
-            desNameLen = dataLen-i-1;
-            memcpy(srcName,pData,srcNameLen);
-            memcpy(desName,&pData[i+1],desNameLen);
-            reName = 1;
-            break;
-        }
-
-        if(i==(dataLen -1))
-        {
-            srcNameLen = dataLen;
-            memcpy(desName,&pData[1],dataLen-1);
-            sceneId = pData[0];
-
-
-            if(sceneId >= TSK_CONF_SCENE_COUNT)
-            {
-                WV_printf("input scene id error,id[%d] >= %d \n",sceneId,TSK_CONF_SCENE_COUNT);
-                return -1;
-            }
-            break;
-        }
-    }
-
-
-    if(reName == 0)//add scene
-    {
-        //WV_printf("add new scene \n");
-        memset(pSceneNameDev->sceneNameId[sceneId].name,0,TSK_CONF_SCENE_NAME_MAX_LEN);
-        memcpy(pSceneNameDev->sceneNameId[sceneId].name,desName,dataLen-1);
-        //WV_printf("new scene [%d]name %s\n",sceneId,desName);
-        TSK_CONF_SceneGetLive(&pSceneInfoDev->Scene[sceneId]);
-        memcpy(pSceneInfoDev->Scene[sceneId].ucSceneName , pSceneNameDev->sceneNameId[sceneId].name ,TSK_CONF_SCENE_NAME_MAX_LEN);
-        pSceneInfoDev->Scene[sceneId].ucSceneId = sceneId;
-
-        ret |=TSK_SCENE_Save(sceneId);
-        ret |=TSK_CONF_SaveSceneName();
-
-    }else{//rename scene
-
-        for(i=0;i<TSK_CONF_SCENE_COUNT;i++)
-        {
-
-            if(strncmp(srcName,pSceneNameDev->sceneNameId[i].name,TSK_CONF_SCENE_NAME_MAX_LEN) == 0)
-            {
-                memcpy(pSceneNameDev->sceneNameId[i].name,desName,TSK_CONF_SCENE_NAME_MAX_LEN);
-                memcpy(pSceneInfoDev->Scene[i].ucSceneName , pSceneNameDev->sceneNameId[i].name ,TSK_CONF_SCENE_NAME_MAX_LEN);
-                pSceneInfoDev->Scene[sceneId].ucSceneId = sceneId;
-                ret |=TSK_CONF_SaveSceneName();
-                //memcpy(pSceneInfoDev->Scene[i].ucSceneName , pSceneNameDev->sceneNameId[i].name ,TSK_CONF_SCENE_NAME_MAX_LEN);
-            }
-
-        }
-    }
-    TSK_CONF_getSceneType();
-    return ret;
-
-}
-
-/********************************************************************
-
-WV_S32 TSK_CONF_SceneGetLive(TSK_CONF_SCENE_INFO_E *pScene); 
-
-********************************************************************/
-WV_S32 TSK_CONF_SceneGetLive(TSK_CONF_SCENE_CONF *pScene)  //get real time sceneInfo
-{
-
-    WV_S32 j;
-    TSK_SCENE_INFO_S sceneInfo;
-    TSK_SCENE_GetCurent(&sceneInfo);
-    //get current scene mov name
-    for(j=0;j<4;j++)
-    {
-        if(sceneInfo.mov[j].ena == 0) continue;
-        memcpy(pScene->ucSceneMovName[j].ucVideoFileName,pMovInfoDev->movFile[sceneInfo.mov[j].id].name,TSK_CONF_SCENE_NAME_MAX_LEN);
-    }
-    pScene->ucOutLineCount = sceneInfo.winNum;
-    for(j=0;j<sceneInfo.winNum;j++)
-    {
-
-
-        pScene->OutLine[j].usChannel = sceneInfo.win[j].videoId;
-        pScene->OutLine[j].usID =sceneInfo.win[j].outId;
-        pScene->OutLine[j].usLeft =sceneInfo.win[j].x;
-        pScene->OutLine[j].usTop =sceneInfo.win[j].y;
-        pScene->OutLine[j].usRight = pScene->OutLine[j].usLeft +sceneInfo.win[j].w;
-        pScene->OutLine[j].usBottom =pScene->OutLine[j].usTop + sceneInfo.win[j].h;
-    }
-    //get scene ani info
-
-    pScene->ucBKFrameCount = sceneInfo.animationNum;
-    for(j=0;j<sceneInfo.animationNum;j++)
-    {
-        pScene->BKFrame[j].usID = sceneInfo.animation[j].id;
-        pScene->BKFrame[j].usLeft = sceneInfo.animation[j].x;
-        pScene->BKFrame[j].usTop = sceneInfo.animation[j].y;
-        pScene->BKFrame[j].usRight = pScene->BKFrame[j].usLeft + sceneInfo.animation[j].w;
-        pScene->BKFrame[j].usBottom =pScene->BKFrame[j].usTop + sceneInfo.animation[j].h;
-
-    }
-
-    return 0;
-
-}
-
 /********************************************************************
 
 WV_S32 TSK_CONF_GetSceneConfByID(WV_U32 sceneID ,TSK_CONF_SCENE_CONF *pScene); 
@@ -1576,7 +1211,7 @@ WV_S32 TSK_CONF_GetSceneConfByID(WV_U32 sceneID ,TSK_CONF_SCENE_CONF *pScene)
     SYS_ENV_GetU32(name,&data);
     if(data == 0)return WV_SOK;// get scene enable status ,if sceneEnable ==0,continue;
     //get scene name
-    if(strlen(pSceneNameDev->sceneNameId[sceneID].name) == 0)
+    if(strlen((WV_S8 *)pSceneNameDev->sceneNameId[sceneID].name) == 0)
     {
         sprintf(name,"Scene%dEnable",sceneID);
         SYS_ENV_SetU32(name,0);
@@ -1662,6 +1297,289 @@ WV_S32 TSK_CONF_GetSceneConfByID(WV_U32 sceneID ,TSK_CONF_SCENE_CONF *pScene)
         pScene->BKFrame[j].usBottom =pScene->BKFrame[j].usTop +(WV_U16) data;
 
     }
+    return WV_SOK;
+}
+
+/********************************************************************
+
+WV_S32 TSK_CONF_ChangeScene(WV_U8 *pData ,WV_U32 dataLen); 
+
+********************************************************************/
+WV_S32 TSK_CONF_ChangeScene(WV_U8 *pData ,WV_U32 dataLen)
+{
+    WV_S32 i,ret;
+
+    for(i=0;i<TSK_CONF_SCENE_COUNT;i++)
+    {
+        
+        if(strlen((WV_S8 *)pSceneNameDev->sceneNameId[i].name) == dataLen)
+        {
+            ret = strncmp((WV_S8 *)pData,(WV_S8 *)pSceneNameDev->sceneNameId[i].name,dataLen);
+            if(ret == 0)
+            {
+
+                TSK_CONF_GetSceneConfByID(pSceneInfoDev->currentID,&pSceneInfoDev->Scene[pSceneInfoDev->currentID]);
+                TSK_SCENE_Change(TSK_SCENE_TYPE_NETDATA, i);
+                break;
+            }
+        }
+    }
+
+    return ret;
+}
+/********************************************************************
+
+WV_S32 TSK_CONF_SaveSceneName(); 
+
+********************************************************************/
+WV_S32 TSK_CONF_SaveSceneName()
+{
+    WV_S32 ret;
+    WV_S8 *pBuf = (WV_S8 *)pSceneNameDev;
+    FILE *fp;
+    ret = access(TSK_CONF_Scene_NameFile,R_OK);
+    WV_printf("save scene name start \n");
+    if(ret != 0){
+        WV_printf("access file [%s] error\n",TSK_CONF_Scene_NameFile);
+        return -1;
+    }
+
+    fp = fopen(TSK_CONF_Scene_NameFile,"wb+");
+    if(fp == NULL)
+    {
+        WV_printf("fopen file [%s] error\n",TSK_CONF_Scene_NameFile);
+        return -1;
+    }
+    //open mov.ini
+
+    WV_S32 writeLen=0;
+
+    writeLen = fwrite(pBuf,1,sizeof(TSK_CONF_SCENE_FILE),fp);
+
+    if(writeLen != sizeof(TSK_CONF_SCENE_FILE))
+    {
+        WV_printf("[TSK_CONF_SaveSceneName()]write scene.ini len[%d],struct TSK_CONF_SCENE_INFO_E len[%d]\n",writeLen,sizeof(TSK_CONF_SCENE_FILE));
+        fclose(fp);
+        return -1;
+    }
+
+    WV_printf("save scene name ok\n");
+    fclose(fp);
+    //set scene name to dev
+    return WV_SOK;
+}
+
+/********************************************************************
+
+WV_S32 TSK_CONF_GetSceneName(TSK_CONF_SCENE_INFO_E *pDev); 
+
+********************************************************************/
+WV_S32 TSK_CONF_GetSceneName()
+{
+
+    WV_S32 ret,i;
+    WV_S8 *pBuf = (WV_S8 *)pSceneNameDev;
+    FILE *fp;
+
+    //access scene name file
+    ret = access(TSK_CONF_Scene_NameFile,R_OK);
+    if(ret != 0)
+    {
+        WV_S8 name[20];
+        WV_U32 data;
+        WV_printf("access file [%s] error\n",TSK_CONF_Scene_NameFile);
+        if((fp = fopen(TSK_CONF_Scene_NameFile,"a+")) == NULL){
+            WV_printf("creat file [%s] failed\n",TSK_CONF_Scene_NameFile);
+            return -1;
+        }
+        WV_printf("creat file [%s] ok\n",TSK_CONF_Scene_NameFile);
+        fclose(fp);
+        //Init conf
+        for(i=0;i<TSK_CONF_SCENE_COUNT;i++)
+        {
+
+            sprintf(name, "Scene%dEnable",i);
+            SYS_ENV_GetU32(name,&data);
+            if(data == 1 )
+            {
+                sprintf((WV_S8 *)pSceneNameDev->sceneNameId[i].name,"scene%d",i);
+            }
+        }
+
+        TSK_CONF_SaveSceneName();
+        return WV_SOK;
+
+    }
+
+    fp = fopen(TSK_CONF_Scene_NameFile,"rb+");
+    if(fp == NULL)
+    {
+        WV_printf("fopen file [%s] error\n",TSK_CONF_Scene_NameFile);
+        return -1;
+    }
+    //open mov.ini
+
+    WV_S32 readLen=0;
+
+    readLen = fread(pBuf,1,sizeof(TSK_CONF_SCENE_FILE),fp);
+
+    if(readLen != sizeof(TSK_CONF_SCENE_FILE))
+    {
+        printf("read scene.ini len[%d],struct TSK_CONF_SCENE_FILE len[%d]\n",readLen,sizeof(TSK_CONF_SCENE_FILE));
+        fclose(fp);
+        return -1;
+    }
+    fclose(fp);
+    //set scene name to dev
+
+    return ret;
+}
+
+
+/********************************************************************
+
+WV_S32 TSK_CONF_SaveSceneType(WV_U8 id,WV_U8 u8Type); 
+
+********************************************************************/
+WV_S32 TSK_CONF_SaveSceneType(WV_U8 id,WV_U8 type)
+{
+    /*
+        WV_S8 name[WV_CONF_NAME_MAX_LEN];
+        WV_U32 data = 0;
+        data = type;
+        pSceneInfoDev->Scene[id].u16SceneType = type;
+        sprintf(name,"Scene%dType",id);
+        SYS_ENV_SetU32(name,data);
+
+        SYS_ENV_Save();
+        TSK_CONF_getSceneTypeNum();
+*/
+
+    return WV_SOK;
+}
+/********************************************************************
+
+WV_S32 TSK_CONF_SceneGetLive(TSK_CONF_SCENE_INFO_E *pScene); 
+
+********************************************************************/
+WV_S32 TSK_CONF_SceneGetLive(TSK_CONF_SCENE_CONF *pScene)  //get real time sceneInfo
+{
+
+    WV_S32 j;
+    TSK_SCENE_INFO_S sceneInfo;
+    TSK_SCENE_GetCurent(&sceneInfo);
+    //get current scene mov name
+    for(j=0;j<4;j++)
+    {
+        if(sceneInfo.mov[j].ena == 0) continue;
+        memcpy(pScene->ucSceneMovName[j].ucVideoFileName,pMovInfoDev->movFile[sceneInfo.mov[j].id].name,TSK_CONF_SCENE_NAME_MAX_LEN);
+    }
+    pScene->ucOutLineCount = sceneInfo.winNum;
+    for(j=0;j<sceneInfo.winNum;j++)
+    {
+
+
+        pScene->OutLine[j].usChannel = sceneInfo.win[j].videoId;
+        pScene->OutLine[j].usID =sceneInfo.win[j].outId;
+        pScene->OutLine[j].usLeft =sceneInfo.win[j].x;
+        pScene->OutLine[j].usTop =sceneInfo.win[j].y;
+        pScene->OutLine[j].usRight = pScene->OutLine[j].usLeft +sceneInfo.win[j].w;
+        pScene->OutLine[j].usBottom =pScene->OutLine[j].usTop + sceneInfo.win[j].h;
+    }
+    //get scene ani info
+
+    pScene->ucBKFrameCount = sceneInfo.animationNum;
+    for(j=0;j<sceneInfo.animationNum;j++)
+    {
+        pScene->BKFrame[j].usID = sceneInfo.animation[j].id;
+        pScene->BKFrame[j].usLeft = sceneInfo.animation[j].x;
+        pScene->BKFrame[j].usTop = sceneInfo.animation[j].y;
+        pScene->BKFrame[j].usRight = pScene->BKFrame[j].usLeft + sceneInfo.animation[j].w;
+        pScene->BKFrame[j].usBottom =pScene->BKFrame[j].usTop + sceneInfo.animation[j].h;
+
+    }
+
+    return 0;
+
+}
+
+/********************************************************************
+
+WV_S32  TSK_CONF_SaveNewScene(WV_U8 *pData ,WV_U32 dataLen); 
+
+********************************************************************/
+WV_S32 TSK_CONF_SaveNewScene(WV_U8 *pData ,WV_U32 dataLen)
+{
+    WV_S32 i,ret=0;
+    //WV_U32 sceneEna;
+    //WV_S8 name[WV_CONF_NAME_MAX_LEN];
+    WV_S8 srcName[TSK_CONF_SCENE_NAME_MAX_LEN];
+    WV_S8 desName[TSK_CONF_SCENE_NAME_MAX_LEN];
+    WV_U8 sceneId;
+    memset(srcName,0,sizeof(srcName));
+    memset(desName,0,sizeof(desName));
+
+    WV_S32 reName = 0,srcNameLen,desNameLen;
+    for(i=1;i<dataLen;i++)
+    {
+        if(pData[i] == '?' )
+        {
+            srcNameLen = i;
+            desNameLen = dataLen-i-1;
+            memcpy(srcName,pData,srcNameLen);
+            memcpy(desName,&pData[i+1],desNameLen);
+            reName = 1;
+            break;
+        }
+
+        if(i==(dataLen -1))
+        {
+            srcNameLen = dataLen;
+            memcpy(desName,&pData[1],dataLen-1);
+            sceneId = pData[0];
+
+
+            if(sceneId >= TSK_CONF_SCENE_COUNT)
+            {
+                WV_printf("input scene id error,id[%d] >= %d \n",sceneId,TSK_CONF_SCENE_COUNT);
+                return -1;
+            }
+            break;
+        }
+    }
+
+
+    if(reName == 0)//add scene
+    {
+        //WV_printf("add new scene \n");
+        memset(pSceneNameDev->sceneNameId[sceneId].name,0,TSK_CONF_SCENE_NAME_MAX_LEN);
+        memcpy(pSceneNameDev->sceneNameId[sceneId].name,desName,dataLen-1);
+        //WV_printf("new scene [%d]name %s\n",sceneId,desName);
+        TSK_CONF_SceneGetLive(&pSceneInfoDev->Scene[sceneId]);
+        memcpy(pSceneInfoDev->Scene[sceneId].ucSceneName , pSceneNameDev->sceneNameId[sceneId].name ,TSK_CONF_SCENE_NAME_MAX_LEN);
+        pSceneInfoDev->Scene[sceneId].ucSceneId = sceneId;
+
+        ret |=TSK_SCENE_Save(sceneId);
+        ret |=TSK_CONF_SaveSceneName();
+
+    }else{//rename scene
+
+        for(i=0;i<TSK_CONF_SCENE_COUNT;i++)
+        {
+
+            if(strncmp(srcName,(WV_S8 *)pSceneNameDev->sceneNameId[i].name,TSK_CONF_SCENE_NAME_MAX_LEN) == 0)
+            {
+                memcpy(pSceneNameDev->sceneNameId[i].name,desName,TSK_CONF_SCENE_NAME_MAX_LEN);
+                memcpy(pSceneInfoDev->Scene[i].ucSceneName , pSceneNameDev->sceneNameId[i].name ,TSK_CONF_SCENE_NAME_MAX_LEN);
+                pSceneInfoDev->Scene[sceneId].ucSceneId = sceneId;
+                ret |=TSK_CONF_SaveSceneName();
+                //memcpy(pSceneInfoDev->Scene[i].ucSceneName , pSceneNameDev->sceneNameId[i].name ,TSK_CONF_SCENE_NAME_MAX_LEN);
+            }
+
+        }
+    }
+    TSK_CONF_getSceneType();
+    return ret;
 
 }
 
@@ -1676,10 +1594,10 @@ WV_S32 TSK_CONF_SceneGetConf(TSK_CONF_SCENE_INFO_E *pDev)
 
     memset(pDev,0,sizeof(TSK_CONF_SCENE_INFO_E));
 
-    WV_U32 i=0,j=0,data;
-    WV_U32 winNum,aniNum;
+    WV_U32 i=0,data;
+    //WV_U32 winNum,aniNum;
 
-    WV_S8 name[WV_CONF_NAME_MAX_LEN];
+    //WV_S8 name[WV_CONF_NAME_MAX_LEN];
     //get scene name
     TSK_CONF_GetSceneName();
     //get scene conf
@@ -1799,10 +1717,10 @@ WV_S32 TSK_CONF_SceneDelet(WV_U8 * pBuf,WV_U32 dataLen)
     WV_U32 data = 0;
     for(i=0;i<TSK_CONF_SCENE_COUNT;i++)
     {
-        if(strlen(pSceneNameDev->sceneNameId[i].name) == dataLen)
+        if(strlen((WV_S8 *)pSceneNameDev->sceneNameId[i].name) == dataLen)
         {
 
-            if(strncmp(pBuf,pSceneNameDev->sceneNameId[i].name,dataLen) == 0)
+            if(strncmp((WV_S8 *)pBuf,(WV_S8 *)pSceneNameDev->sceneNameId[i].name,dataLen) == 0)
             {
                 //set scene enable to 0
                 memset(pSceneNameDev->sceneNameId[i].name,0,TSK_CONF_SCENE_NAME_MAX_LEN);
@@ -1840,9 +1758,9 @@ WV_S32 TSK_CONF_SaveCurrentScene(WV_U8 * pBuf,WV_U32 dataLen)
 
     for(i=0;i<TSK_CONF_SCENE_COUNT;i++)
     {
-        if(strlen(pSceneNameDev->sceneNameId[i].name) == dataLen)
+        if(strlen((WV_S8 *)pSceneNameDev->sceneNameId[i].name) == dataLen)
         {
-            ret=strncmp(pBuf,pSceneNameDev->sceneNameId[i].name,dataLen) ;
+            ret=strncmp((WV_S8 *)pBuf,(WV_S8 *)pSceneNameDev->sceneNameId[i].name,dataLen) ;
             if(ret==0)
             {
 
@@ -1871,7 +1789,6 @@ WV_S32 TSK_CONF_GetSceneInfo(WV_U8 * pBuf,WV_U32 *pDataLen);
 WV_S32 TSK_CONF_GetSceneInfo(WV_U8 * pBuf,WV_U32 *pDataLen)
 {
 
-    WV_S32 ret=0;
 
     /*
         ret = TSK_CONF_SceneGetConf(pSceneInfoDev);
@@ -1883,9 +1800,9 @@ WV_S32 TSK_CONF_GetSceneInfo(WV_U8 * pBuf,WV_U32 *pDataLen)
         }
 */
 
-    WV_U16 data;
+    WV_U32 data;
     SYS_ENV_GetU32("SceneCurId",&data);
-    pSceneInfoDev->currentID = data;
+    pSceneInfoDev->currentID = (WV_U8)data;
 
     TSK_CONF_SceneGetLive(&pSceneInfoDev->Scene[data]);
     TSK_CONF_getSceneType();
@@ -2000,7 +1917,7 @@ WV_S32 TSK_CONF_GetFreeMovID(const WV_U8 *pName)
             continue;
         }
 
-        if(strcmp(pMovInfoDev->movFile[i].name,pName) == 0 )
+        if(strcmp((WV_S8 *)pMovInfoDev->movFile[i].name,(WV_S8 *)pName) == 0 )
         {
             movID = i;
 
@@ -2035,13 +1952,13 @@ WV_S32 TSK_CONF_CheckMovEncrypt(WV_U8 *pFile,WV_U8 *pType)
 
     FILE *fp=NULL;
     WV_U8 buf[1024+1];
-    WV_S32 readLen=0,ret=0;
-    if(access(pFile,F_OK) != 0 )
+    WV_S32 readLen=0;
+    if(access((WV_S8 *)pFile,F_OK) != 0 )
     {
         return WV_EFAIL;
     }
 
-    fp = fopen(pFile,"rb");
+    fp = fopen((WV_S8 *)pFile,"rb");
     if(fp == NULL)
     {
         return WV_EFAIL;
@@ -2109,7 +2026,7 @@ WV_S32 TSK_CONF_cpVideoToLocal(WV_S8 *srcFilePath,WV_S8 *desFilePath)
         }
 
 
-        movID = TSK_CONF_GetFreeMovID(pDirent->d_name);
+        movID = TSK_CONF_GetFreeMovID((WV_U8 *)pDirent->d_name);
         if(movID == -1) continue;
 
         memset(movSrc,0,sizeof(movSrc));
@@ -2117,7 +2034,7 @@ WV_S32 TSK_CONF_cpVideoToLocal(WV_S8 *srcFilePath,WV_S8 *desFilePath)
 
         sprintf(movSrc,"%s%s",srcFilePath,pDirent->d_name);
         memset(movType,0,sizeof(movType));
-        if(TSK_CONF_CheckMovEncrypt(movSrc,movType)  !=  0) continue; //检测视频是否加密
+        if(TSK_CONF_CheckMovEncrypt((WV_U8 *)movSrc,movType)  !=  0) continue; //检测视频是否加密
 
         if(WV_FILE_CpyWithOutHead(1024,movSrc,TSK_CONF_MOV_DEFAULT_NAME) != 0 )
         {

@@ -16,6 +16,36 @@
 #define FILENAME_NET_CONF ""
 #define FILENAME_LEISHI_DB "./env/leishi.db"
 #define FILENAME_SHIYI_DB "./env/shiyi.db"
+
+
+/****************************************************************************************
+
+WV_S32 SYS_FILE_GetConfFileToDest(WV_U8 *pData,WV_S32 len,WV_S8 *pDestFileName)
+
+****************************************************************************************/
+WV_S32 SYS_FILE_GetConfFileToDest(WV_U8 *pData,WV_S32 len,WV_S8 *pDestFileName)
+{
+	FILE *fp;
+	fp = fopen(pDestFileName,"wb+");
+	if(fp == NULL)
+	{
+		printf("fopen %s error \n",pDestFileName); 
+		return -1;
+	}
+	WV_S32 writeLen;
+	writeLen =fwrite(pData,1,len,fp);
+	if(writeLen != len)
+	{
+		printf("fwrite %s error \n",pDestFileName);
+		fclose(fp);	
+		return -1;
+	}
+	
+	fclose(fp);
+	return 0;	
+	
+}
+
 /****************************************************************************************
 
 WV_S32 SYS_FILE_GetConfFileWV_U8 *pData,WV_S32 len,WV_U8 cmd,WV_U16 arg)
@@ -47,33 +77,5 @@ WV_S32 SYS_FILE_GetConfFile(WV_U8 *pData,WV_S32 len,WV_U8 cmd,WV_U16 arg)
     }
 
     return ret;
-	
-}
-
-/****************************************************************************************
-
-WV_S32 SYS_FILE_GetConfFileToDest(WV_U8 *pData,WV_S32 len,WV_S8 *pDestFileName)
-
-****************************************************************************************/
-WV_S32 SYS_FILE_GetConfFileToDest(WV_U8 *pData,WV_S32 len,WV_S8 *pDestFileName)
-{
-	FILE *fp;
-	fp = fopen(pDestFileName,"wb+");
-	if(fp == NULL)
-	{
-		printf("fopen %s error \n",pDestFileName); 
-		return -1;
-	}
-	WV_S32 writeLen;
-	writeLen =fwrite(pData,1,len,fp);
-	if(writeLen != len)
-	{
-		printf("fwrite %s error \n",pDestFileName);
-		fclose(fp);	
-		return -1;
-	}
-	
-	fclose(fp);
-	return 0;	
 	
 }

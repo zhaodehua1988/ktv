@@ -3,6 +3,10 @@
 #include"tsk_usb.h"
 #include "tsk_usbShow.h"
 #include "tsk_usbImport.h"
+#include "tsk_update.h"
+#include "tsk_mobileShow.h"
+#include "tsk_go.h"
+#include "tsk_player.h"
 #define  TSK_USB_PATH            "/usb"
 #define  TSK_USB_UPDATE_PATH     "/update"
 #define  TSK_USB_MAIN_NAME       "hello"
@@ -21,6 +25,7 @@ typedef struct TSK_USB_DEV_E
 }TSK_USB_DEV_E;
 
 static TSK_USB_DEV_E gUsbDev;
+
 /********************************************
 WV_S32 TSK_GET_USB_DEV()
 查找usb设备文件
@@ -263,10 +268,10 @@ WV_S32 TSK_USB_GetUsb(WV_S32 argc, WV_S8 **argv,WV_S8 *prfBuff)
 
             prfBuff += sprintf(prfBuff,"********************\r\n");
             prfBuff += sprintf(prfBuff,"name     = %s\r\n", ptr->d_name);
-            prfBuff += sprintf(prfBuff,"node num = %d\r\n", ptr->d_ino);
-            prfBuff += sprintf(prfBuff,"node off = %d \r\n",ptr->d_off);
-            prfBuff += sprintf(prfBuff,"type     = %d \r\n",ptr->d_type);
-            prfBuff += sprintf(prfBuff,"len      = %d \r\n",ptr->d_reclen );
+            prfBuff += sprintf(prfBuff,"node num = %d\r\n", (int)ptr->d_ino);
+            prfBuff += sprintf(prfBuff,"node off = %d \r\n",(int)ptr->d_off);
+            prfBuff += sprintf(prfBuff,"type     = %d \r\n",(int)ptr->d_type);
+            prfBuff += sprintf(prfBuff,"len      = %d \r\n",(int)ptr->d_reclen );
             sprintf(filePath,"%s/%s",dirPath,ptr->d_name);
             ret = stat(filePath,&statBuf);
             if(ret != 0)
@@ -274,7 +279,7 @@ WV_S32 TSK_USB_GetUsb(WV_S32 argc, WV_S8 **argv,WV_S8 *prfBuff)
                 prfBuff += sprintf(prfBuff,"    get %s stat erro !! \r\n",ptr->d_name);
                 continue;
             }
-            prfBuff += sprintf(prfBuff,"size   = %d \r\n",statBuf.st_size );
+            prfBuff += sprintf(prfBuff,"size   = %d \r\n",(int)statBuf.st_size );
 
         }
         closedir(dir);
@@ -342,7 +347,7 @@ WV_S32 TSK_USB_GetLs(WV_S32 argc, WV_S8 **argv,WV_S8 *prfBuff)
             prfBuff += sprintf(prfBuff,"    get %s stat erro !! \r\n",ptr->d_name);
             continue;
         }
-        prfBuff += sprintf(prfBuff,"%40s %2d %8x %8d\r\n",ptr->d_name,ptr->d_type,statBuf.st_mode,statBuf.st_size );
+        prfBuff += sprintf(prfBuff,"%40s %2d %8x %8d\r\n",ptr->d_name,ptr->d_type,statBuf.st_mode,(int)statBuf.st_size );
 
     }
     closedir(dir);
@@ -380,10 +385,10 @@ WV_S32 TSK_USB_GetStat(WV_S32 argc, WV_S8 **argv,WV_S8 *prfBuff)
         return 0;
     }
 
-    prfBuff += sprintf(prfBuff,"block size : %d\r\n \r\n",sfs.f_bsize);
-    prfBuff += sprintf(prfBuff,"block all  : %d\r\n \r\n",sfs.f_blocks);
-    prfBuff += sprintf(prfBuff,"block free : %d\r\n \r\n",sfs.f_bfree);
-    prfBuff += sprintf(prfBuff,"block avail : %d\r\n \r\n",sfs.f_bavail);
+    prfBuff += sprintf(prfBuff,"block size : %d\r\n \r\n",(int)sfs.f_bsize);
+    prfBuff += sprintf(prfBuff,"block all  : %d\r\n \r\n",(int)sfs.f_blocks);
+    prfBuff += sprintf(prfBuff,"block free : %d\r\n \r\n",(int)sfs.f_bfree);
+    prfBuff += sprintf(prfBuff,"block avail : %d\r\n \r\n",(int)sfs.f_bavail);
 
     WV_FILE_GetAvail(dirPath,&lenM);
 
@@ -606,7 +611,6 @@ WV_S32 TSK_USB_GetAni(WV_S32 argc, WV_S8 **argv,WV_S8 *prfBuff)
     WV_S8 scrFile[64];
     WV_S8 desFile[64];
     WV_S8 scrPath[64];
-    WV_S8 desPath[64];
     WV_S32  i,j;
 
     sprintf(scrPath,"%s%s/png",TSK_USB_PATH,TSK_USB_UPDATE_PATH);

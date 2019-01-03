@@ -1152,18 +1152,18 @@ WV_S32  TSK_FPGA_SaveColor(WV_U8 channel);
 WV_S32  TSK_FPGA_SaveColor(WV_U8 channel )
 { 
     FILE    *fp = NULL;
-    WV_U8  *pColorBuf,pFileBuf[TSK_FPGA_COLOR_COL*4+16] ;
+    WV_S8  *pColorBuf,pFileBuf[TSK_FPGA_COLOR_COL*4+16] ;
     WV_S32 i,j;
     WV_S32 writeLen;
-    sprintf(gFpgaDev.pColorBuf, "./Color/Colorfile%d.dat",channel);
-    fp = fopen(gFpgaDev.pColorBuf, "wb");
+    sprintf((WV_S8 *)gFpgaDev.pColorBuf, "./Color/Colorfile%d.dat",channel);
+    fp = fopen((WV_S8 *)gFpgaDev.pColorBuf, "wb");
     if ( fp == NULL )
     {
         WV_ERROR("SaveOut() fopen error\r\n");
         return WV_EFAIL;
     }
 
-    pColorBuf = gFpgaDev.pColorBuf;
+    pColorBuf =(WV_S8 *) gFpgaDev.pColorBuf;
 
     for(i = 0;i < TSK_FPGA_COLOR_ROW ;i++   )
     {
@@ -1776,7 +1776,6 @@ WV_S32 TSK_FPGA_GetTemp(WV_U16* pCpu,WV_U16 *pFpgaIn,WV_U16 *pFpgaOut)
 {
     WV_S32 ret = 0;
     WV_U16 t;
-    float tmp;
     WV_S32 chl;
     WV_S16 tmpCpu;
     chl = FPGA_CONF_GetOutChl_Num();

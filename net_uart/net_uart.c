@@ -92,7 +92,7 @@ WV_S32 NET_UART_GetNetConf(WV_U8 *buf)
 {
 	WV_S8 name[64]={0};
 	WV_U32 data=0;
-	WV_S32 i,j=0,len=0,ret=0;
+	WV_S32 i,j=0,ret=0;
 	for(i=0;i<64;i++)
 	{
 		if(buf[i] == '#')
@@ -124,18 +124,18 @@ WV_S32 NET_UART_GetNetConf(WV_U8 *buf)
 			return ret;
 		}
 
-		sprintf(pgNetUartDev->clientIp,"%s",ip);
+		sprintf((WV_S8 *)pgNetUartDev->clientIp,"%s",ip);
 	
 	}
 	else if(strcmp(name,"ClientPort") == 0)
 	{
-		sscanf(&buf[i],"%d",&data);
-		data = atoi(&buf[i]);
+		sscanf((WV_S8 *)&buf[i],"%d",&data);
+		data = atoi((WV_S8 *)&buf[i]);
 		pgNetUartDev->clientPort = data;
 		
 	}else if(strcmp(name,"ServerPort") == 0){
-		sscanf(&buf[i],"%d",&data);
-		data = atoi(&buf[i]);
+		sscanf((WV_S8 *)&buf[i],"%d",&data);
+		data = atoi((WV_S8 *)&buf[i]);
 		pgNetUartDev->port = data;
 		
 	}
@@ -356,7 +356,7 @@ WV_S32 NET_UART_GetNetUartConf(NET_UART_DEV_E  * pDev)
 {
 
 	WV_S8 buf[1024];
-	WV_S32 i,j,ret;
+	WV_S32 ret;
 	ret = access(NET_UART_CMDFILE,W_OK);
 
 	if(ret != 0){
@@ -387,7 +387,7 @@ WV_S32 NET_UART_GetNetUartConf(NET_UART_DEV_E  * pDev)
 						continue;
 					if(buf[0] == '<')
 						break;
-					NET_UART_GetNetConf(buf);
+					NET_UART_GetNetConf((WV_U8 *)buf);
 				}
 				break;
 			} 
@@ -528,6 +528,24 @@ WV_S32 NET_UART_SceneCheck(NET_UART_DEV_E  *pDev,WV_U8 *pBuf,WV_S32 len)
 
 }
 
+/****************************************************************************
+
+WV_S32 NET_UART_Send(WV_U8 pData,WV_U32 dataLen)
+
+****************************************************************************/
+WV_S32 NET_UART_Send(WV_U8 *pData,WV_U32 dataLen)
+{
+	NET_UART_printf(" net to uart send cmd\n");
+	WV_S32 i;
+	for(i=0;i<dataLen;i++)
+	{
+		printf("%02x ",pData[i]);
+	}	
+	printf("\r\n");
+	socklen_t addrLen = sizeof(struct sockaddr_in);
+	sendto(pgNetUartDev->mSocket, pData, dataLen, 0, (struct sockaddr *)&pgNetUartDev->cliAddr, addrLen);
+	return WV_SOK;	
+}
 /******************************************************************************
 
 WV_S32 NET_UART_SceneChange(NET_UART_DEV_E  *pDev,WV_U8 *pBuf,WV_S32 len);
@@ -674,9 +692,6 @@ WV_S32 NET_UART_CliInit(NET_UART_DEV_E * pDev)
 ****************************************************************************/
 WV_S32 NET_UART_CliInit(NET_UART_DEV_E * pDev)
 {
-	WV_U32 reuse;
-	WV_S32 status;
-	socklen_t len;
 	
 	struct sockaddr_in* pAddr;
 	pAddr = &(pDev->cliAddr);
@@ -685,7 +700,7 @@ WV_S32 NET_UART_CliInit(NET_UART_DEV_E * pDev)
 	pAddr->sin_family = AF_INET;
 	pAddr->sin_port = htons(pDev->clientPort);
 	//pAddr->sin_addr.s_addr = htonl(INADDR_ANY);  
-	pAddr->sin_addr.s_addr = inet_addr(pDev->clientIp);
+	pAddr->sin_addr.s_addr = inet_addr((WV_S8 *)pDev->clientIp);
 	bzero(&(pAddr->sin_zero), 8);
 
 	return WV_SOK;	
@@ -758,12 +773,10 @@ WV_S32 NET_UART_Recv(WV_S32 socket,WV_U8 * pBuf, WV_S32 len)
 WV_S32 NET_UART_Recv(WV_S32 socket,NET_UART_DEV_E * pDev, WV_S32 len)
 {
 
-	WV_S32 recvLen,recvToal,reqLen,ret =0;
+	WV_S32 recvLen,recvToal,ret =0;
 	recvToal = 0; 
 	WV_U8 pRevBuf[NET_UART_BUF_MAXLEN];
-	socklen_t addrLen = sizeof(struct sockaddr_in);
 	recvLen = recvfrom(socket,pRevBuf,len,0,NULL,NULL);
-	int i;
 	if(recvLen >0)
 	{ 	  
 
@@ -789,24 +802,6 @@ WV_S32 NET_UART_Recv(WV_S32 socket,NET_UART_DEV_E * pDev, WV_S32 len)
  	return ret;
 }
 
-/****************************************************************************
-
-WV_S32 NET_UART_Send(WV_U8 pData,WV_U32 dataLen)
-
-****************************************************************************/
-WV_S32 NET_UART_Send(WV_U8 *pData,WV_U32 dataLen)
-{
-	NET_UART_printf(" net to uart send cmd\n");
-	WV_S32 i;
-	for(i=0;i<dataLen;i++)
-	{
-		printf("%02x ",pData[i]);
-	}	
-	printf("\r\n");
-	socklen_t addrLen = sizeof(struct sockaddr_in);
-	sendto(pgNetUartDev->mSocket, pData, dataLen, 0, &pgNetUartDev->cliAddr, addrLen);
-	return WV_SOK;	
-}
 
 /****************************************************************************
 
@@ -816,7 +811,7 @@ WV_S32 NET_UART_Get_Cmd(NET_UART_DEV_E * pDev)
 WV_S32 NET_UART_Get_Cmd(NET_UART_DEV_E * pDev)
 {
 	//get 
-	WV_S32 len,i;
+	WV_S32 len;
 	
 	len = NET_UART_Recv(pDev ->mSocket,pDev,NET_UART_BUF_MAXLEN);
 
@@ -833,9 +828,6 @@ WV_S32 NET_UART_CMD_Porc(NET_UART_DEV_E *pDev,WV_S32 cmdLen)
 {
 
 	WV_S32 ret=0;
-	WV_U32 port;
-	WV_S8 ip[20];
-	WV_S32 i;
 #if 0
 	printf("get cmd:");
 	for(i=0;i<cmdLen;i++)

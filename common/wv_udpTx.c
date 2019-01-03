@@ -19,7 +19,7 @@ WV_S32  WV_UDPTX_Creat(WV_ETH_UDP_TX_E *pSock);
 WV_S32  WV_UDPTX_Creat(WV_ETH_UDP_TX_E *pSock)
 {
  
-	WV_S32         reuse,nSendBufLen;
+	WV_S32         reuse;
 	socklen_t      len; 
     struct sockaddr_in *pAddr;
     pAddr = & (pSock->addrTx); 

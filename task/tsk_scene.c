@@ -124,7 +124,6 @@ WV_S32 TSK_SCENE_GetSyncEna();
 *******************************************************************/
 WV_S32 TSK_SCENE_GetSyncEna()
 {
-    printf("11111111111111111--TSK_SCENE_GetSyncEna \n");
     return gCurScene.DevCascading;
 }
 /*******************************************************************

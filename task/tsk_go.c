@@ -247,17 +247,12 @@ WV_S32 TSK_GO_DrawGrid_EXIT();
 WV_S32 TSK_GO_DrawGrid_EXIT()
 {
 	
-	WV_U32 ret;
 	WV_U16 outPutEna;
-	HI_RECT Rect;
-	WV_S32 chl,i;
+	WV_S32 chl;
 	chl=FPGA_CONF_GetOutChl_Num();
-	//Rect.x = 0;
-	//Rect.y = 0;
-	//Rect.w = RECT_W;
-	//Rect.h = RECT_H+4;
+
 	FPGA_CONF_SetOutput(0);
-	//WV_CHECK_RET( HI_GO_FillRect(gGoDev.goDev.layerSurfHndl, &Rect, 0, HIGO_COMPOPT_NONE) );   		
+	
 	HI_GO_FillRect(gGoDev.goDev.layerSurfHndl, NULL, 0, HIGO_COMPOPT_NONE);
 	HIS_GO_RefreshLayer(&gGoDev.goDev);
 		
@@ -280,9 +275,6 @@ WV_S32 TSK_GO_DrawGrid_EXIT()
 	TSK_SCENE_SceneOpen();
 	outPutEna = TSK_FPGA_GetOutConf();
 	FPGA_CONF_SetOutput(outPutEna);
-	//FPGA_CONF_ResetA();
-	//TSK_SCENE_Restart();
-
 	return WV_SOK;
 }
 /*****************************************************************************
@@ -290,8 +282,7 @@ WV_S32 TSK_GO_DrawGrid_Start();
 *****************************************************************************/
 WV_S32 TSK_GO_DrawGrid_Start()
 {
-	WV_U16 outPutEna;
-	WV_S32 chl,i;
+	WV_S32 i;
 
 	for(i=0;i<3;i++)
 	{
@@ -405,7 +396,6 @@ WV_S32 TSK_GO_FillRect_Start();
 *****************************************************************************/
 WV_S32 TSK_GO_FillRect_Start()
 {
-	WV_S32 ret;	
 	WV_S32 i,j,k;
 	WV_S32 num=0;	
 	WV_U32 color_R;
@@ -443,8 +433,6 @@ WV_S32 TSK_GO_FillRect_EXIT();
 *****************************************************************************/
 WV_S32 TSK_GO_FillRect_EXIT()
 {
-	
-	WV_U32 ret;
 
 	HI_RECT Rect;
 
@@ -563,7 +551,7 @@ WV_S32 TSK_GO_FillRectDebug(WV_U32 colorNum,WV_U32 *pColor)
 	//save back color 
 	gLightData.color = pColor[0] | 0xff000000;
 	HIS_GO_RefreshLayer(&gGoDev.goDev);	
-	
+	return WV_SOK;
 }
 /*****************************************************************************
 
@@ -876,9 +864,10 @@ WV_S32 TSK_GO_RectPicAndMovPos(WV_U16 BackAniEna,WV_U8 saveMode,WV_U32 dataLen,W
 	WV_S32 i;
 	HI_RECT Rect;
 	WV_U32 color;	
-	TSK_GO_POS_E *pPos = (TSK_GO_MOV_PIC_POS_S *)pData;	
+/*	TSK_GO_POS_E *pPos = (TSK_GO_POS_E *)pData;	
+
 	WV_U16 *pTemp = (WV_U16 *)pData;
-/*
+
 	for(i=0;i<2;i++)
 	{
 		printf("pTemp[%d]=%d pTemp[%d]=%d pTemp[%d]=%d pTemp[%d]=%d \n",4*i,pTemp[4*i],4*i+1,pTemp[4*i+1],4*i+2,pTemp[4*i+2],4*i+3,pTemp[4*i+3]);
@@ -1344,7 +1333,7 @@ WV_S32   ret;
     
     if(strcmp(argv[1],"drawline") == 0)
     {
-	WV_U16 x0,y0,x1,y1;
+	WV_U32 x0,y0,x1,y1;
 	if(argc<6)
 	{
 		prfBuff += sprintf(prfBuff,"set drawline <x0><y0> <x1> <y1> \r\n"); 
@@ -1354,7 +1343,7 @@ WV_S32   ret;
 	WV_STR_S2v(argv[3],&y0);
 	WV_STR_S2v(argv[4],&x1);
 	WV_STR_S2v(argv[5],&y1);
-	TSK_GO_DrawLine_Test(x0,y0,x1,y1);
+	TSK_GO_DrawLine_Test((WV_U16)x0,(WV_U16)y0,(WV_U16)x1,(WV_U16)y1);
 	
 	return WV_SOK;
     } 
@@ -1444,7 +1433,7 @@ WV_S32 TSK_GO_CmdSetText(WV_S32 argc, WV_S8 **argv,WV_S8 *prfBuff)
 	   	prfBuff += sprintf(prfBuff,"set text <x> <y> <w> <h> <color> <text>  \r\n");
 		return WV_SOK;
 	  } 
-	WV_S32 x,y,w,h,color;
+	WV_U32 x,y,w,h,color;
 	WV_STR_S2v(argv[0],&x);
 	WV_STR_S2v(argv[1],&y);
 	WV_STR_S2v(argv[2],&w);
@@ -1473,9 +1462,7 @@ WV_S32 TSK_GO_SetBank(WV_S32 argc, WV_S8 **argv,WV_S8 *prfBuff)
 WV_S32 TSK_GO_SetBack(WV_S32 argc, WV_S8 **argv, WV_S8 *prfBuff)
 {
 	WV_U32 color;
-	WV_U32 devAddr;
-	WV_U8 buf[255] = {0};
-	WV_S32 ret, i;
+	WV_S32 ret;
 
 	HI_RECT Rect;
 	Rect.x = 0;
@@ -1510,7 +1497,7 @@ WV_S32 TSK_GO_SetBack(WV_S32 argc, WV_S8 **argv, WV_S8 *prfBuff)
 		HI_GO_FillRect(gGoDev.goDev.layerSurfHndl, &Rect, 0, HIGO_COMPOPT_NONE);
 		HIS_GO_RefreshLayer(&gGoDev.goDev);
 	}
-
+	return WV_SOK;
 }
   
 /***************************************************************

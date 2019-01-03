@@ -33,7 +33,7 @@ typedef struct HIS_PLAYER_MOVFILE
     WV_S8 name[30];
 }HIS_PLAYER_MOVFILE;
 
-static HIS_PLAYER_MOVFILE gHisPlayMov[HIS_PLAYER_MOV_MAXNUM];
+//static HIS_PLAYER_MOVFILE gHisPlayMov[HIS_PLAYER_MOV_MAXNUM];
 /***************************************************************
 
 WV_S32  HIS_PLAYER_Init();
@@ -53,11 +53,7 @@ WV_S32  HIS_PLAYER_Init()
     //  HI_FORMAT_LIB_VERSION_S stPlayerVersion;
     // memset(&stPlayerVersion, 0, sizeof(stPlayerVersion));
     // HI_SVR_PLAYER_GetVersion(&stPlayerVersion);
-    //  WV_printf("HiPlayer V%u.%u.%u.%u\n",\
-    stPlayerVersion.u8VersionMajor,\
-            stPlayerVersion.u8VersionMinor,\
-            stPlayerVersion.u8Revision,\
-            stPlayerVersion.u8Step);
+    //  WV_printf("HiPlayer V%u.%u.%u.%u\n",tPlayerVersion.u8VersionMajor,stPlayerVersion.u8VersionMinor,stPlayerVersion.u8Revision,stPlayerVersion.u8Step);
     s32Ret = HI_SVR_PLAYER_RegisterDynamic(HI_SVR_PLAYER_DLL_PARSER, "libformat.so");
 
     if (HI_SUCCESS != s32Ret)
@@ -418,7 +414,7 @@ static WV_S32 HIS_PLAYER_CallBack(HI_HANDLE hPlayer, HI_SVR_PLAYER_EVENT_S *pstr
     else if (HI_SVR_PLAYER_EVENT_NETWORK_INFO == (HI_SVR_PLAYER_EVENT_E)pstruEvent->eEvent)
     {
        // WV_printf("[0x%x]:HI_SVR_PLAYER_EVENT_NETWORK_INFO \n",hPlayer);
-        HI_FORMAT_NET_STATUS_S *pstNetStat = (HI_FORMAT_NET_STATUS_S*)pstruEvent->pu8Data;
+        //HI_FORMAT_NET_STATUS_S *pstNetStat = (HI_FORMAT_NET_STATUS_S*)pstruEvent->pu8Data;
         /*  WV_printf("HI_SVR_PLAYER_EVNET_NETWORK_INFO: type:%d, code:%d, str:%s\n",\
         pstNetStat->eType, pstNetStat->s32ErrorCode, pstNetStat->szProtocals); */
         /*
@@ -438,7 +434,7 @@ static WV_S32 HIS_PLAYER_CallBack(HI_HANDLE hPlayer, HI_SVR_PLAYER_EVENT_S *pstr
     }
     else if (HI_SVR_PLAYER_EVENT_FIRST_FRAME_TIME == (HI_SVR_PLAYER_EVENT_E)pstruEvent->eEvent)
     {
-        HI_U32 u32Time = *((HI_U32*)pstruEvent->pu8Data);
+        //HI_U32 u32Time = *((HI_U32*)pstruEvent->pu8Data);
        // WV_printf("[0x%x]:the first frame time is %d ms\n",hPlayer,u32Time);
     }
     else if (HI_SVR_PLAYER_EVENT_DOWNLOAD_PROGRESS == (HI_SVR_PLAYER_EVENT_E)pstruEvent->eEvent)
@@ -451,8 +447,7 @@ static WV_S32 HIS_PLAYER_CallBack(HI_HANDLE hPlayer, HI_SVR_PLAYER_EVENT_S *pstr
         HI_SVR_PLAYER_Invoke(hPlayer, HI_FORMAT_INVOKE_GET_BANDWIDTH, &s64BandWidth);
 
         memcpy(&stDown, pstruEvent->pu8Data, pstruEvent->u32Len);
-        // WV_printf("download progress:%d, duration:%lld ms, buffer size:%lld bytes, bandwidth = %lld\n",\
-        stDown.u32Progress, stDown.s64Duration, stDown.s64BufferSize, s64BandWidth);
+        // WV_printf("download progress:%d, duration:%lld ms, buffer size:%lld bytes, bandwidth = %lld\n",stDown.u32Progress, stDown.s64Duration, stDown.s64BufferSize, s64BandWidth);
         if (stDown.u32Progress >= 100 && s32PausedCtrl == 2){
             HI_SVR_PLAYER_Resume(hPlayer);
         }
@@ -461,9 +456,7 @@ static WV_S32 HIS_PLAYER_CallBack(HI_HANDLE hPlayer, HI_SVR_PLAYER_EVENT_S *pstr
     {
         WV_printf("[0x%x]:HI_SVR_PLAYER_EVENT_BUFFER_STATE \n",hPlayer);
         HI_SVR_PLAYER_BUFFER_S *pstBufStat = (HI_SVR_PLAYER_BUFFER_S*)pstruEvent->pu8Data;
-        // WV_printf("HI_SVR_PLAYER_EVENT_BUFFER_STATE type:%d, duration:%lld ms, size:%lld bytes\n",pstBufStat->eType,\
-        pstBufStat->stBufStat.s64Duration,\
-                pstBufStat->stBufStat.s64BufferSize);
+        // WV_printf("HI_SVR_PLAYER_EVENT_BUFFER_STATE type:%d, duration:%lld ms, size:%lld bytes\n",pstBufStat->eType,pstBufStat->stBufStat.s64Duration,pstBufStat->stBufStat.s64BufferSize);
 
         HI_SVR_PLAYER_GetFileInfo(hPlayer, &pstFileInfo);
 
@@ -482,9 +475,7 @@ static WV_S32 HIS_PLAYER_CallBack(HI_HANDLE hPlayer, HI_SVR_PLAYER_EVENT_S *pstr
         }
         else if (pstBufStat->eType == HI_SVR_PLAYER_BUFFER_START)
         {
-            // WV_printf("### HI_SVR_PLAYER_EVENT_BUFFER_STATE type:HI_SVR_PLAYER_BUFFER_START, duration:%lld ms, size:%lld bytes\n",\
-            pstBufStat->stBufStat.s64Duration,\
-                    pstBufStat->stBufStat.s64BufferSize);
+            // WV_printf("### HI_SVR_PLAYER_EVENT_BUFFER_STATE type:HI_SVR_PLAYER_BUFFER_START, duration:%lld ms, size:%lld bytes\n",pstBufStat->stBufStat.s64Duration,pstBufStat->stBufStat.s64BufferSize);
             if ((HI_FORMAT_SOURCE_NET_VOD == pstFileInfo->eSourceType ||
                  HI_FORMAT_SOURCE_NET_LIVE == pstFileInfo->eSourceType ) &&
                     HI_SVR_PLAYER_STATE_PLAY == ePlayerState)
@@ -495,9 +486,7 @@ static WV_S32 HIS_PLAYER_CallBack(HI_HANDLE hPlayer, HI_SVR_PLAYER_EVENT_S *pstr
         }
         else if (pstBufStat->eType == HI_SVR_PLAYER_BUFFER_ENOUGH)
         {
-            // WV_printf("### HI_SVR_PLAYER_EVENT_BUFFER_STATE type:HI_SVR_PLAYER_BUFFER_ENOUGH, duration:%lld ms, size:%lld bytes\n",\
-            pstBufStat->stBufStat.s64Duration,\
-                    pstBufStat->stBufStat.s64BufferSize);
+            // WV_printf("### HI_SVR_PLAYER_EVENT_BUFFER_STATE type:HI_SVR_PLAYER_BUFFER_ENOUGH, duration:%lld ms, size:%lld bytes\n",pstBufStat->stBufStat.s64Duration,pstBufStat->stBufStat.s64BufferSize);
             if ((HI_FORMAT_SOURCE_NET_VOD == pstFileInfo->eSourceType ||
                  HI_FORMAT_SOURCE_NET_LIVE == pstFileInfo->eSourceType ) &&
                     2 == s32PausedCtrl)
@@ -507,9 +496,7 @@ static WV_S32 HIS_PLAYER_CallBack(HI_HANDLE hPlayer, HI_SVR_PLAYER_EVENT_S *pstr
         }
         else if (pstBufStat->eType == HI_SVR_PLAYER_BUFFER_FULL)
         {
-            // WV_printf("### HI_SVR_PLAYER_EVENT_BUFFER_STATE type:HI_SVR_PLAYER_BUFFER_FULL, duration:%lld ms, size:%lld bytes\n",\
-            pstBufStat->stBufStat.s64Duration,\
-                    pstBufStat->stBufStat.s64BufferSize);
+            // WV_printf("### HI_SVR_PLAYER_EVENT_BUFFER_STATE type:HI_SVR_PLAYER_BUFFER_FULL, duration:%lld ms, size:%lld bytes\n",pstBufStat->stBufStat.s64Duration,pstBufStat->stBufStat.s64BufferSize);
             if ((HI_FORMAT_SOURCE_NET_VOD == pstFileInfo->eSourceType ||
                  HI_FORMAT_SOURCE_NET_LIVE == pstFileInfo->eSourceType ) &&
                     2 == s32PausedCtrl)
@@ -1038,7 +1025,7 @@ WV_S32  HIS_PLAYER_playRoll(HI_HANDLE  * pHndlPlayer)
 {
     WV_S32 ret;
     ret = HI_SVR_PLAYER_Play(*pHndlPlayer);
-
+    return ret;
 }
 
 /***************************************************************
@@ -1048,10 +1035,8 @@ WV_S32  HIS_PLAYER_Replay(HI_HANDLE  * pHndlPlayer);
 ***************************************************************/
 WV_S32  HIS_PLAYER_Replay(HI_HANDLE  * pHndlPlayer)
 {
-    WV_S32 i,ret;
     WV_U32  status;
-    //	for(i=0;i<1000;i++)
-    //	{
+    WV_S32 i;
     WV_CHECK_RET(HIS_PLAYER_GetStatus(pHndlPlayer,&status));
 
     //printf("play[0] get starus [%d]\n",status);
@@ -1082,9 +1067,7 @@ WV_S32  HIS_PLAYER_Replay(HI_HANDLE  * pHndlPlayer)
         }
 
     }
-    //	usleep(33000);
-    //}
-    return ret;
+    return WV_SOK;
 
 }
 
@@ -1318,12 +1301,12 @@ WV_S32  HIS_PLAYER_Start(HI_HANDLE  * pHndlPlayer ,WV_U8 * pFileName);
 
 ***************************************************************/
 
-WV_S32  HIS_PLAYER_Start(HI_HANDLE  * pHndlPlayer ,WV_U8 * pFileName)
+WV_S32  HIS_PLAYER_Start(HI_HANDLE  * pHndlPlayer ,WV_S8 * pFileName)
 {
     printf("goto HIS_PLAYER_Start\n");
     WV_S32 s32Ret;
     HI_SVR_PLAYER_MEDIA_S stMedia;
-    HI_FORMAT_FILE_INFO_S *pstFileInfo;
+    //HI_FORMAT_FILE_INFO_S *pstFileInfo;
 
     memset(&stMedia, 0, sizeof(stMedia));
     sprintf(stMedia.aszUrl, "%s", pFileName);
@@ -1500,7 +1483,7 @@ WV_S32  HIS_PLAYER_PlayRandom(HI_HANDLE  *pHndlPlayer)
     srand(time(0));
     id=x+rand()%(y-x+1);
 
-    for(id;id<=y;id++)
+    for(;id<=y;id++)
     {
         memset(mov,0,sizeof(mov));
         sprintf(mov,"./mov/mov%d.mp4",id);

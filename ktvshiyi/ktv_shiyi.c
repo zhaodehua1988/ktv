@@ -86,7 +86,7 @@ WV_S32 KTV_SHIYI_GetIpAndPort(WV_U8 *buf)
 {
 	WV_S8 name[64]={0};
 	WV_U32 data=0;
-	WV_S32 i,j=0,len=0,ret=0;
+	WV_S32 i,j=0,ret=0;
 	for(i=0;i<64;i++)
 	{
 		if(buf[i] == '#')
@@ -123,8 +123,8 @@ WV_S32 KTV_SHIYI_GetIpAndPort(WV_U8 *buf)
 	}
 	else if(strcmp(name,"SYServerPort") == 0)
 	{
-		sscanf(&buf[i],"%d",&data);
-		data = atoi(&buf[i]);
+		sscanf((WV_S8 *)&buf[i],"%d",&data);
+		data = atoi((WV_S8 *)&buf[i]);
 		pShiyiDev->svrPort = data;
 		
 	}
@@ -140,7 +140,7 @@ WV_S32 KTV_SHIYI_GetServerConf()
 {
 
 	WV_S8 buf[1024];
-	WV_S32 i,j,ret;
+	WV_S32 ret;
 	ret = access(KTV_SHIYI_CMDFILE,W_OK);
 
 	if(ret != 0){
@@ -171,7 +171,7 @@ WV_S32 KTV_SHIYI_GetServerConf()
 						continue;
 					if(buf[0] == '<')
 						break;
-						KTV_SHIYI_GetIpAndPort(buf);
+						KTV_SHIYI_GetIpAndPort((WV_U8 *)buf);
 				}
 				break;
 			} 
@@ -215,7 +215,7 @@ WV_S32 KTV_SHIYI_callback_DB(void* data, int ncols, char** values, char** header
 	 	//WV_printf("[%d]%s: %s\n",i, headers[i], values[i]);
 		memcpy(srcbuf,values[i],strlen(values[i]));
 
-		if(utf8togb2312(srcbuf,strlen(srcbuf),destbuf,sizeof(destbuf)) != 0)
+		if(utf8togb2312((WV_S8 *)srcbuf,strlen((WV_S8 *)srcbuf),(WV_S8 *)destbuf,sizeof(destbuf)) != 0)
 		{
 			return WV_EFAIL;
 		}
@@ -224,7 +224,7 @@ WV_S32 KTV_SHIYI_callback_DB(void* data, int ncols, char** values, char** header
 		
 		if(SVR_CONTROL_GetKtvChangeMode() == 1 )     //1:背景视频随动 
 		{
-			TSK_CONF_changeMovByType(destbuf);
+			TSK_CONF_changeMovByType((WV_S8 *)destbuf);
 		}else if(SVR_CONTROL_GetKtvChangeMode() == 2 )//2:场景随动
 		{
 			TSK_CONF_changeSceneByType(destbuf);
@@ -389,7 +389,7 @@ WV_S32 KTV_SHIYI_GetCmd(WV_U8 *pBuf)
 
 	if(dataLen < sizeof(KTV_SHIYI_HEAD_E)) return WV_EFAIL;
 
-	p=&pBuf[sizeof(KTV_SHIYI_HEAD_E)];
+	p=(WV_S8 *)&pBuf[sizeof(KTV_SHIYI_HEAD_E)];
 #if TEST_DEBUG
 	printf("get cmd :%s \n",p);
 #endif	
@@ -456,7 +456,7 @@ WV_S32 KTV_SHIYI_CheckErr()
 	for(i=0;i<totalLen;i++)
 	{
 		if(pShiyiDev->pBuf[i]=='{'){
-			p=&pShiyiDev->pBuf[i];
+			p=(WV_S8 *)&pShiyiDev->pBuf[i];
 			break;
 		}
 	}
@@ -483,7 +483,7 @@ WV_S32 KTV_SHIYI_CheckErr()
 	sscanf(&p[1],"%d",&errorCode);
 	if(errorCode != 0 ){
 
-		if((p=strstr(pShiyiDev->pBuf,"errorDescription")) == NULL){
+		if((p=strstr((WV_S8 *)pShiyiDev->pBuf,"errorDescription")) == NULL){
 
 			KTV_SHIYI_printf(" check(errorDescription) recv cmd error !\n");
 			return WV_EFAIL;				
@@ -512,7 +512,7 @@ WV_S32 KTV_SHIYI_SubscribeEvents(KTV_SHIYI_DEV_E  * pDev)
 	KTV_SHIYI_printf("....SubscribeEvents start ... !\n");
 	WV_U32 headLen,typeLen,dataLen,totalLen;
 	WV_S32 ret=-1;
-	WV_U8 msg[1024]={0};
+	WV_S8 msg[1024]={0};
 	sprintf(msg,KTV_SHIYI_SUBSCRIBE_DATA);
 
 	headLen = sizeof(KTV_SHIYI_HEAD_E);
@@ -556,7 +556,7 @@ WV_S32 KTV_SHIYI_Register(KTV_SHIYI_DEV_E  * pDev)
 	KTV_SHIYI_printf("Register start ... !\n");
 	WV_U32 headLen,typeLen,dataLen,totalLen;
 	WV_S32 ret=-1;
-	WV_U8 msg[1024]={0};
+	WV_S8 msg[1024]={0};
 	WV_U8 mac[6]={0};
 	SYS_IP_getMacInt(mac);
 	sprintf(msg,KTV_SHIYI_REGISTMSG_DATA,mac[0],mac[1],mac[2],mac[3],mac[4],mac[5]);

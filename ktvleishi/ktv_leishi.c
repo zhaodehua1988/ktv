@@ -358,61 +358,7 @@ int KTV_LEISHI_ExecutiveCommand(int client)
         KTV_LEISHI_RECV_BadRequest(client);
         return WV_EFAIL;
     }
-}
-
-/**********************************************************************/
-/* Execute a CGI script.  Will need to set environment variables as
- * appropriate.
- * Parameters: client socket descriptor
- *             path to the CGI script */
-/**********************************************************************/
-void KTV_LEISHI_ExecuteCgi(int client, const char *path, const char *method, const char *query_string)
-{
-    char buf[1024];
-
-    int numchars = 1;
-    int content_length = -1;
-
-    buf[0] = 'A'; buf[1] = '\0';
-    /* POST */
-
-    /* 对 POST 的 HTTP 请求中找出 content_length */
-    numchars = KTV_LEISHI_AnalyseLine(client, buf, sizeof(buf));
-    // printf("+++++%s\n",buf);
-    while ((numchars > 0) && strcmp("\n", buf))
-    {
-        /*利用 \0 进行分隔 */
-        buf[15] = '\0';
-        /* HTTP 请求的特点*/
-        if (strcasecmp(buf, "Content-Length:") == 0)
-            content_length = atoi(&(buf[16]));
-        // printf("****contenr_lenth is : %d\n",content_length);
-        numchars = KTV_LEISHI_AnalyseLine(client, buf, sizeof(buf));            //这行代码读出了空行，空行一下就是json命令了
-        // printf("xxxxx numchars is %d\n",numchars);
-    }
-
-    /*没有找到 content_length */
-    if (content_length == -1) {
-        /*错误请求*/
-        printf("no Content-Length!\n");
-        KTV_LEISHI_RECV_BadRequest(client);
-        return WV_EFAIL;
-    }
-
-    int orderfd;
-    //将接受到的json字符串打包道json结构体里面去。
-    orderfd = KTV_LEISHI_AnalyseJson(client, buf, content_length);
-    printf("the orderfd is %d\n",orderfd);
-
-    //发送正确命令
-    //    KTV_LEISHI_RecvOk(client);
-    int temp = 0;
-    temp = KTV_LEISHI_ParseCommand(client);
-    if(temp != WV_EFAIL)
-        KTV_LEISHI_ExecutiveCommand(client);
-    else
-        return  WV_EFAIL;
-
+    return WV_SOK;
 }
 
 /**********************************************************************/
@@ -468,7 +414,10 @@ int KTV_LEISHI_AnalyseLine(int sock, char *buf, int size)
     return(i);
 }
 
+/*********************************************************************
 //这个是解析收到的json数据。
+int KTV_LEISHI_AnalyseJson(int sock, char *buf, int size)；
+**********************************************************************/
 int KTV_LEISHI_AnalyseJson(int sock, char *buf, int size)
 {
     //printf("go to get json\n");
@@ -500,6 +449,63 @@ int KTV_LEISHI_AnalyseJson(int sock, char *buf, int size)
     }
     return(i);
 }
+/**********************************************************************/
+/* Execute a CGI script.  Will need to set environment variables as
+ * appropriate.
+ * Parameters: client socket descriptor
+ *             path to the CGI script */
+/**********************************************************************/
+void KTV_LEISHI_ExecuteCgi(int client, const char *path, const char *method, const char *query_string)
+{
+    char buf[1024];
+
+    int numchars = 1;
+    int content_length = -1;
+
+    buf[0] = 'A'; buf[1] = '\0';
+    /* POST */
+
+    /* 对 POST 的 HTTP 请求中找出 content_length */
+    numchars = KTV_LEISHI_AnalyseLine(client, buf, sizeof(buf));
+    // printf("+++++%s\n",buf);
+    while ((numchars > 0) && strcmp("\n", buf))
+    {
+        /*利用 \0 进行分隔 */
+        buf[15] = '\0';
+        /* HTTP 请求的特点*/
+        if (strcasecmp(buf, "Content-Length:") == 0)
+            content_length = atoi(&(buf[16]));
+        // printf("****contenr_lenth is : %d\n",content_length);
+        numchars = KTV_LEISHI_AnalyseLine(client, buf, sizeof(buf));            //这行代码读出了空行，空行一下就是json命令了
+        // printf("xxxxx numchars is %d\n",numchars);
+    }
+
+    /*没有找到 content_length */
+    if (content_length == -1) {
+        /*错误请求*/
+        printf("no Content-Length!\n");
+        KTV_LEISHI_RECV_BadRequest(client);
+        return ;
+    }
+
+    int orderfd;
+    //将接受到的json字符串打包道json结构体里面去。
+    orderfd = KTV_LEISHI_AnalyseJson(client, buf, content_length);
+    printf("the orderfd is %d\n",orderfd);
+
+    //发送正确命令
+    //    KTV_LEISHI_RecvOk(client);
+    int temp = 0;
+    temp = KTV_LEISHI_ParseCommand(client);
+    if(temp != WV_EFAIL)
+        KTV_LEISHI_ExecutiveCommand(client);
+    else
+        return  ;
+
+}
+
+
+
 
 
 /********************************************************
@@ -527,7 +533,7 @@ int KTV_LEISHI_Init(u_short *port)
     if (*port == 0)  /* if dynamically allocating a port */
     {
         int namelen = sizeof(name);
-        if (getsockname(httpd, (struct sockaddr *)&name, &namelen) == -1)
+        if (getsockname(httpd, (struct sockaddr *)&name, (socklen_t *)&namelen) == -1)
             error_die("getsockname");
         *port = ntohs(name.sin_port);
     }
@@ -543,9 +549,10 @@ int KTV_LEISHI_Init(u_short *port)
 void * KTV_LEISHI_Proc(int client);
 
 *********************************************************/ 
-void * KTV_LEISHI_Proc(int client)
+void * KTV_LEISHI_Proc(void * client)
 {
-
+    WV_S32 *clientInt;
+    clientInt = (WV_S32 *)client;
     printf("go to accept_request!\n");
     char buf[1024];
     int numchars;
@@ -553,12 +560,12 @@ void * KTV_LEISHI_Proc(int client)
     char url[255];
     char path[512];
     size_t i, j;
-    struct stat st;
+    //struct stat st;
     int cgi = 0;      /* becomes true if server decides this is a CGI program */
     char *query_string = NULL;
 
     /*得到请求的第一行*/
-    numchars = KTV_LEISHI_AnalyseLine(client, buf, sizeof(buf));
+    numchars = KTV_LEISHI_AnalyseLine(*clientInt, buf, sizeof(buf));
     //    printf("*****%s",buf);   //解析出来了：*****POST /thunder/command HTTP/1.1
     i = 0; j = 0;
     /*把客户端的请求方法存到 method 数组*/
@@ -572,8 +579,8 @@ void * KTV_LEISHI_Proc(int client)
     /*如果既不是 GET 又不是 POST 则无法处理 */
     if (strcasecmp(method, "GET") && strcasecmp(method, "POST"))
     {
-        KTV_LEISHI_RECV_Unimplemented(client);
-        return WV_EFAIL;
+        KTV_LEISHI_RECV_Unimplemented(*clientInt);
+        return NULL;
     }
 
     /* POST 的时候开启 cgi */
@@ -609,7 +616,7 @@ void * KTV_LEISHI_Proc(int client)
     }
     // printf("the path under is: %s\n",path);
 
-    KTV_LEISHI_ExecuteCgi(client, path, method, query_string);
+    KTV_LEISHI_ExecuteCgi(*clientInt, path, method, query_string);
 
     //发送正确命令
     //KTV_LEISHI_RecvOk(client);
@@ -617,7 +624,8 @@ void * KTV_LEISHI_Proc(int client)
     //    KTV_LEISHI_ExecutiveCommand(client);
 
     /*断开与客户端的连接（HTTP 特点：无连接）*/
-    close(client);
+    close(*clientInt);
+    return NULL;
 }
 
 /********************************************************
@@ -647,12 +655,12 @@ int KTV_LEISHI_Open()
     while (1)
     {
         /*套接字收到客户端连接请求*/
-        client_sock = accept(server_sock,(struct sockaddr *)&client_name,&client_name_len);
+        client_sock = accept(server_sock,(struct sockaddr *)&client_name,(socklen_t *)&client_name_len);
         if (client_sock == -1)
             error_die("accept");
         /*派生新线程用 accept_request 函数处理新请求*/
         /* accept_request(client_sock); */
-        if (pthread_create(&newthread , NULL,  KTV_LEISHI_Proc, client_sock) != 0)
+        if (pthread_create(&newthread , NULL,  KTV_LEISHI_Proc, &client_sock) != 0)
             perror("pthread_create");
     }
 
@@ -675,6 +683,13 @@ int KTV_LEISHI_Close()
 
     //释放内存
     cJSON_Delete(json_get);
-    WV_THR_Destroy(&(newthread));
+    WV_S32 ret;
+    void *returnVal;
+    if(&newthread != NULL)
+    {
+        ret = pthread_cancel(newthread); 
+        ret = pthread_join(newthread, &returnVal); 
+    }  
+    //WV_THR_Destroy(&(newthread));
     return WV_SOK;
 }

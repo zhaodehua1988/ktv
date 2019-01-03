@@ -81,6 +81,42 @@ WV_S32 SYS_INFO_DevReset()
     WV_CMD_GetReset(); 
 	return 0;	
 }
+/********************************************************************
+
+WV_S32 SYS_INFO_SaveInfoFile(SYS_INFO_DEV_E *pDev);
+
+********************************************************************/
+WV_S32 SYS_INFO_SaveInfoFile(SYS_INFO_DEV_E *pDev)
+{
+
+	pDev->infoUse = 1;
+
+	FILE *fp;
+	WV_S32 writeLen;
+	WV_S8 *pData =(WV_S8 *)pDev->info;
+	fp = fopen(SYS_INFO_FILE_PATH,"wb+");
+	if(fp == NULL)
+	{
+		WV_printf("*********fopen %s  error **************\n",SYS_INFO_FILE_PATH);
+		pDev->infoUse = 0;
+		return -1;
+	}
+
+
+	writeLen = fwrite(pData,1,sizeof(SYS_INFO_DATA)*SYS_INFO_MAX_LINE,fp);
+	if(writeLen != sizeof(SYS_INFO_DATA)*SYS_INFO_MAX_LINE )
+	{
+		WV_printf("*********fwrite %s  error **************\n",SYS_INFO_FILE_PATH);
+		fclose(fp);
+		pDev->infoUse = 0;
+		return -1;
+	}
+
+	fclose(fp);
+	pDev->infoUse = 0;
+	return 0;
+			
+}
 
 
 /********************************************************************
@@ -290,7 +326,7 @@ WV_S32 SYS_INFO_GetInfo(WV_U32 *pDataLen,WV_S8 *pData )
 	WV_U32 dataLen = 0;	
 	SYS_INFO_DATA *pInfo = gSysInfoDev.info;
 	WV_S8 *pBuf = pData;
-	WV_S32 verLen,infoLen,i;
+	WV_S32 verLen,i;
 	verLen = strlen(gSysInfoDev.pVer);
 	strncpy(pBuf,gSysInfoDev.pVer,verLen);//cp ver 
 	pBuf +=verLen ;
@@ -365,42 +401,6 @@ WV_S32 SYS_INFO_ReadInfoFile(SYS_INFO_DEV_E *pDev)
 }
 
 
-/********************************************************************
-
-WV_S32 SYS_INFO_SaveInfoFile(SYS_INFO_DEV_E *pDev);
-
-********************************************************************/
-WV_S32 SYS_INFO_SaveInfoFile(SYS_INFO_DEV_E *pDev)
-{
-
-	pDev->infoUse = 1;
-
-	FILE *fp;
-	WV_S32 writeLen,dataLen,i;
-	WV_S8 *pData = pDev->info;
-	fp = fopen(SYS_INFO_FILE_PATH,"wb+");
-	if(fp == NULL)
-	{
-		WV_printf("*********fopen %s  error **************\n",SYS_INFO_FILE_PATH);
-		pDev->infoUse = 0;
-		return -1;
-	}
-
-
-	writeLen = fwrite(pData,1,sizeof(SYS_INFO_DATA)*SYS_INFO_MAX_LINE,fp);
-	if(writeLen != sizeof(SYS_INFO_DATA)*SYS_INFO_MAX_LINE )
-	{
-		WV_printf("*********fwrite %s  error **************\n",SYS_INFO_FILE_PATH);
-		fclose(fp);
-		pDev->infoUse = 0;
-		return -1;
-	}
-
-	fclose(fp);
-	pDev->infoUse = 0;
-	return 0;
-			
-}
 
 /********************************************************************
 

@@ -93,7 +93,7 @@ WV_S32 SVR_CONTROL_GetKTVConf(WV_S8 * buf)
 {
 	WV_S8 name[64];
 	WV_U32 data=0;
-	WV_S32 i,j=0,len;
+	WV_S32 i,j=0;
 	memset(name,0,sizeof(name));
 	for(i=0;i<64;i++)
 	{
@@ -177,7 +177,7 @@ WV_S32 SVR_CONTROL_ParseConfFile(const WV_S8 *pCmd,WV_S32 cmdLen,WV_S32 (*pCmdFu
 {
 	
 	WV_S8 buf[1024];
-	WV_S32 i,typeID,ret;
+	WV_S32 i,ret;
 	ret = access(SVR_CONTROL_CMDFILE,W_OK);
 	if(ret != 0){
 		SVR_CONTROL_printf("access file [%s] error\n",SVR_CONTROL_CMDFILE);

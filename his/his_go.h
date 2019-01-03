@@ -69,5 +69,5 @@ WV_S32 HIS_GO_PrintDec(HIS_DEV_GODEC_E * pDev, WV_S8 * pBuf);
 
 WV_S32 HIS_GODEC_ShowPic(HIS_DEV_GODEC_E * pDev,WV_S32 i);
 WV_S32 HIS_GO_SetColorKey(WV_U32 ena,WV_U32 colorKey);
-
+WV_S32 HIS_GO_RefreshLayerForPic(HIS_DEV_HIGO_E * pDev);
 #endif

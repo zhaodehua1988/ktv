@@ -114,7 +114,7 @@ WV_S32  WV_UDP_Rx(WV_ETH_UDP_RX_E *pDev,WV_S8 *pBuf, WV_S32 *len)
 	//get recv ip
 	pAddr = & (pDev->addrRx);  
 	recv_addr_len  = sizeof(struct sockaddr);
-	*len =  recvfrom(pDev->socketHndl,pBuf,2048,0,(struct sockaddr *)pAddr, &recv_addr_len ); 
+	*len =  recvfrom(pDev->socketHndl,pBuf,2048,0,(struct sockaddr *)pAddr,(socklen_t *) &recv_addr_len ); 
 	//UDPRX_printf("recv data %d\r\n",*len); 
 	return WV_SOK; 
 }

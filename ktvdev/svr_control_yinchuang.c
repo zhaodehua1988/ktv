@@ -49,7 +49,7 @@ WV_S32 SVR_CONTROL_YinChuang_AnalyzeMovClassCmd(WV_S8 *buf);
 *********************************************************/ 
 WV_S32 SVR_CONTROL_YinChuang_AnalyzeMovClassCmd(WV_S8 *buf)
 {	
-	int a,id,i,k=0,j=0;
+	int a,id,i,j=0;
 	char temp[3];
 	memset(temp,0,sizeof(temp));
 	//************get  id****************
@@ -317,8 +317,7 @@ WV_S32 SVR_CONTROL_YinChuang_MapSongType() ;
 ******************************************************************************/  
 WV_S32 SVR_CONTROL_YinChuang_MapSongType(WV_S32 id,WV_U8 *pOut)  
 { 
-	WV_S32 ret;
-	WV_U8 nameMap[16]={0};
+	WV_S8 nameMap[16]={0};
 	switch(id){
 		case 3:
 			sprintf(nameMap,"好声音");
@@ -393,7 +392,7 @@ WV_S32 SVR_CONTROL_YinChuang_MapSongType(WV_S32 id,WV_U8 *pOut)
 
 	if(strlen(nameMap) == 0 ) return WV_EFAIL;
 
-	if(utf8togb2312(nameMap,strlen(nameMap),pOut,8) != 0)
+	if(utf8togb2312(nameMap,strlen(nameMap),(WV_S8 *)pOut,8) != 0)
 	{
 		WV_ERROR(" Map song type is error \n");	
 		return WV_EFAIL;
@@ -425,7 +424,7 @@ WV_S32 SVR_CONTROL_YinChuang_ChangeMovByCmd(WV_S32 classID)
 	//根据歌曲类别查找视频
 	if(movChangeMode == SVR_CONTROL_CHANGE_MOV )     //1:背景视频随动 ;
 	{
-		TSK_CONF_changeMovByType(mapName);
+		TSK_CONF_changeMovByType((WV_S8 *)mapName);
 	}else if(movChangeMode == SVR_CONTROL_CHANGE_SCENE )//2:场景随动
 	{
 		TSK_CONF_changeSceneByType(mapName);
@@ -454,7 +453,7 @@ WV_S32 SVR_CONTROL_YinChuang(WV_S8 *pData,WV_S32 len)
 	}
 
 	WV_S32 ret=0;
-	WV_S32 i=0,j=0;
+	WV_S32 i=0;
 	WV_S8 *p=pData;
 	WV_S32 classID=-1;
 	if(strncmp(pData,"YC_SONG",7) != 0 && strncmp(pData,"YC_RANDOM",9) != 0){

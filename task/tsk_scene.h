@@ -149,4 +149,7 @@ WV_S32 TSK_SCENE_Standby(WV_S32 mode);
 WV_S32 TSK_SCENE_AddLastWin();
 WV_S32 TSK_SCENE_DeletLastWin();
 WV_S32 TSK_SCENE_SetWinChange(WV_S32 ena);
+WV_S32 TSK_SCENE_SaveCustom(WV_U32  id,TSK_CONF_SCENE_CONF *pScene);
+WV_S32 TSK_SCENE_CleanWinFram();
+WV_S32 TSK_SCENE_SetDefault(WV_U32  id );
 #endif

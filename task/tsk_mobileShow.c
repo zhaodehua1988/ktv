@@ -159,9 +159,9 @@ WV_S32 TSK_Mobile_PlayMovUrl(WV_U8 cmd,WV_U8 *url,WV_S32 len)
 {
 	WV_printf("url:%s\n",url);
 	
-	WV_U8 name[64];
-	memset(name,0,sizeof(name));
-	sprintf(name,"%s",url);
+	//WV_U8 name[64];
+	//memset(name,0,sizeof(name));
+	//sprintf(name,"%s",url);
 	TSK_GO_MOV_PIC_POS_S movPos,picPos;
 	TSK_GO_GetUsb_PicAndMov_Pos(&movPos,&picPos);
 
@@ -197,7 +197,7 @@ WV_S32 TSK_Mobile_PlayMovUrl(WV_U8 cmd,WV_U8 *url,WV_S32 len)
 		TSK_SCENE_CloseWinAndAni();
 	}	
 	TSK_PLAYER_Destory(2);
-	TSK_PLAYER_SetFile(2,url);
+	TSK_PLAYER_SetFile(2,(WV_S8 *)url);
 	TSK_PLAYER_setWin(2,movPos.startX,movPos.startY,movPos.endX-movPos.startX,movPos.endY-movPos.startY);
 	TSK_PLAYER_Creat(2);
 

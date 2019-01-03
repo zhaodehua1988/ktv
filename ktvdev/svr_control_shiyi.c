@@ -36,7 +36,7 @@ WV_S32 SVR_CONTROL_ShiYi_AnalyzeMovClassCmd(WV_S8 *buf)
 {
 	
 	
-	int a,id,i,k=0,j=0;
+	int a,id,i,j=0;
 	char temp[3];
 	memset(temp,0,sizeof(temp));
 	//************get  id****************
@@ -198,7 +198,7 @@ WV_S32 SVR_CONTROL_ShiYi(WV_S8 *pData,WV_S32 len)
 				//WV_printf("get cmd scene id[%d]\n",i);	
 				if(movChangeMode == 1 )      //1:背景视频随动 ;
 				{
-					TSK_CONF_changeMovByType(gSvrShiyiDev.movType[i].typeName);
+					TSK_CONF_changeMovByType((WV_S8 *)gSvrShiyiDev.movType[i].typeName);
 				}else if(movChangeMode == 2 )//2:场景随动
 				{
 					TSK_CONF_changeSceneByType(gSvrShiyiDev.movType[i].typeName);

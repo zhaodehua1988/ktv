@@ -37,7 +37,7 @@ void * TSK_CAST_Proc ( void * prm)
 {
  TSK_CAST_DEV_E  * pDev; 
  WV_U8  *sockBuf, * esBuf;
- WV_U32  esLen,sendLen,fillLen;
+ WV_U32  esLen,fillLen;
  WV_S32 ret =0; 
  pDev = (TSK_CAST_DEV_E  *) prm;
  

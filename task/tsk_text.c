@@ -49,7 +49,7 @@ typedef struct TSK_TEXT_NODE
 }TSK_TEXT_NODE;
   
 //struct node gTextData[3][3]={0};
-TSK_TEXT_NODE gTextData[TSK_TEXT_SHOW_WORD_COL_NUM]={0};
+TSK_TEXT_NODE gTextData[TSK_TEXT_SHOW_WORD_COL_NUM];
 TSK_TEXT_CONF gTextConf;
 
 TSK_TEXT_DEV_E 		gTskQueDev;
@@ -151,8 +151,7 @@ WV_S32 TSK_TEXT_GetConf(WV_U8 saveMode,WV_U32 dataLen,WV_U8 *pData)
 		gTextConf.u32FontSize = pTemp32[1];
 
 		TSK_GO_CleanRect( gTextConf.x,gTextConf.y,gTextConf.w,gTextConf.h);
-		//WV_printf("x %d,y %d,w%d,h%d,color:0x%x,uiFontSize:%d",\
-			gTextConf.x*2,gTextConf.y*2,gTextConf.w*2,gTextConf.h*2,gTextConf.u32Color,gTextConf.u32FontSize); 
+		//WV_printf("x %d,y %d,w%d,h%d,color:0x%x,uiFontSize:%d",gTextConf.x*2,gTextConf.y*2,gTextConf.w*2,gTextConf.h*2,gTextConf.u32Color,gTextConf.u32FontSize); 
 
 		TSK_GO_ShowText( gTextConf.x,gTextConf.y,gTextConf.w,gTextConf.h,gTextConf.u32Color,gTextConf.u32FontSize,"弹幕调试",1,1);
 		TSK_GO_RefreshLayerForPic();	
@@ -166,6 +165,7 @@ WV_S32 TSK_TEXT_GetConf(WV_U8 saveMode,WV_U32 dataLen,WV_U8 *pData)
 		TSK_SCENE_OpenWinAndAni();
 		gTskQueDev.showPosEna = 0;
 	}
+	return WV_SOK;
 }
 /******************************************************************************
 
@@ -229,7 +229,7 @@ void *TSK_TEXT_Proc(void *prm)
 	WV_S32 ret;
 	pDev = (TSK_TEXT_DEV_E *)prm;
 
-	int i,j;
+	int i;
 	pDev->open = 1;
 	pDev->close = 0;
 
@@ -269,7 +269,7 @@ void *TSK_TEXT_Proc(void *prm)
 
 					gTextData[i].x-=speed;
 					
-					ret = TSK_GO_ShowText( gTextData[i].x,gTextData[i].y,gTextData[i].w,gTextData[i].h,gTextConf.u32Color,gTextConf.u32FontSize,gTextData[i].pText,gTextData[i].text[0],0);
+					ret = TSK_GO_ShowText( gTextData[i].x,gTextData[i].y,gTextData[i].w,gTextData[i].h,gTextConf.u32Color,gTextConf.u32FontSize,(WV_S8 *)gTextData[i].pText,gTextData[i].text[0],0);
 					textShow = 1;
 					if(ret != 0 ){
 						gTextData[i].pText = NULL;
@@ -309,7 +309,7 @@ void *TSK_TEXT_Proc(void *prm)
 					
 					if(gTextData[i].w >= (gTextConf.w/4))
 					{
-						ret = TSK_GO_ShowText( gTextData[i].lostX,gTextData[i].y,gTextData[i].w,gTextData[i].h,gTextConf.u32Color,gTextConf.u32FontSize,gTextData[i].pText,gTextData[i].text[0],0);
+						ret = TSK_GO_ShowText( gTextData[i].lostX,gTextData[i].y,gTextData[i].w,gTextData[i].h,gTextConf.u32Color,gTextConf.u32FontSize,(WV_S8 *)gTextData[i].pText,gTextData[i].text[0],0);
 						textShow = 1;
 						if(ret != 0 ){
 							gTextData[i].pText = NULL;
@@ -354,7 +354,7 @@ WV_S32 TSK_TEXT_Open()
 WV_S32 TSK_TEXT_Open()
 {
 	WV_printf("----------TSK_TEXT_Open() ---------------\n");
-
+	memset(gTextData,0,sizeof(TSK_TEXT_NODE)*9);
 	pSrxQueBuf = (WV_U8*) malloc(TSK_TEXT_QUE_BUF_LEN *TSK_TEXT_QUE_DEEP);
 	WV_CHECK_RET(   WV_QUE_Create(  &gSrxQueRx,TSK_TEXT_QUE_DEEP)  );  
 	WV_CHECK_RET(   WV_QUE_Create(  &gSrxQueFree,TSK_TEXT_QUE_DEEP)  );   

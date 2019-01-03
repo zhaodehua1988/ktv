@@ -4,6 +4,7 @@
 #include "sqlite3.h"
 
 typedef int (*WV_SQLITE_callback)(void* para,int columnCount,char** columnValue,char** columnName);
+WV_S32 WV_SQLITE3_Init();
 WV_S32 WV_SQLITE_SearchVal(WV_S8 *db_name,WV_S8 *sql_cmd,WV_SQLITE_callback callback);
 
 int utf8togb2312(const char *sourcebuf,size_t sourcelen,char *destbuf,size_t destlen);

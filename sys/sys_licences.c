@@ -84,9 +84,9 @@ WV_S32 SYS_LICENCES_Check_ID(WV_U8 *pId)//[check id]
 {
 	WV_S32 ret=0 ;
 	
-	WV_U8 outId[SYS_LICENCES_ID_LEN];
+	WV_S8 outId[SYS_LICENCES_ID_LEN];
 
-	SYS_LIC_Encrypt(pId,SYS_LIC_PWD ,outId,SYS_LICENCES_ID_LEN);
+	SYS_LIC_Encrypt(pId,SYS_LIC_PWD ,(WV_U8 *)outId,SYS_LICENCES_ID_LEN);
 	ret = strncmp(gSysLicDev.curentId,outId,SYS_LICENCES_ID_LEN);
 	if(ret != 0 )
 	{
@@ -167,7 +167,7 @@ WV_S32 SYS_LICENCES_READ_ID()//[get id between 0~9]
 
 	SYS_LIC_printf("read id :%s \n",gSysLicDev.curentId);	
 	
-	
+	return WV_SOK;
 }
 
 /********************************************************************
@@ -244,6 +244,46 @@ WV_S32 SYS_LICENCES_ReadMin()
 
 /********************************************************************
 
+WV_S32 SYS_LICENCES_SaveLic(); 
+
+********************************************************************/
+WV_S32 SYS_LICENCES_SaveLic()
+{
+	WV_U8 licIn[64];
+	WV_U8 licOut[64];
+	WV_S32 i,len,writeLen;	
+	FILE *fp;
+	for(i=0;i<SYS_LICENCES_ID_LEN;i++)
+	{
+		licIn[i]=gSysLicDev.OldId[i];
+	}
+	
+	licIn[SYS_LICENCES_ID_LEN] = gSysLicDev.flag +0x30;
+
+	sprintf((WV_S8 *)&licIn[SYS_LICENCES_ID_LEN+1],"%d",gSysLicDev.time_h);
+	len = strlen((WV_S8 *)licIn);
+	SYS_LIC_Encrypt(licIn,SYS_LIC_PWD,licOut,len);
+	fp = fopen(SYS_LICENCES_FILE_PATH,"wb+");
+	if(fp == NULL)
+	{
+		SYS_LIC_printf("licences save hour open lic file error \n");
+		return WV_EFAIL;
+	}
+	writeLen = fwrite(licOut,1,len,fp);
+	if(writeLen != len)
+	{
+		SYS_LIC_printf("licences save hour write error \n");
+		fclose(fp);
+		return WV_EFAIL;
+	}
+
+	fclose(fp);
+	system("sync");
+	return WV_SOK;
+}
+
+/********************************************************************
+
 WV_S32 SYS_LICENCES_SetBaseTime(); 
 
 ********************************************************************/
@@ -260,6 +300,7 @@ WV_S32 SYS_LICENCES_SetBaseTime()
 		gSysLicDev.OldId[i] = gSysLicDev.curentId[i] + 0x30;
 	}	
 	SYS_LICENCES_SaveLic();
+	return WV_SOK;
 }
 
 /********************************************************************
@@ -354,7 +395,7 @@ WV_S32 SYS_LICENCES_ReadLic()
 	}
 	fclose(fp);
 
-	ret = SYS_LIC_Encrypt(bufIn,SYS_LIC_PWD,bufOut,readLen);
+	ret = SYS_LIC_Encrypt((WV_U8 *)bufIn,SYS_LIC_PWD,(WV_U8 *)bufOut,readLen);
 
 	if(ret != 0 )
 	{
@@ -436,58 +477,7 @@ WV_S32 SYS_LICENCES_WriteLic(WV_U8 *pLic,WV_S32 len)
 
 	return ret;
 }
-/********************************************************************
 
-WV_S32 SYS_LICENCES_SaveLic(); 
-
-********************************************************************/
-WV_S32 SYS_LICENCES_SaveLic()
-{
-	WV_U8 licIn[64];
-	WV_U8 licOut[64];
-	WV_S32 i,len,ret,writeLen;	
-	FILE *fp;
-	for(i=0;i<SYS_LICENCES_ID_LEN;i++)
-	{
-		licIn[i]=gSysLicDev.OldId[i];
-	}
-	
-	licIn[SYS_LICENCES_ID_LEN] = gSysLicDev.flag +0x30;
-
-	//itoa(gSysLicDev.time_h,&lic[SYS_LICENCES_ID_LEN+1],10);
-	sprintf(&licIn[SYS_LICENCES_ID_LEN+1],"%d",gSysLicDev.time_h);
-	len = strlen(licIn);
-	//printf("licIn:%s\n",licIn);	
-	//enc
-
-	SYS_LIC_Encrypt(licIn,SYS_LIC_PWD,licOut,len);
-	/*
-	ret = access(SYS_LICENCES_FILE_PATH,W_OK);	
-	if(ret != 0 )
-	{
-		gSysLicDev.ena = 0;
- 		SYS_LIC_printf("licences file is not exit\n");
-		return ret;
-	}
-	*/
-	fp = fopen(SYS_LICENCES_FILE_PATH,"wb+");
-	if(fp == NULL)
-	{
-		SYS_LIC_printf("licences save hour open lic file error \n");
-		return WV_EFAIL;
-	}
-	writeLen = fwrite(licOut,1,len,fp);
-	if(writeLen != len)
-	{
-		SYS_LIC_printf("licences save hour write error \n");
-		fclose(fp);
-		return WV_EFAIL;
-	}
-
-	fclose(fp);
-	system("sync");
-	return WV_SOK;
-}
 /********************************************************************
 
 WV_S32 SYS_LICENCES_Init(); 

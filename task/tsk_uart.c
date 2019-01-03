@@ -7,6 +7,7 @@
 #include "his_gpio.h"
 #include "his_temperature.h"
 #include "his_reg.h"
+#include "net_uart.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -101,7 +102,7 @@ static TSK_UART_LOOP_E gSceneLoop;
 
 static TSK_UART_DEV_E gUartDev;
 static WV_S32 gWagShow = -1;
-static WV_S32 gSceneCtrlCmd = -1;
+//static WV_S32 gSceneCtrlCmd = -1;
 
 /*******************************************************************
  WV_S32 TSK_UART_GetWindowMode();
@@ -500,7 +501,7 @@ WV_S32 TSK_UART_RecvCmd(TSK_UART_DEV_E * pDev,WV_U8  *pBuf,WV_S32 *pLen)
 { 
 
 		//printf("TSK_UART_RecvCmd\n");
-		WV_S32  recvLen,len,i;
+		WV_S32  recvLen,i;
 		 struct  termios opt;
 		if(pDev-> fd < 0 )
 		{
@@ -561,10 +562,10 @@ WV_S32 TSK_UART_Send(WV_U8  *pBuf ,WV_U32  len);
 
 ****************************************************************************************/
 
-WV_S32 TSK_UART_Send(WV_U8  *pBuf ,WV_U32  len)
+WV_S32 TSK_UART_Send(WV_S8  *pBuf ,WV_U32  len)
 { 
 
-	 WV_S32  ret,i;
+	 WV_S32  ret;
 	 if(gUartDev.fd < 0 )
 	 {
         TSK_UART_printf("no UART open !!!"); 
@@ -654,7 +655,7 @@ WV_S32 TSK_UART_SceneAck();
 ****************************************************************************************/
 WV_S32 TSK_UART_SceneAck(TSK_UART_DEV_E * pDev,WV_S32 id)
 {
-	WV_S32 ret,i;
+	WV_S32 ret;
 	ret  = write(pDev->fd,pDev->sceneCmd[id].AckCmd,pDev->sceneCmd[id].AckLen); 
 	
 	if(ret != pDev->sceneCmd[id].AckLen)
@@ -765,7 +766,7 @@ WV_S32 TSK_UART_SceneStrlApp(WV_S32 cmd)
 		case 8:TSK_SCENE_Standby(TSK_SCENE_TYPE_UARTDATA);break;
 		default:break;
 	}
-
+    return WV_SOK;
 }
 
 /******************************************************************************
@@ -1363,7 +1364,7 @@ WV_S32 TSK_UART_AnalyzeSceneCtrl(WV_S8 *buf)
         }
     }
 
-#if 1
+#if 0
 	for(i=0;i<TSK_UART_SCENE_CTRLCMD_NUM;i++)
 	{
 		if(gUartDev.sceneCtrl[i].CmdLen >0){
@@ -1390,7 +1391,7 @@ WV_S32 TSK_UART_SetSerialConf(WV_S8 * buf)
 {
 	WV_S8 name[64];
 	WV_U32 data=0;
-	WV_S32 i,j=0,len;
+	WV_S32 i,j=0;
 	memset(name,0,sizeof(name));
 	for(i=0;i<64;i++)
 	{
@@ -1615,7 +1616,7 @@ WV_S32 TSK_UART_SetLoopConf(WV_S8 *buf)
 
 	WV_S8 name[64];
 	WV_U32 data=0;
-	WV_S32 i,j=0,len;
+	WV_S32 i,j=0;
 	memset(name,0,sizeof(name));
 	for(i=0;i<64;i++)
 	{
@@ -1658,7 +1659,7 @@ WV_S32 TSK_UART_GetSceneLoop()
 	gSceneLoop.loopTime = 0;
 
 	WV_S8 buf[1024];
-	WV_S32 i,j,ret;
+	WV_S32 i,ret;
 	ret = access(TSK_SCENE_CMDFILE,W_OK);
 
 	if(ret != 0){
@@ -1719,7 +1720,7 @@ void * TSK_UART_Loop(void * prm)
 	
 
 	TSK_UART_LOOP_E  * pDev; 
-	WV_S32 ret=-1,i,j;
+	WV_S32 i,j;
 	pDev = (TSK_UART_LOOP_E  *) prm;
 	pDev-> open  = 1;
 	pDev-> close  = 0;  
@@ -1750,6 +1751,7 @@ void * TSK_UART_Loop(void * prm)
 
  pDev-> open  = 0;
  pDev-> close = 1;
+ return NULL;
 }
   
 /****************************************************************************************

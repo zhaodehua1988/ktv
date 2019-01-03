@@ -11,8 +11,8 @@
 
 *******************************************************************************/
 
-#ifndef  _SYS_INFO_H_H_
-#define  _SYS_INFO_H_H_
+#ifndef  _SYS_FILE_H_H_
+#define  _SYS_FILE_H_H_
 #include "wv_common.h" 
 WV_S32 SYS_FILE_GetConfFile(WV_U8 *pData,WV_S32 len,WV_U8 cmd,WV_U16 arg);
 #endif

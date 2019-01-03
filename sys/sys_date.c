@@ -180,11 +180,7 @@ WV_S32 SYS_DATE_CMDSet(WV_S32 argc, WV_S8 **argv,WV_S8 *prfBuff)
 ****************************************************************************/
 WV_S32 SYS_DATE_CMDSet(WV_S32 argc, WV_S8 **argv,WV_S8 *prfBuff)
 {
-   WV_S8    year[20];
-	WV_S8    mon[20];
-	WV_S8    day[20]; 
-	WV_S8    num[20];
-   WV_S32 ret;
+
 	SYS_DATE_GetConf();
 
 	if(argc < 4)

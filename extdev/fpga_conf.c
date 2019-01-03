@@ -2,6 +2,7 @@
 #include"his_spi.h"
 #include "tsk_player.h" 
 #include "tsk_scene.h" 
+#include "sys_env.h"
 typedef struct FPGA_CONF_VERSION
 {
 	WV_U16 ver;
@@ -136,8 +137,7 @@ WV_S32 FPGA_CONF_ResetA()
   
 	for(i=0;i<1000;i++){
 
-		TSK_FPGA_Read(0x29,&data);
-
+		HIS_SPI_FpgaRd(0x29,&data);
 		if(data==0){
 			break;	
 		}		
@@ -160,7 +160,7 @@ WV_S32 FPGA_CONF_ResetA()
      
      for(i=0;i<100;i++){
 
-	TSK_FPGA_Read(0x0e,&data);
+	HIS_SPI_FpgaRd(0x0e,&data);
 
 	if(data==0){
 		break;	
@@ -206,14 +206,14 @@ WV_S32 FPGA_CONF_SetOutlineStart()
     WV_S32 ret = 0;
     WV_U16 data = 1;
     WV_S32 i; 
-    WV_S32 num=0; 
+    //WV_S32 num=0; 
     WV_RET_ADD(	HIS_SPI_FpgaWd(0x27,0),ret);
 	
     WV_RET_ADD(	HIS_SPI_FpgaWd(0xe,1),ret);
 	
     for(i=0;i<1000;i++){
 
-		TSK_FPGA_Read(0x0e,&data);
+		HIS_SPI_FpgaRd(0x0e,&data);
 		if(data==0){
 			break;	
 		}
@@ -223,7 +223,7 @@ WV_S32 FPGA_CONF_SetOutlineStart()
 
 	for(i=0;i<10;i++){
 
-		TSK_FPGA_Read(0x0b,&data);
+		HIS_SPI_FpgaRd(0x0b,&data);
 		if(data==3){
 			break;	
 		}
@@ -324,7 +324,7 @@ WV_S32 FPGA_CONF_SetMapEnd()
 *******************************************************************/
 WV_S32 FPGA_CONF_CleanWinFram()
 {
-	WV_S32 ret;
+	WV_S32 ret=0;
    WV_RET_ADD(	HIS_SPI_FpgaWd(0xe,1),ret);
    WV_printf("fpga clean win fram \n");	
 	return WV_SOK;  
@@ -375,7 +375,7 @@ WV_S32 FPGA_CONF_SetWin(WV_U16  num, FPGA_WIN_INFO_S * pInfo)
 	
     for(i=0;i<1000;i++){
 
-		TSK_FPGA_Read(0x0e,&data);
+		HIS_SPI_FpgaRd(0x0e,&data);
 		if(data==0){
 			break;	
 		}
@@ -385,7 +385,7 @@ WV_S32 FPGA_CONF_SetWin(WV_U16  num, FPGA_WIN_INFO_S * pInfo)
 
 	for(i=0;i<10;i++){
 
-		TSK_FPGA_Read(0x0b,&data);
+		HIS_SPI_FpgaRd(0x0b,&data);
 		if(data==3){
 			break;	
 		}
@@ -443,7 +443,7 @@ WV_S32 FPGA_CONF_GetSplitDefault( FPGA_SPLIT_INFO_S * pInfo)
 	pInfo->endX7 = 959;
 	pInfo->startY7 = 0;
 	pInfo->endY7   = 1079;
-
+	return WV_SOK;
 }
 #if 1
 /*******************************************************************
@@ -453,7 +453,7 @@ WV_S32 FPGA_CONF_GetSplitDefault( FPGA_SPLIT_INFO_S * pInfo)
  WV_S32 FPGA_CONF_SetSplit( FPGA_SPLIT_INFO_S * pInfo)
   {
 		WV_S32 ret = 0;  
-		WV_S32 i,chl;
+		WV_S32 chl;
 		WV_U16 ena;
 		chl = FPGA_CONF_GetOutChl_Num();
 		ena = FPGA_CONF_GetOutput();
@@ -834,6 +834,7 @@ WV_S32 FPGA_CONF_GetVersion()
 		}
 	}
 	//WV_printf("\nchannel num is [%d]\n",gVersion.num);
+	return WV_SOK;
 }
  /*******************************************************************
  WV_S32 FPGA_CONF_GetVersion(WV_U16  ver);

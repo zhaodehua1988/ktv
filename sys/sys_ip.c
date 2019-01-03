@@ -483,6 +483,5 @@ WV_S32 SYS_IP_Init()
 
  WV_S32 SYS_IP_DeInit()
 { 
-    
    return WV_SOK;
 }

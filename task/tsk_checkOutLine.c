@@ -1,6 +1,8 @@
 #include "tsk_checkOutLine.h"
 #include "fpga_conf.h"
 #include "his_spi.h"
+#include "tsk_fpga.h"
+#include "tsk_scene.h"
 typedef struct TSK_CHECK_OUT_DEV_E 
 {
 	WV_THR_HNDL_T 	thrHndl; 

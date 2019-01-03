@@ -92,4 +92,5 @@ WV_S32 FPGA_CONF_GetOutChl_Num();
 WV_S32 FPGA_CONF_GetVersion_ID(); 
 WV_U16 FPGA_CONF_SetGlobalOutput(WV_U16 ena);
 WV_S32 FPGA_CONF_CleanWinFram();
+WV_S32 FPGA_CONF_GetSplitDefault( FPGA_SPLIT_INFO_S * pInfo);
 #endif

@@ -45,8 +45,8 @@
 #define SVR_UDP_CMD_ASK_SCENE_PLAY    0x86
 #define SVR_UDP_CMD_ASK_SCENE_STOP    0x87
 
-static long long svr_udp_startTime[10];
-static long long svr_udp_endTime[10];
+//static long long svr_udp_startTime[10];
+//static long long svr_udp_endTime[10];
 
 typedef struct SVR_UDP_DEV_E
 {
@@ -214,6 +214,57 @@ WV_S32 SVR_UDP_SwitchChar(WV_S8 *pStr,WV_S32 *pValue)
 
 /****************************************************************************
 
+WV_S32 SVR_UDP_Send(SVR_UDP_DEV_E * pDev)
+
+****************************************************************************/
+WV_S32 SVR_UDP_Send(SVR_UDP_DEV_E * pDev,WV_S32 port,WV_S8 *pIp)
+{
+	WV_S32 sendLen,reqLen;
+	WV_U8  sendBuf[SVR_UDP_DATA_MAX_LEN ];
+	WV_U32 headLen;
+	WV_S32 brdcFd;
+	SVR_UDP_printf("svr udp send cmd,port=%d \n",port);
+	brdcFd = socket(PF_INET,SOCK_DGRAM,0);
+	if(brdcFd < 0){
+		SVR_UDP_printf("udp send socket error\r\n");
+		return WV_EFAIL;
+	}
+	WV_S32 optval = 1;
+
+	setsockopt(brdcFd,SOL_SOCKET,SO_BROADCAST|SO_REUSEADDR,&optval,sizeof(optval));
+	
+	struct sockaddr_in theirAddr;
+	memset(&theirAddr,0,sizeof(struct sockaddr_in));
+
+	theirAddr.sin_family = AF_INET;
+	theirAddr.sin_addr.s_addr = inet_addr(pIp);  	
+	theirAddr.sin_port = htons(port);
+	bind(brdcFd, (struct sockaddr*)&theirAddr, sizeof(struct sockaddr));
+
+	//send data
+	headLen = sizeof(pDev->headBuf);
+	memcpy(sendBuf,&pDev->headBuf,headLen);
+	if(pDev->headBuf.dataNum > 0 )
+	{
+		memcpy(sendBuf+headLen,pDev->pBuf,pDev->headBuf.dataNum);
+		sendLen = headLen+pDev->headBuf.dataNum;
+	}else{
+		sendLen = headLen;
+	}	
+	reqLen = sendto(brdcFd,sendBuf,sendLen,0,(struct sockaddr*)&(theirAddr),sizeof(struct sockaddr));
+	
+	if(reqLen != sendLen){
+		SVR_UDP_printf("udp send head error !!!!!!!!!!!!!,reqLen[%d]sednLen[%d]\r\n",reqLen,sendLen);
+		close(brdcFd);
+		return WV_EFAIL;
+	}
+	close(brdcFd);
+	return WV_SOK;
+}
+
+
+/****************************************************************************
+
 WV_S32 SVR_UDP_SyncScene(WV_U32 id);
 
 ****************************************************************************/
@@ -366,14 +417,14 @@ WV_S32 SVR_UDP_PlayNotifySlave();
 WV_S32 SVR_UDP_PlayNotifySlave()
 {
 	
-	printf("-------------SVR_UDP_PlayNotifySlave() --------------\n");
+	//printf("-------------SVR_UDP_PlayNotifySlave() --------------\n");
 
 	if(TSK_SCENE_GetSyncEna() != 1)
 	{
 		//SVR_UDP_PlayerPlay(pSvrUdp->headBuf.arg1);
 		return WV_SOK;	
 	}
-	WV_S32 i,j;
+	WV_S32 i;
 	WV_U8 cascadeInfo;
 	WV_U16 cascadeNum;
 	WV_U8 ipInt[30];
@@ -403,7 +454,7 @@ WV_S32 SVR_UDP_PlayNotifySlave()
 		{
 			return WV_SOK;
 		}
-		sleep(1);
+		usleep(10000);
 	}
 
 	//SVR_UDP_PlayerPlay(pSvrUdp->headBuf.arg1);	
@@ -449,11 +500,11 @@ WV_S32 SVR_UDP_SearchDev();
 WV_S32 SVR_UDP_SearchDev()//如何是主机则循环查询从机设备
 {
 	
-	printf("----------SVR_UDP_SearchDev()--------------\n");
-	WV_S32 ret = 0;
+	//printf("----------SVR_UDP_SearchDev()--------------\n");
+	//WV_S32 ret = 0;
 	if(TSK_SCENE_GetSyncEna() != 1)
 	{
-		//usleep(30000);
+		usleep(30000);
 		//printf("---sync [%d] \n",TSK_SCENE_GetSyncEna());
 		return  WV_SOK; 
 	}
@@ -627,61 +678,9 @@ WV_S32 SVR_UDP_Recv(WV_S32 socket,SVR_UDP_DEV_E * pDev, WV_S32 len)
 		ret = WV_EFAIL;
 
 	}
-
      
  	return ret;
 }
-
-/****************************************************************************
-
-WV_S32 SVR_UDP_Send(SVR_UDP_DEV_E * pDev)
-
-****************************************************************************/
-WV_S32 SVR_UDP_Send(SVR_UDP_DEV_E * pDev,WV_S32 port,WV_S8 *pIp)
-{
-	WV_S32 sendLen,reqLen;
-	WV_U8  sendBuf[SVR_UDP_DATA_MAX_LEN ];
-	WV_U32 headLen;
-	WV_S32 brdcFd;
-	SVR_UDP_printf("svr udp send cmd,port=%d \n",port);
-	brdcFd = socket(PF_INET,SOCK_DGRAM,0);
-	if(brdcFd < 0){
-		SVR_UDP_printf("udp send socket error\r\n");
-		return WV_EFAIL;
-	}
-	WV_S32 optval = 1;
-
-	setsockopt(brdcFd,SOL_SOCKET,SO_BROADCAST|SO_REUSEADDR,&optval,sizeof(optval));
-	
-	struct sockaddr_in theirAddr;
-	memset(&theirAddr,0,sizeof(struct sockaddr_in));
-
-	theirAddr.sin_family = AF_INET;
-	theirAddr.sin_addr.s_addr = inet_addr(pIp);  	
-	theirAddr.sin_port = htons(port);
-	bind(brdcFd, (struct sockaddr*)&theirAddr, sizeof(struct sockaddr));
-
-	//send data
-	headLen = sizeof(pDev->headBuf);
-	memcpy(sendBuf,&pDev->headBuf,headLen);
-	if(pDev->headBuf.dataNum > 0 )
-	{
-		memcpy(sendBuf+headLen,pDev->pBuf,pDev->headBuf.dataNum);
-		sendLen = headLen+pDev->headBuf.dataNum;
-	}else{
-		sendLen = headLen;
-	}	
-	reqLen = sendto(brdcFd,sendBuf,sendLen,0,(struct sockaddr*)&(theirAddr),sizeof(struct sockaddr));
-	
-	if(reqLen != sendLen){
-		SVR_UDP_printf("udp send head error !!!!!!!!!!!!!,reqLen[%d]sednLen[%d]\r\n",reqLen,sendLen);
-		close(brdcFd);
-		return WV_EFAIL;
-	}
-	close(brdcFd);
-	return WV_SOK;
-}
-
 
 /****************************************************************************
 
@@ -691,12 +690,10 @@ WV_S32 SVR_UDP_PlayerPlay(WV_U32 id);
 WV_S32 SVR_UDP_PlayerPlay(WV_U32 id)
 {
 
-	printf("SVR_UDP_PlayerPlay [%d]\n",id);
+	//printf("SVR_UDP_PlayerPlay [%d]\n",id);
 	TSK_Player_playRoll(id);
 	return WV_SOK;
 }
-
-
 /****************************************************************************
 
 WV_S32 SVR_UDP_CmdCheck(SVR_UDP_HEAD_E head)
@@ -720,7 +717,7 @@ WV_S32 SVR_UDP_GetCmd()
 WV_S32 SVR_UDP_Get_Cmd(SVR_UDP_DEV_E * pDev)
 {
 	//get 
-	WV_S32 len,i,ret;
+	WV_S32 len,ret;
 	
 	len = sizeof(SVR_UDP_HEAD_E);
 	//ret = SVR_UDP_Recv(pDev ->mSocket,(WV_U8 *)&(pDev ->headBuf),len);
@@ -832,7 +829,7 @@ WV_S32 SVR_UDP_SetPlayer(SVR_UDP_HEAD_E *pHead,WV_U8 *pBuf)
 WV_S32 SVR_UDP_SetPlayer(SVR_UDP_HEAD_E *pHead,WV_U8 *pBuf)
 {	
 	WV_S32 ret=0;
-	printf("***********player replay[%d] ********* \n",pHead->arg1);
+	//printf("***********player replay[%d] ********* \n",pHead->arg1);
 	ret = 	TSK_Player_Replay(pHead->arg1);
 	if(ret != 0 )
 	{
@@ -901,7 +898,6 @@ WV_S32 SVR_UDP_CMD_Porc(SVR_UDP_DEV_E *pDev)
 	WV_S32 ret=0;
 	WV_U32 port;
 	WV_S8 ip[20];
-	WV_S32 i;
 	//printf("get cmd0 = 0x%02x \n",pHead->cmdL0);
 	switch(pDev->headBuf.cmdL0){
 		case SVR_UDP_CMD_GETIP:
@@ -925,11 +921,11 @@ WV_S32 SVR_UDP_CMD_Porc(SVR_UDP_DEV_E *pDev)
 			if(TSK_SCENE_GetSyncEna() == 2)
 			{
 				port = SVR_UDP_RECV_PORT;
-				pDev->headBuf.cmdL0 |= 0x80;
+				pDev->headBuf.cmdL0 = SVR_UDP_CMD_ASK_PLAY;
 				sprintf(ip,"%s",inet_ntoa(pDev->recvAddr.sin_addr));
 				//printf("play ask ip[%s]\n",ip);
+				ret = SVR_UDP_Send(pDev,port,ip);
 				ret = SVR_UDP_SetPlayer(&pDev->headBuf,pDev->pBuf);
-				ret = SVR_UDP_Send(pDev,port,ip);	
 			}		
 			break;
 		case SVR_UDP_CMD_SCENE_CHANGE:

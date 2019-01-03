@@ -53,4 +53,5 @@ WV_S32 TSK_GO_ShowText( WV_U32 x,WV_U32 y,WV_U32 w,WV_U32 h,WV_U32 color,WV_U32 
 WV_S32 TSK_GO_CleanRect( WV_U32 x,WV_U32 y,WV_U32 w,WV_U32 h);
 WV_S32 TSK_GO_RefreshLayerForPic();
 WV_S32 TSK_GO_GetBackAni_Pos(TSK_GO_MOV_PIC_POS_S * pBackAniPos,WV_U16 *pChn,WV_U16 *pID);
+WV_S32 TSK_GO_DrawEllipse( WV_U16 x ,WV_U16 y,WV_U32 r,WV_U32 color);
 #endif

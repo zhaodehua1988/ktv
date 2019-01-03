@@ -5,4 +5,6 @@
 WV_S32 TSK_USB_SetShowEna();
 WV_S32 TSK_USB_ShowMovEnd();
 WV_S32 TSK_USB_GetShowFlag();
+WV_S32 TSK_USB_ShowOpen();
+WV_S32 TSK_USB_ShowClose();
 #endif

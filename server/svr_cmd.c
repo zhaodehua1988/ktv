@@ -18,6 +18,8 @@
 #include "tsk_text.h"
 #include "sys_env.h"
 #include "sys_file.h"
+#include "sys_licences.h"
+#include "tsk_player.h"
 #define  SVR_CMD_MAX_NUM    128
 #define  POINT_MAX_COL      128
 #define  POINT_MAX_RAW      128
@@ -46,9 +48,7 @@ WV_S32  SVR_CMD_HandProc(SVR_FRAME_HEAD_E * pHead ,WV_U8 *pData);
 ********************************************************************/
 WV_S32  SVR_CMD_HandProc(SVR_FRAME_HEAD_E * pHead ,WV_U8 *pData)
 {   
-	WV_S32 num,verLen,id;
-	WV_S8 version[20];
-	
+	WV_S32 num,id;
  	num = FPGA_CONF_GetOutChl_Num();
 	id = FPGA_CONF_GetVersion_ID();
 	if(num < 0){
@@ -379,9 +379,7 @@ WV_S32  SVR_CMD_OutResolutionProc(SVR_FRAME_HEAD_E * pHead ,WV_U8 *pData)
 WV_S32 SVR_CMD_splitConf_Check(FPGA_SPLIT_INFO_S info);
 ********************************************************************/
 WV_S32 SVR_CMD_splitConf_Check(FPGA_SPLIT_INFO_S info)
-{
-	WV_S32 ret=0;
-	
+{	
 	if(info.startY0 > 2160 || info.endY0 > 2160 ||\
 		info.startY1 > 2160 || info.endY1 > 2160 ||\
 		info.startY2 > 2160 || info.endY2 > 2160 ||\
@@ -569,10 +567,7 @@ WV_S32 SVR_CMD_windowConf_Check(FPGA_SPLIT_INFO_S info);
 WV_S32 SVR_CMD_windowConf_Check(WV_S32 i,FPGA_WIN_INFO_S info)
 {
 	
-	WV_S32 ret = 0;
-
 	TSK_SCENE_SetWin(i,info.outId,info.x,info.y, info.w, info.h, info.videoId);
-
 	return WV_SOK;
 }
 
@@ -630,11 +625,8 @@ WV_S32  SVR_CMD_movConfProc(SVR_FRAME_HEAD_E * pHead ,WV_U8 *pData)
 	WV_U16 *pRcv;
 	WV_U32 id;
 
-	WV_U32 winNum;	 
 	len  =  pHead->dataNum;
-
 	pRcv=(WV_U16*)pData;
-
 	id = pHead->arg1;
 	if((id<0) || (id > 128)){
 
@@ -743,11 +735,11 @@ WV_S32  SVR_CMD_IPConfProc(SVR_FRAME_HEAD_E * pHead ,WV_U8 *pData)
 	WV_U8 *pRcv;
 	pRcv = pData;
 
-	WV_U8 ip[20];
-	WV_U8 mask[20];
-	WV_U8 gateWay[20];
-	WV_U8 dns[20];
-	WV_U8 mac[20];
+	WV_S8 ip[20];
+	WV_S8 mask[20];
+	WV_S8 gateWay[20];
+	WV_S8 dns[20];
+	WV_S8 mac[20];
 	WV_U16 *pPort;
 
 	
@@ -758,7 +750,7 @@ WV_S32  SVR_CMD_IPConfProc(SVR_FRAME_HEAD_E * pHead ,WV_U8 *pData)
 	sprintf(dns,"%d.%d.%d.%d",pRcv[12],pRcv[13],pRcv[14],pRcv[15]);
 	sprintf(mac,"%02x:%02x:%02x:%02x:%02x:%02x",0,pRcv[17],pRcv[18],pRcv[19],pRcv[20],pRcv[21]);//mac:00:**:**:**:**:**
 	
-   pPort = pRcv + 22;
+   pPort = (WV_U16 *)(pRcv + 22);
 
 	WV_printf("ip:%s\n",ip);
 	WV_printf("mask:%s\n",mask);
@@ -819,6 +811,7 @@ WV_S32  SVR_CMD_DrawLineProc(SVR_FRAME_HEAD_E * pHead ,WV_U8 *pData)
 	len = pHead->dataNum;
 	
 	cmd = pHead->cmdL1;
+	chl = pHead->arg1;	
 	
 	if(cmd<0 || cmd > 3)
 	{
@@ -846,7 +839,7 @@ WV_S32  SVR_CMD_DrawLineProc(SVR_FRAME_HEAD_E * pHead ,WV_U8 *pData)
 	//drawline
 
 
-		chl = pHead->arg1;
+
 		pRcv16 = (WV_U16 *)pData;
 		pRcv32 = (WV_U32 *)pData;
 
@@ -1177,7 +1170,7 @@ WV_S32  SVR_CMD_ChangeMov(SVR_FRAME_HEAD_E * pHead ,WV_U8 *pData)
 	dataLen = pHead->dataNum;
 	movNum = pHead->cmdL1;
 	
-	ret = TSK_CONF_ChangeMov(movNum,pData ,dataLen);
+	ret = TSK_CONF_ChangeMov(movNum,(WV_S8 *)pData ,dataLen);
 
 	SVR_CMD_Ack(pHead,ret);
 	return ret;
@@ -1358,7 +1351,7 @@ WV_S32 SVR_CMD_GetDevInfo(SVR_FRAME_HEAD_E * pHead ,WV_U8 *pData)
 
 	WV_S32 ret=0;
 	WV_U32 dataLen;
-	ret = SYS_INFO_GetInfo(&dataLen,pData );
+	ret = SYS_INFO_GetInfo(&dataLen,(WV_S8 *)pData );
 	SVR_CMD_Ack(pHead,ret);
 	
 	pHead->dataNum = dataLen;
@@ -1404,7 +1397,7 @@ WV_S32  SVR_CMD_GetMapLine(SVR_FRAME_HEAD_E * pHead ,WV_U8 *pData)
 	//printf("SVR_CMD_GetMapLine\n");
 	WV_S32 ret = 0;
 	
-	ret = TSK_GO_DrawMapLine(pHead->dataNum,pData);
+	ret = TSK_GO_DrawMapLine(pHead->dataNum,(WV_S8*)pData);
 	SVR_CMD_Ack(pHead,ret);
 	return WV_SOK;
 }

@@ -22,4 +22,5 @@ WV_S32 SVR_UDP_PlayerSync();
 WV_S32 SVR_UDP_SyncScenePause();
 WV_S32 SVR_UDP_SyncSceneStop();
 WV_S32 SVR_UDP_SyncScenePlay();
+WV_S32 SVR_UDP_PlayNotifySlave();
 #endif

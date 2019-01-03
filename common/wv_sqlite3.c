@@ -35,11 +35,10 @@ int utf8togb2312(const char *sourcebuf,size_t sourcelen,char *destbuf,size_t des
     }
     memset(destbuf,0,destlen);
 
-    const char **source = &sourcebuf;
+     const char **source =&sourcebuf;
 
     char **dest = &destbuf;
-    int i;
-    if(-1 == iconv(cd,source,&sourcelen,dest,&destlen))
+    if(-1 == iconv(cd,(char **)source,&sourcelen,dest,&destlen))
     {
         Sqlite3_printf("change utf-8 to gb2312 error[%d]\n",errno);
         return -1;
@@ -70,7 +69,7 @@ int gb2312toutf8(const char *sourcebuf,size_t sourcelen,char *destbuf,size_t des
     const char **source = &sourcebuf;
 
     char **dest = &destbuf;
-    if(-1 == iconv(cd,source,&sourcelen,dest,&destlen))
+    if(-1 == iconv(cd,(char **)source,&sourcelen,dest,&destlen))
     {
         printf("iconv error!\n");
         return -1;
@@ -187,14 +186,10 @@ WV_S32 WV_SQLITE3_SearchBycallback(WV_S8 *db_name,WV_S8 *sql_cmd,WV_SQLITE_callb
 WV_S32 WV_SQLITE3_SearchBycallback(WV_S8 *db_name,WV_S8 *sql_cmd,WV_SQLITE_callback callback)
 {
 
-    int i = 0 ;
-    int j = 0 ;
-    int nrow = 0, ncolumn = 0;
-    char **azResult; //二维数组存放结果
+    
     sqlite3 *db=NULL;
     char *zErrMsg = 0;
     int rc;
-    int len=0;
 
     if(access(db_name, 0) == -1)
     {
@@ -449,5 +444,5 @@ WV_S32 WV_SQLITE3_Init()
 
     WV_CMD_Register("sqlite",NULL,"sqlite comand ",NULL);
     WV_CMD_Register("sqlite","get","sqlite get val",WV_SQLITE_GetTable);
-
+    return WV_SOK;
 }

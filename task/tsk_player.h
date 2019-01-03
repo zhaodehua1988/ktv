@@ -30,7 +30,7 @@ WV_S32  TSK_PLAYER_SetVolume(WV_S32 volume,WV_U32 playerID);
 WV_S32  TSK_PLAYER_GetVolume(WV_S32 *pVolume,WV_U32 playerID);
 WV_S32  TSK_PLAYER_ReadVolume();
 WV_S32 TSK_PLAYER_VidFrameToPicture(WV_S32 player);
-
+WV_S32 TSK_Player_playRoll(WV_S32 id);
 #define TSK_PLAYER_MODE_3840_1080  0
 #define TSK_PLAYER_MODE_3840_2160  1
 #define TSK_PLAYER_MODE_1920_1080  2
