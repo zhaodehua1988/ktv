@@ -17,4 +17,5 @@ WV_S32  HIS_PLAYER_Replay(HI_HANDLE  * pHndlPlayer);
 WV_S32  HIS_PLAYER_playRoll(HI_HANDLE  * pHndlPlayer);
 WV_S32  HIS_PLAYER_PlayRandom(HI_HANDLE  * pHndlPlayer);
 WV_S32  HIS_PLAYER_GetStatus(HI_HANDLE  * pHndlPlayer ,WV_U32 *pStatus);
+WV_S32  HIS_PLAYER_ChangeMov(HI_HANDLE  *pHndlPlayer,WV_S8 *pMovName);
 #endif

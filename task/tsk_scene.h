@@ -152,4 +152,7 @@ WV_S32 TSK_SCENE_SetWinChange(WV_S32 ena);
 WV_S32 TSK_SCENE_SaveCustom(WV_U32  id,TSK_CONF_SCENE_CONF *pScene);
 WV_S32 TSK_SCENE_CleanWinFram();
 WV_S32 TSK_SCENE_SetDefault(WV_U32  id );
+WV_S32 TSK_SCENE_GetMovIDByplayerHandle(WV_U32 playerHandle);
+WV_S32 TSK_SCENE_ChangeMovByPlayerHandle(WV_U32 playerHandle,WV_U32 movID);
+
 #endif

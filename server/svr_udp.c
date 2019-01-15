@@ -830,7 +830,7 @@ WV_S32 SVR_UDP_SetPlayer(SVR_UDP_HEAD_E *pHead,WV_U8 *pBuf)
 {	
 	WV_S32 ret=0;
 	//printf("***********player replay[%d] ********* \n",pHead->arg1);
-	ret = 	TSK_Player_Replay(pHead->arg1);
+	ret = 	TSK_Player_Replay(0);
 	if(ret != 0 )
 	{
 		printf("player[%d] rePlay error\n",pHead->arg1);	

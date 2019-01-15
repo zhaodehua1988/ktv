@@ -3,7 +3,7 @@
 #include <sys/stat.h>
 #include <dirent.h>
 #include "svr_control_cmd.h"
-
+#include "tsk_player.h"
 #define TSK_CONF_MOV_InfoFile         "./env/mov1.ini"
 #define TSK_CONF_Scene_NameFile       "./env/scene.ini"
 
@@ -180,6 +180,7 @@ WV_S32 TSK_CONF_getMovTypeNum()
                     pMovInfoDev->movFile[j].u16Type = i;
                     gMovTypeInfo[i].u32TotalNum++;
                     gMovTypeInfo[i].typeEna = 1;
+                    gMovTypeInfo[i].u32LocalNum = 1;
                     break;
                 }
             }
@@ -243,7 +244,7 @@ WV_S32 TSK_CONF_changeMovByType(WV_S8 *pType);
 ********************************************************************/
 WV_S32 TSK_CONF_changeMovByType(WV_S8 *pType)
 {
-    printf("pType is %s\n",pType);
+    //printf("pType is %s\n",pType);
     WV_S32 i,j=0;
     WV_U16 u16Type=0xffff;
 
@@ -251,7 +252,7 @@ WV_S32 TSK_CONF_changeMovByType(WV_S8 *pType)
     {
 
         if(gMovTypeInfo[i].typeEna == 0 ) continue;
-        printf("ucTypeName is %s\n",gMovTypeInfo[i].ucTypeName);
+        //printf("ucTypeName is %s\n",gMovTypeInfo[i].ucTypeName);
         if(strncmp(pType,gMovTypeInfo[i].ucTypeName,TSK_CONF_MOV_TYPE_NAME_LEN) == 0)
         {
             u16Type=i;
@@ -259,10 +260,10 @@ WV_S32 TSK_CONF_changeMovByType(WV_S8 *pType)
             break;
         }
     }
-    printf("the u16Type is %d\n",u16Type);
+    //printf("the u16Type is %d\n",u16Type);
     if(u16Type == 0xffff)
     {
-        printf("no found!!!!!!\n");
+        //printf("no found!!!!!!\n");
         return WV_EFAIL;
     }
 
@@ -270,7 +271,7 @@ WV_S32 TSK_CONF_changeMovByType(WV_S8 *pType)
     {
         if((pMovInfoDev->movFile[i].dataLen > 0) && (pMovInfoDev->movFile[i].u16Type == u16Type))
         {
-            WV_printf("get movFile[%d].type = %d \n",i,u16Type);
+            //WV_printf("get movFile[%d].type = %d \n",i,u16Type);
 
             if(j<gMovTypeInfo[u16Type].u32LocalNum)
             {
@@ -278,7 +279,7 @@ WV_S32 TSK_CONF_changeMovByType(WV_S8 *pType)
                 continue;
             }
 
-            WV_printf("tsk_scene_setMov %d \n",i);
+           // WV_printf("tsk_scene_setMov %d \n",i);
             TSK_SCENE_SetMov(0,i);
             TSK_SCENE_ConfMov(0);
             TSK_SCENE_SetMov(1,i);
@@ -293,10 +294,10 @@ WV_S32 TSK_CONF_changeMovByType(WV_S8 *pType)
         }
     }
 
-    WV_printf("localNum=%d,total=%d\n",gMovTypeInfo[u16Type].u32LocalNum,gMovTypeInfo[u16Type].u32TotalNum);
+    //WV_printf("localNum=%d,total=%d\n",gMovTypeInfo[u16Type].u32LocalNum,gMovTypeInfo[u16Type].u32TotalNum);
     if((SVR_CONTROL_GetKtvDev() == 0) || (SVR_CONTROL_GetKtvDev() == 4)) //雷石点歌机，初始化时默认歌曲随机播放
     {
-        printf("in TSK_CONF_changeMovByType I used the TSK_SCENE_ChangePlayMode +++++++++\n");
+        //printf("in TSK_CONF_changeMovByType I used the TSK_SCENE_ChangePlayMode +++++++++\n");
         TSK_SCENE_ChangePlayMode(0);//
     }
 
@@ -304,16 +305,73 @@ WV_S32 TSK_CONF_changeMovByType(WV_S8 *pType)
     return WV_SOK;
 }
 
+
+
 /********************************************************************
 
-WV_S32 TSK_CONF_changeMovRollType(); 
+WV_S32 TSK_CONF_changeMovRollType(WV_U32 handle); 
 
 ********************************************************************/
-WV_S32 TSK_CONF_changeMovRollType()
+WV_S32 TSK_CONF_changeMovRollType(WV_U32 handle)
 {
     WV_S32 ret=-1;
-    ret=TSK_CONF_changeMovByType(gCurrentTypeName);
+    WV_S32 movID=-1;
+    movID=TSK_SCENE_GetMovIDByplayerHandle(handle);
+    if(movID >512 || movID <0 ) return ret;
+    WV_S8 pType[TSK_CONF_MOV_TYPE_NAME_LEN+1]={0};
+
+    memcpy(pType,pMovInfoDev->movFile[movID].typeName,TSK_CONF_MOV_TYPE_NAME_LEN);
+
+    WV_S32 i,j=0;
+    WV_U16 u16Type=0xffff;
+
+    for(i=0;i<TSK_CONF_MOV_TYPE_MAX_NUM;i++)
+    {
+
+        if(gMovTypeInfo[i].typeEna == 0 ) continue;
+        //printf("ucTypeName is %s\n",gMovTypeInfo[i].ucTypeName);
+        if(strncmp(pType,gMovTypeInfo[i].ucTypeName,TSK_CONF_MOV_TYPE_NAME_LEN) == 0)
+        {
+            u16Type=i;
+            memcpy(gCurrentTypeName,pType,TSK_CONF_MOV_TYPE_NAME_LEN);
+            break;
+        }
+    }
+    //printf("the u16Type is %d\n",u16Type);
+    if(u16Type == 0xffff)
+    {
+        //printf("no found!!!!!!\n");
+        return WV_EFAIL;
+    }
+
+    for(i=0;i<TSK_CONF_MOV_MAX_NUM;i++)
+    {
+        if((pMovInfoDev->movFile[i].dataLen > 0) && (pMovInfoDev->movFile[i].u16Type == u16Type))
+        {
+            //WV_printf("get movFile[%d].type = %d \n",i,u16Type);
+
+            if(j<gMovTypeInfo[u16Type].u32LocalNum)
+            {
+                j++;
+                continue;
+            }
+            //if(gMovTypeInfo[u16Type].u32TotalNum >1 && movID == i) continue;
+            //WV_printf("tsk_scene_setMov %d \n",i);
+            //sprintf(name,"./mov/mov%d.mp4",i);
+            //TSK_PLAYER_ChangeMov(handle,name);
+            //if(gMovTypeInfo[u16Type].u32TotalNum >1 && i== movID)
+            ret = TSK_SCENE_ChangeMovByPlayerHandle(handle,i);
+            gMovTypeInfo[u16Type].u32LocalNum ++;
+            if(gMovTypeInfo[u16Type].u32LocalNum >=gMovTypeInfo[u16Type].u32TotalNum)
+            {
+                gMovTypeInfo[u16Type].u32LocalNum = 0 ;
+            }
+            break;
+        }
+    }
+
     return ret;
+
 }
 
 /********************************************************************

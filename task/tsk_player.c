@@ -520,7 +520,18 @@ WV_S32  TSK_PLAYER_Destory(WV_S32 id)
 
     return WV_SOK;
 }
+/****************************************************************************
 
+WV_S32  TSK_PLAYER_GetPlayerIDByHandle(WV_U32 playerHandle)
+
+****************************************************************************/
+WV_S32  TSK_PLAYER_GetPlayerIDByHandle(WV_U32 playerHandle)
+{
+    if(gTskPlayer[0].playerEna == 1 && gTskPlayer[0].playerHandl == playerHandle) return 0;
+    if(gTskPlayer[1].playerEna == 1 && gTskPlayer[1].playerHandl == playerHandle) return 1;
+    
+    return WV_EFAIL;
+}
 /****************************************************************************
 
 WV_S32 TSK_PLAYER_CMDStart(WV_S32 argc, WV_S8 **argv,WV_S8 *prfBuff)
@@ -774,11 +785,11 @@ WV_S32 TSK_Player_Replay(WV_U32 id);
 *******************************************************************/
 WV_S32 TSK_Player_Replay(WV_S32 id)
 {
-    
-    if(TSK_PLAYER_GetStatus(id) == 2) return WV_SOK;
+    //printf("***********player replay[%d] *********ena=[%d] \n",id,gTskPlayer[id].playerEna);    
+    //if(TSK_PLAYER_GetStatus(id) == 2) return WV_SOK;
 
     if (gTskPlayer[id].playerEna == 1){
-        //printf("***********player replay[%d] ********* \n",id);
+
       HIS_PLAYER_Replay(&(gTskPlayer[id].playerHandl));      
     }
     return WV_SOK;
@@ -1015,4 +1026,10 @@ WV_S32 TSK_PLAYER_VidFrameToPicture(WV_S32 player)
     return WV_SOK;
 }
 
-
+/***********************************************************************
+WV_S32 TSK_PLAYER_ChangeMov(WV_U32 playerHandle,WV_S8 *pMovName);
+***********************************************************************/
+WV_S32 TSK_PLAYER_ChangeMov(WV_U32 playerHandle,WV_S8 *pMovName)
+{
+    return HIS_PLAYER_ChangeMov(&playerHandle,pMovName);
+}

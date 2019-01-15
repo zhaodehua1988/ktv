@@ -59,7 +59,7 @@ WV_S32 SVR_CONTROL_GetTypeRound();
 *********************************************************/ 
 WV_S32 SVR_CONTROL_GetTypeRound()
 {
-	SVR_CONTROL_printf("get Ktv Dev port[%d]\n",gControlDev.port);
+	SVR_CONTROL_printf("get Ktv Dev TypeRound[%d]\n",gControlDev.typeRound);
 	return gControlDev.typeRound;
 }
 /********************************************************

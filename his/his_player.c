@@ -18,6 +18,7 @@
 #include <time.h>
 #include "svr_control_cmd.h"
 #include "tsk_conf.h"
+#include "tsk_uart.h"
 #define  HIS_PLAYER_STATUS_INIT          	0
 #define  HIS_PLAYER_STATUS_DEINIT        	1
 #define  HIS_PLAYER_STATUS_PLAY        		2
@@ -318,20 +319,22 @@ static WV_S32 HIS_PLAYER_CallBack(HI_HANDLE hPlayer, HI_SVR_PLAYER_EVENT_S *pstr
 
             if(TSK_PLAYER_SetHiPlayNext(1,hPlayer) != 0)
             {
-                //printf("------------------------------------\n");
+
                 if(TSK_SCENE_GetPlayMode() == 0 )
                 {
-                    //printf("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n");
-                    if(SVR_CONTROL_GetTypeRound()==1){
-                        //printf("goto ++++++++++++++ TSK_CONF_changeMovRollType\n");
-                        TSK_CONF_changeMovRollType();
-                    }else {
-                        //printf("goto ++++++++++++++ HI_SVR_PLAYER_Play\n");
+                     //按类别循环
+                    if(SVR_CONTROL_GetTypeRound()==1 || TSK_UART_GetTypeRound() == 1){
+                        
+                        if(TSK_CONF_changeMovRollType(hPlayer) != 0 )//如果按类别播放下一个失败，则继续播放当前视频
+                        {
+                            HI_SVR_PLAYER_Play(hPlayer);
+                        }
+                    }else {//单视频循环
+                        
                         HI_SVR_PLAYER_Play(hPlayer);
                     }
-
-                    //TSK_CONF_changeMovRollType();
                 }else{
+                    //随机播放
                     HIS_PLAYER_PlayRandom(&hPlayer);
                 }
             }
@@ -1039,10 +1042,9 @@ WV_S32  HIS_PLAYER_Replay(HI_HANDLE  * pHndlPlayer)
     WV_S32 i;
     WV_CHECK_RET(HIS_PLAYER_GetStatus(pHndlPlayer,&status));
 
-    //printf("play[0] get starus [%d]\n",status);
+
     if(status == HIS_PLAYER_STATUS_STOP)
     {
-
         WV_CHECK_RET( HI_SVR_PLAYER_Play(*pHndlPlayer));
         return WV_SOK;
 
@@ -1053,7 +1055,7 @@ WV_S32  HIS_PLAYER_Replay(HI_HANDLE  * pHndlPlayer)
     {
         HI_SVR_PLAYER_Stop (*pHndlPlayer);
 
-        for(i=0;i<200;i++)
+        for(i=0;i<20;i++)
         {
             WV_CHECK_RET(HIS_PLAYER_GetStatus( pHndlPlayer, &status));
 
@@ -1067,6 +1069,7 @@ WV_S32  HIS_PLAYER_Replay(HI_HANDLE  * pHndlPlayer)
         }
 
     }
+
     return WV_SOK;
 
 }
@@ -1087,7 +1090,6 @@ WV_S32  HIS_PLAYER_Play(HI_HANDLE  * pHndlPlayer )
 
     if(status == HIS_PLAYER_STATUS_STOP || status == HIS_PLAYER_STATUS_INIT)
     {
-        printf("IN HIS_PLAYER_Play +++++++++++++++\n");
         WV_CHECK_RET( HI_SVR_PLAYER_Play(*pHndlPlayer));
 
     }
@@ -1358,7 +1360,7 @@ WV_S32  HIS_PLAYER_Start(HI_HANDLE  * pHndlPlayer ,WV_S8 * pFileName)
     if (HI_SUCCESS == s32Ret)
     {
 
-        printf("\n**********************test set net fileBuf size \n");
+        //printf("\n**********************test set net fileBuf size \n");
         stBufConfig.eType = HI_FORMAT_BUFFER_CONFIG_SIZE;
         //stBufConfig.s64Total的值不能超过s64BufMaxSize的值
         stBufConfig.s64Total = s64BufMaxSize;
@@ -1366,7 +1368,7 @@ WV_S32  HIS_PLAYER_Start(HI_HANDLE  * pHndlPlayer ,WV_S8 * pFileName)
         stBufConfig.s64EventEnough = (3 * 1024 * 1024);
         stBufConfig.s64TimeOut = 1200;
         s32Ret = HI_SVR_PLAYER_Invoke(*pHndlPlayer,HI_FORMAT_INVOKE_SET_BUFFER_CONFIG, &stBufConfig);
-        printf("set buf config ret=%d \n",s32Ret);
+       // printf("set buf config ret=%d \n",s32Ret);
 
 
     }
@@ -1396,64 +1398,6 @@ WV_S32  HIS_PLAYER_Start(HI_HANDLE  * pHndlPlayer ,WV_S8 * pFileName)
     return  s32Ret;
 }
 
-
-/***************************************************************
-
-WV_S32  HIS_PLAYER_PlayRandom(HI_HANDLE  * pHndlPlayer);
-
-***************************************************************/
-/*
-WV_S32  HIS_PLAYER_PlayRandom(HI_HANDLE  *pHndlPlayer)
-{
-
-        WV_U32 id,i=0,x=0,y=0;
-        WV_S32 ret;
-        WV_S8 fileName[30];
-        memset(gHisPlayMov,0,sizeof(gHisPlayMov));
-        DIR *dirptr=NULL;
-        struct dirent *entry;
-        if((dirptr = opendir("./mov")) == NULL)
-        {
-                WV_printf("open ./mov/ dir failed !\n");
-                return WV_EFAIL;
-        }
-
-        while((entry = readdir(dirptr)) != NULL)
-        {
-                if(strcmp(entry->d_name,".") == 0 || strcmp(entry->d_name,"..") == 0 )
-                {
-                        continue;
-                }
-
-                if(strstr(entry->d_name,"mov") != NULL)
-                {
-                        sprintf(&gHisPlayMov[i],"%s",entry->d_name);
-                        i++;
-                }
-
-                if(i==0)
-                {
-                        WV_printf("HIS_PLAYER_PlayRandom:not find mov file \n");
-                        return WV_SOK;
-                }
-                if(i>=128)
-                {
-                        break;
-                }
-
-        }
-
-        y=i-1;
-
-        srand(time(0));
-        id=x+rand()%(y-x+1);  //random id
-        sprintf(fileName,"./mov/%s",&gHisPlayMov[id]);
-        //WV_printf("HIS_PLAYER_PlayRandom fileName=%s\n",fileName);
-        HIS_PLAYER_Stop(pHndlPlayer);
-        HIS_PLAYER_Start(pHndlPlayer ,fileName);
-        return WV_SOK;
-}
-*/
 /***************************************************************
 
 WV_S32  HIS_PLAYER_PlayRandom(HI_HANDLE  * pHndlPlayer);
@@ -1509,14 +1453,27 @@ WV_S32  HIS_PLAYER_PlayRandom(HI_HANDLE  *pHndlPlayer)
     }
     return WV_SOK;
 }
-
 /***************************************************************
 
-WV_S32  HIS_PLAYER_PlayRandom(HI_HANDLE  * pHndlPlayer);
+WV_S32  HIS_PLAYER_ChangeMov(HI_HANDLE  *pHndlPlayer,WV_S32 movID);
 
 ***************************************************************/
-
-
+WV_S32  HIS_PLAYER_ChangeMov(HI_HANDLE  *pHndlPlayer,WV_S8 *pMovName)
+{
+    WV_S32 ret=-1;
+    ret = WV_FILE_Access(pMovName);
+    if(ret == WV_SOK)
+    {
+        HIS_PLAYER_Stop(pHndlPlayer);
+        //清除caches
+        system("sync");
+        system("echo 3 > /proc/sys/vm/drop_caches");//  echo 3 > /proc/sys/vm/drop_caches");
+        HIS_PLAYER_Start(pHndlPlayer ,pMovName);
+        printf("change mov to %s \n",pMovName);
+        return WV_SOK;
+    }
+    return ret;
+}
 
 
 

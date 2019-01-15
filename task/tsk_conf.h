@@ -33,8 +33,8 @@ WV_S32 TSK_CONF_MovGetConf();
 WV_S32 TSK_CONF_SaveSceneType(WV_U8 id,WV_U8 type);
 WV_S32 TSK_CONF_changeSceneByType(WV_U8 *pType);
 
-WV_S32 TSK_CONF_changeMovRollType();
-
+//WV_S32 TSK_CONF_changeMovRollType();
+WV_S32 TSK_CONF_changeMovRollType(WV_U32 handle);
 WV_S32 TSK_CONF_SaveCustomScene(WV_U8 *pData ,WV_U32 dataLen);
 WV_S32 TSK_CONF_SaveFadeinout(WV_U8 Fade);
 WV_S32 TSK_CONF_LoadFadeinout(WV_U8 *Fade);

@@ -1,6 +1,6 @@
 /**
  \file
- \brief Server (SVR) player module. CNcomment:svr playerÄ£¿éCNend
+ \brief Server (SVR) player module. CNcomment:svr playerÄ£ï¿½ï¿½CNend
  \author HiSilicon Technologies Co., Ltd.
  \date 2008-2018
  \version 1.0
@@ -26,42 +26,42 @@ extern "C" {
 /** @{ */  /** <!-- [Hiplayer]*/
 
 /** Invalid handle */
-/** CNcomment:·Ç·¨¾ä±ú */
+/** CNcomment:ï¿½Ç·ï¿½ï¿½ï¿½ï¿½ */
 #define HI_SVR_PLAYER_INVALID_HDL        (0)
 
 /** Normal playing speed */
-/** CNcomment:Õý³£²¥·ÅËÙ¶È*/
+/** CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ù¶ï¿½*/
 #define HI_SVR_PLAYER_PLAY_SPEED_NORMAL  (1024)
 
 /** File type */
-/** CNcomment:ÉèÖÃµÄÎÄ¼þÀàÐÍ */
+/** CNcomment:ï¿½ï¿½ï¿½Ãµï¿½ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½ï¿½ */
 typedef enum hiSVR_PLAYER_MEDIA_PARAM_E
 {
-    HI_SVR_PLAYER_MEDIA_STREAMFILE = (1 << 0),    /**< Audio and video (AV) media file *//**< CNcomment:ÒôÊÓÆµÃ½ÌåÎÄ¼þ */
-    HI_SVR_PLAYER_MEDIA_SUBTITLE   = (1 << 1),    /**< Subtitle file *//**< CNcomment:×ÖÄ»ÎÄ¼þ */
+    HI_SVR_PLAYER_MEDIA_STREAMFILE = (1 << 0),    /**< Audio and video (AV) media file *//**< CNcomment:ï¿½ï¿½ï¿½ï¿½ÆµÃ½ï¿½ï¿½ï¿½Ä¼ï¿½ */
+    HI_SVR_PLAYER_MEDIA_SUBTITLE   = (1 << 1),    /**< Subtitle file *//**< CNcomment:ï¿½ï¿½Ä»ï¿½Ä¼ï¿½ */
     HI_SVR_PLAYER_MEDIA_BUTT       = (1 << 2)
 } HI_SVR_PLAYER_MEDIA_PARAM_E;
 
 /** The play mode of the player */
-/** CNcomment:ÉèÖÃ²¥·ÅÆ÷²¥·ÅÊôÐÔ */
+/** CNcomment:ï¿½ï¿½ï¿½Ã²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
 typedef enum hiSVR_PLAYER_PLAY_MODE_E
 {
-    HI_SVR_PLAYER_PLAYMODE_NORMAL = 0x0, /**< Normal play mode *//**< CNcomment: Õý³£²¥·ÅÄ£Ê½ */
-    HI_SVR_PLAYER_PLAYMODE_PRELOAD = 0x1,/**< Preload play mode. This mode will be used only in network playing *//**< CNcomment: Ô¤¼ÓÔØ²¥·ÅÄ£Ê½ */
+    HI_SVR_PLAYER_PLAYMODE_NORMAL = 0x0, /**< Normal play mode *//**< CNcomment: ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä£Ê½ */
+    HI_SVR_PLAYER_PLAYMODE_PRELOAD = 0x1,/**< Preload play mode. This mode will be used only in network playing *//**< CNcomment: Ô¤ï¿½ï¿½ï¿½Ø²ï¿½ï¿½ï¿½Ä£Ê½ */
     HI_SVR_PLAYER_PLAYMODE_BUTT
 } HI_SVR_PLAYER_PLAY_MODE_E;
 
 /** Player attribute ID */
-/** CNcomment:²¥·ÅÆ÷ÊôÐÔID */
+/** CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ID */
 typedef enum hiSVR_PLAYER_ATTR_E
 {
-    HI_SVR_PLAYER_ATTR_STREAMID = 0x0,         /**< Set or obtain the stream ID. This attribute is applicable to multi-audio multi-video streams. The parameter is ::HI_SVR_PLAYER_STREAMID_S. *//**< CNcomment:ÉèÖÃ/»ñÈ¡Á÷±àºÅ£¬¸ÃÊôÐÔÕë¶Ô¶àÒôÆµ¡¢¶àÊÓÆµÁ÷µÄÇé¿ö£¬²ÎÊýÎª::HI_SVR_PLAYER_STREAMID_S */
-    HI_SVR_PLAYER_ATTR_WINDOW_HDL,             /**< Obtain the window ID. The parameter is the HI_U32 variable. *//**< CNcomment:»ñÈ¡window id£¬²ÎÊýÎªHI_U32±äÁ¿ */
-    HI_SVR_PLAYER_ATTR_AVPLAYER_HDL,           /**< Obtain the audio/video play (AVPlay) handle. The parameter is the HI_HANDLE variable. *//**< CNcomment:»ñÈ¡AVPlayer¾ä±ú£¬²ÎÊýÎªHI_HANDLE±äÁ¿ */
-    HI_SVR_PLAYER_ATTR_SUBTITLE_HDL,           /**< Obtain the subtitle handle. The parameter is the HI_HANDLE variable. *//**< CNcomment:»ñÈ¡Subtitle¾ä±ú£¬²ÎÊýÎªHI_HANDLE±äÁ¿ */
-    HI_SVR_PLAYER_ATTR_SO_HDL,                      /**< Obtain the subtitle output (SO) handle. The parameter is the HI_HANDLE variable. *//**< CNcomment:»ñÈ¡so¾ä±ú£¬²ÎÊýÎªHI_HANDLE±äÁ¿ */
-    HI_SVR_PLAYER_ATTR_AUDTRACK_HDL,          /**< Obtain the audio track handle. The parameter is the HI_HANDLE variable. *//**< CNcomment:»ñÈ¡ÒôÆµtrack¾ä±ú£¬²ÎÊýÎªHI_HANDLE±äÁ¿ */
-    HI_SVR_PLAYER_ATTR_SYNC,                          /**< Set the sync attribute. The parameter is ::HI_SVR_PLAYER_SYNC_ATTR_S. *//**< CNcomment:ÉèÖÃÒôÊÓÆµ¡¢×ÖÄ»Ê±¼ä´ÁÆ«ÒÆ£¬²ÎÊýÎª::HI_SVR_PLAYER_SYNC_ATTR_S */
+    HI_SVR_PLAYER_ATTR_STREAMID = 0x0,         /**< Set or obtain the stream ID. This attribute is applicable to multi-audio multi-video streams. The parameter is ::HI_SVR_PLAYER_STREAMID_S. *//**< CNcomment:ï¿½ï¿½ï¿½ï¿½/ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½Å£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô¶ï¿½ï¿½ï¿½Æµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îª::HI_SVR_PLAYER_STREAMID_S */
+    HI_SVR_PLAYER_ATTR_WINDOW_HDL,             /**< Obtain the window ID. The parameter is the HI_U32 variable. *//**< CNcomment:ï¿½ï¿½È¡window idï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÎªHI_U32ï¿½ï¿½ï¿½ï¿½ */
+    HI_SVR_PLAYER_ATTR_AVPLAYER_HDL,           /**< Obtain the audio/video play (AVPlay) handle. The parameter is the HI_HANDLE variable. *//**< CNcomment:ï¿½ï¿½È¡AVPlayerï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÎªHI_HANDLEï¿½ï¿½ï¿½ï¿½ */
+    HI_SVR_PLAYER_ATTR_SUBTITLE_HDL,           /**< Obtain the subtitle handle. The parameter is the HI_HANDLE variable. *//**< CNcomment:ï¿½ï¿½È¡Subtitleï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÎªHI_HANDLEï¿½ï¿½ï¿½ï¿½ */
+    HI_SVR_PLAYER_ATTR_SO_HDL,                      /**< Obtain the subtitle output (SO) handle. The parameter is the HI_HANDLE variable. *//**< CNcomment:ï¿½ï¿½È¡soï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÎªHI_HANDLEï¿½ï¿½ï¿½ï¿½ */
+    HI_SVR_PLAYER_ATTR_AUDTRACK_HDL,          /**< Obtain the audio track handle. The parameter is the HI_HANDLE variable. *//**< CNcomment:ï¿½ï¿½È¡ï¿½ï¿½Æµtrackï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÎªHI_HANDLEï¿½ï¿½ï¿½ï¿½ */
+    HI_SVR_PLAYER_ATTR_SYNC,                          /**< Set the sync attribute. The parameter is ::HI_SVR_PLAYER_SYNC_ATTR_S. *//**< CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æµï¿½ï¿½ï¿½ï¿½Ä»Ê±ï¿½ï¿½ï¿½Æ«ï¿½Æ£ï¿½ï¿½ï¿½ï¿½ï¿½Îª::HI_SVR_PLAYER_SYNC_ATTR_S */
     HI_SVR_PLAYER_ATTR_VSINK_HDL,              /**< set the vsink handle. The parameter is HI_SVR_VSINK_S* */
     HI_SVR_PLAYER_ATTR_BUTT
 } HI_SVR_PLAYER_ATTR_E;
@@ -69,17 +69,17 @@ typedef enum hiSVR_PLAYER_ATTR_E
 /************************************Player Event Start***********************************/
 
 /** Error information of the player */
-/** CNcomment:²¥·ÅÆ÷´íÎóÐÅÏ¢ */
+/** CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ */
 typedef enum hiSVR_PLAYER_ERROR_E
 {
     HI_SVR_PLAYER_ERROR_NON = 0x0,
-    HI_SVR_PLAYER_ERROR_VID_PLAY_FAIL,         /**< The video fails to be played. *//**< CNcomment: ÊÓÆµ²¥·ÅÆô¶¯Ê§°Ü */
-    HI_SVR_PLAYER_ERROR_AUD_PLAY_FAIL,         /**< The audio fails to be played. *//**< CNcomment: ÒôÆµ²¥·ÅÆô¶¯Ê§°Ü */
-    HI_SVR_PLAYER_ERROR_SUB_PLAY_FAIL,         /**< The subtitle fails to be played. *//**< CNcomment: ×ÖÄ»²¥·ÅÆô¶¯Ê§°Ü */
-    HI_SVR_PLAYER_ERROR_PLAY_FAIL,             /**< The file fails to be played. *//**< CNcomment: ÒôÊÓÆµ²¥·ÅÊ§°Ü */
-    HI_SVR_PLAYER_ERROR_TIMEOUT,               /**< Operation timeout. For example, reading data timeout. *//**< CNcomment: ²Ù×÷³¬Ê±£¬ Èç¶ÁÈ¡Êý¾Ý³¬Ê± */
-    HI_SVR_PLAYER_ERROR_NOT_SUPPORT,           /**< The file format is not supportted. *//**< CNcomment: ÎÄ¼þ¸ñÊ½²»Ö§³Ö */
-    HI_SVR_PLAYER_ERROR_UNKNOW,                /**< Unknown error. *//**< CNcomment: Î´Öª´íÎó */
+    HI_SVR_PLAYER_ERROR_VID_PLAY_FAIL,         /**< The video fails to be played. *//**< CNcomment: ï¿½ï¿½Æµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê§ï¿½ï¿½ */
+    HI_SVR_PLAYER_ERROR_AUD_PLAY_FAIL,         /**< The audio fails to be played. *//**< CNcomment: ï¿½ï¿½Æµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê§ï¿½ï¿½ */
+    HI_SVR_PLAYER_ERROR_SUB_PLAY_FAIL,         /**< The subtitle fails to be played. *//**< CNcomment: ï¿½ï¿½Ä»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê§ï¿½ï¿½ */
+    HI_SVR_PLAYER_ERROR_PLAY_FAIL,             /**< The file fails to be played. *//**< CNcomment: ï¿½ï¿½ï¿½ï¿½Æµï¿½ï¿½ï¿½ï¿½Ê§ï¿½ï¿½ */
+    HI_SVR_PLAYER_ERROR_TIMEOUT,               /**< Operation timeout. For example, reading data timeout. *//**< CNcomment: ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ ï¿½ï¿½ï¿½È¡ï¿½ï¿½ï¿½Ý³ï¿½Ê± */
+    HI_SVR_PLAYER_ERROR_NOT_SUPPORT,           /**< The file format is not supportted. *//**< CNcomment: ï¿½Ä¼ï¿½ï¿½ï¿½Ê½ï¿½ï¿½Ö§ï¿½ï¿½ */
+    HI_SVR_PLAYER_ERROR_UNKNOW,                /**< Unknown error. *//**< CNcomment: Î´Öªï¿½ï¿½ï¿½ï¿½ */
     HI_SVR_PALYER_ERROR_BUTT,
 } HI_SVR_PLAYER_ERROR_E;
 
@@ -88,18 +88,18 @@ typedef enum hiSVR_PLAYER_ERROR_E
  2. When the total size of data in hiplayer's buffer and decoder's buffer is 0 byte, the ::HI_SVR_PLAYER_BUFFER_EMPTY event is reported.
  3. When the total size of data in hiplayer's buffer and decoder's buffer is greater than or equal to 4 MB or the total duration is greater than or equal to 50 seconds, the player notify the ::HI_SVR_PLAYER_BUFFER_ENOUGH event.
  4. When the total size of data in hiplayer's buffer and decoder's buffer is greater than or equal to 5 MB or the total duration is greater than or equal to 60 seconds, the ::HI_SVR_PLAYER_BUFFER_FULL event is reported.  */
-/** CNcomment:»º³å×´Ì¬ÀàÐÍÐÅÏ¢,¸ÃÊÂ¼þÉÏ±¨µÄÌõ¼þ,ÐèÒªÍ¨¹ý::HI_FORMAT_BUFFER_CONFIG_S,À´ÅäÖÃ¡£
-  Ä¬ÈÏ: µ±hiplayer»º³åÇøºÍdecoder»º³åÇøÄÚµÄÒôÊÓÆµÊý¾ÝºÍÐ¡ÓÚ 512KBytes»òÕßÄÜ²¥·ÅµÄÊ±³¤Ð¡ÓÚ200ms, ÉÏ±¨::HI_SVR_PLAYER_BUFFER_START
-  µ±hiplayer»º³åÇøºÍdecoder»º³åÇøÄÚµÄÒôÊÓÆµÊý¾ÝºÍÎª0 bytesÊ±£¬ÉÏ±¨::HI_SVR_PLAYER_BUFFER_EMPTY
-  µ±hiplayer»º³åÇøºÍdecoder»º³åÇøÄÚÒôÊÓÆµÊý¾ÝºÍ´óÓÚµÈÓÚ4M bytes »òÕß ÄÜ²¥·ÅµÄÊ±³¤´óÓÚµÈÓÚ50Ãë, ÉÏ±¨::HI_SVR_PLAYER_BUFFER_ENOUGH
-  µ±hiplayer»º³åÇøºÍdecoder»º³åÇøÄÚÒôÊÓÆµÊý¾ÝºÍ´óÓÚµÈÓÚ5M bytes »òÕß ÄÜ²¥·ÅµÄÊ±³¤´óÓÚµÈÓÚ60Ãë, ÉÏ±¨::HI_SVR_PLAYER_BUFFER_FULL
+/** CNcomment:ï¿½ï¿½ï¿½ï¿½×´Ì¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢,ï¿½ï¿½ï¿½Â¼ï¿½ï¿½Ï±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½,ï¿½ï¿½ÒªÍ¨ï¿½ï¿½::HI_FORMAT_BUFFER_CONFIG_S,ï¿½ï¿½ï¿½ï¿½ï¿½Ã¡ï¿½
+  Ä¬ï¿½ï¿½: ï¿½ï¿½hiplayerï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½decoderï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Úµï¿½ï¿½ï¿½ï¿½ï¿½Æµï¿½ï¿½ï¿½Ýºï¿½Ð¡ï¿½ï¿½ 512KBytesï¿½ï¿½ï¿½ï¿½ï¿½Ü²ï¿½ï¿½Åµï¿½Ê±ï¿½ï¿½Ð¡ï¿½ï¿½200ms, ï¿½Ï±ï¿½::HI_SVR_PLAYER_BUFFER_START
+  ï¿½ï¿½hiplayerï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½decoderï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Úµï¿½ï¿½ï¿½ï¿½ï¿½Æµï¿½ï¿½ï¿½Ýºï¿½Îª0 bytesÊ±ï¿½ï¿½ï¿½Ï±ï¿½::HI_SVR_PLAYER_BUFFER_EMPTY
+  ï¿½ï¿½hiplayerï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½decoderï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æµï¿½ï¿½ï¿½ÝºÍ´ï¿½ï¿½Úµï¿½ï¿½ï¿½4M bytes ï¿½ï¿½ï¿½ï¿½ ï¿½Ü²ï¿½ï¿½Åµï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½Úµï¿½ï¿½ï¿½50ï¿½ï¿½, ï¿½Ï±ï¿½::HI_SVR_PLAYER_BUFFER_ENOUGH
+  ï¿½ï¿½hiplayerï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½decoderï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æµï¿½ï¿½ï¿½ÝºÍ´ï¿½ï¿½Úµï¿½ï¿½ï¿½5M bytes ï¿½ï¿½ï¿½ï¿½ ï¿½Ü²ï¿½ï¿½Åµï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½Úµï¿½ï¿½ï¿½60ï¿½ï¿½, ï¿½Ï±ï¿½::HI_SVR_PLAYER_BUFFER_FULL
  */
 typedef enum hiSVR_PLAYER_BUFFER_E
 {
-    HI_SVR_PLAYER_BUFFER_EMPTY=0,   /**< The buffer is empty. *//**< CNcomment:»º³åÎª¿Õ */
-    HI_SVR_PLAYER_BUFFER_START,     /**< The data in the buffer is insufficient.*//**< CNcomment:»º³å¿ªÊ¼ÊÂ¼þ */
-    HI_SVR_PLAYER_BUFFER_ENOUGH,    /**< The data in the buffer is sufficient *//**< CNcomment:»º³å×ã¹»,¿ÉÒÔ²¥·Å */
-    HI_SVR_PLAYER_BUFFER_FULL,      /**< The buffer is full. *//**< CNcomment:»º³åÎªÂú */
+    HI_SVR_PLAYER_BUFFER_EMPTY=0,   /**< The buffer is empty. *//**< CNcomment:ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½ */
+    HI_SVR_PLAYER_BUFFER_START,     /**< The data in the buffer is insufficient.*//**< CNcomment:ï¿½ï¿½ï¿½å¿ªÊ¼ï¿½Â¼ï¿½ */
+    HI_SVR_PLAYER_BUFFER_ENOUGH,    /**< The data in the buffer is sufficient *//**< CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ã¹»,ï¿½ï¿½ï¿½Ô²ï¿½ï¿½ï¿½ */
+    HI_SVR_PLAYER_BUFFER_FULL,      /**< The buffer is full. *//**< CNcomment:ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½ */
     HI_SVR_PLAYER_BUFFER_BUTT
 } HI_SVR_PLAYER_BUFFER_E;
 
@@ -107,178 +107,178 @@ typedef enum hiSVR_PLAYER_BUFFER_E
 /** CNcomment:PLAYER×´Ì¬ */
 typedef enum hiSVR_PLAYER_STATE_E
 {
-    HI_SVR_PLAYER_STATE_INIT = 0,    /**< The player is in the initial state. It changes to the initial state after being created. *//**< CNcomment:²¥·ÅÆ÷µ±Ç°´¦ÓÚ³õÊ¼×´Ì¬£¬createºó²¥·ÅÆ÷´¦ÓÚini×´Ì¬ */
-    HI_SVR_PLAYER_STATE_DEINIT,      /**< The player is deinitialized. *//**< CNcomment:²¥·ÅÆ÷ÒÑ¾­È¥³õÊ¼×´Ì¬ */
-    HI_SVR_PLAYER_STATE_PLAY,       /**< The player is in the playing state. *//**< CNcomment:²¥·ÅÆ÷µ±Ç°´¦ÓÚ²¥·Å×´Ì¬ */
-    HI_SVR_PLAYER_STATE_FORWARD,    /**< The player is in the fast forward state. *//**< CNcomment:²¥·ÅÆ÷µ±Ç°´¦ÓÚ¿ì½ø×´Ì¬ */
-    HI_SVR_PLAYER_STATE_BACKWARD,   /**< The player is in the rewind state. *//**< CNcomment:²¥·ÅÆ÷µ±Ç°´¦ÓÚ¿ìÍË×´Ì¬ */
-    HI_SVR_PLAYER_STATE_PAUSE,      /**< The player is in the pause state. *//**< CNcomment:²¥·ÅÆ÷µ±Ç°´¦ÓÚÔÝÍ£×´Ì¬ */
-    HI_SVR_PLAYER_STATE_STOP,       /**< The player is in the stop state. *//**< CNcomment:²¥·ÅÆ÷µ±Ç°´¦ÓÚÍ£Ö¹×´Ì¬ */
+    HI_SVR_PLAYER_STATE_INIT = 0,    /**< The player is in the initial state. It changes to the initial state after being created. *//**< CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç°ï¿½ï¿½ï¿½Ú³ï¿½Ê¼×´Ì¬ï¿½ï¿½createï¿½ó²¥·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ini×´Ì¬ */
+    HI_SVR_PLAYER_STATE_DEINIT,      /**< The player is deinitialized. *//**< CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ñ¾ï¿½È¥ï¿½ï¿½Ê¼×´Ì¬ */
+    HI_SVR_PLAYER_STATE_PLAY,       /**< The player is in the playing state. *//**< CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç°ï¿½ï¿½ï¿½Ú²ï¿½ï¿½ï¿½×´Ì¬ */
+    HI_SVR_PLAYER_STATE_FORWARD,    /**< The player is in the fast forward state. *//**< CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç°ï¿½ï¿½ï¿½Ú¿ï¿½ï¿½×´Ì¬ */
+    HI_SVR_PLAYER_STATE_BACKWARD,   /**< The player is in the rewind state. *//**< CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç°ï¿½ï¿½ï¿½Ú¿ï¿½ï¿½ï¿½×´Ì¬ */
+    HI_SVR_PLAYER_STATE_PAUSE,      /**< The player is in the pause state. *//**< CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í£×´Ì¬ */
+    HI_SVR_PLAYER_STATE_STOP,       /**< The player is in the stop state. *//**< CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç°ï¿½ï¿½ï¿½ï¿½Í£Ö¹×´Ì¬ */
     HI_SVR_PLAYER_STATE_BUTT
 } HI_SVR_PLAYER_STATE_E;
 
 /** Event type */
-/** CNcomment:ÊÂ¼þÀàÐÍ */
+/** CNcomment:ï¿½Â¼ï¿½ï¿½ï¿½ï¿½ï¿½ */
 typedef enum hiSVR_PLAYER_EVENT_E
 {
-    HI_SVR_PLAYER_EVENT_STATE_CHANGED = 0x0,   /**< Player status change event. The parameter type is ::HI_SVR_PLAYER_STATE_E. *//**< CNcomment:²¥·ÅÆ÷×´Ì¬×ª»»ÊÂ¼þ£¬²ÎÊýÀàÐÍÎª::HI_SVR_PLAYER_STATE_E */
+    HI_SVR_PLAYER_EVENT_STATE_CHANGED = 0x0,   /**< Player status change event. The parameter type is ::HI_SVR_PLAYER_STATE_E. *//**< CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×´Ì¬×ªï¿½ï¿½ï¿½Â¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îª::HI_SVR_PLAYER_STATE_E */
     HI_SVR_PLAYER_EVENT_SOF,           /**< Event indicating that file playing starts or a file is rewound to the file header. The parameter type is HI_U32. The value ::HI_SVR_PLAYER_STATE_PLAY indicates that file playing starts and the value ::HI_SVR_PLAYER_STATE_BACKWARD indicates that a file is rewound to the file header. */
-                                       /**< CNcomment:ÎÄ¼þ¿ªÊ¼²¥·Å»ò¿ìÍËµ½ÎÄ¼þÍ·ÊÂ¼þ£¬²ÎÊýÀàÐÍÎªHI_U32£¬ÖµÎª::HI_SVR_PLAYER_STATE_PLAY±íÊ¾¿ªÊ¼²¥·Å£¬²ÎÊýÖµÎª::HI_SVR_PLAYER_STATE_BACKWARD±íÊ¾¿ìÍËµ½ÎÄ¼þÍ· */
-    HI_SVR_PLAYER_EVENT_EOF,           /**< Event indicating that a file is played till the end of the file. There is no parameter. *//**< CNcomment:ÎÄ¼þ²¥·Åµ½Î²ÊÂ¼þ£¬ÎÞ²ÎÊý */
-    HI_SVR_PLAYER_EVENT_PROGRESS,      /**< Event indicating the current progress of the player. This event is reported once every 300 ms. The parameter is ::HI_SVR_PLAYER_PROGRESS_S. *//**< CNcomment:²¥·ÅÆ÷µ±Ç°²¥·Å½ø¶ÈÊÂ¼þ£¬Ã¿¸ô300msÉÏ±¨Ò»´Î¸ÃÊÂ¼þ£¬²ÎÊýÖµÎª::HI_SVR_PLAYER_PROGRESS_S */
-    HI_SVR_PLAYER_EVENT_STREAMID_CHANGED,  /**< Stream ID change event. The parameter is ::HI_SVR_PLAYER_STREAMID_S. *//**< CNcomment:stream id ·¢Éú±ä»¯ÊÂ¼þ£¬²ÎÊýÎª::HI_SVR_PLAYER_STREAMID_S */
+                                       /**< CNcomment:ï¿½Ä¼ï¿½ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½Å»ï¿½ï¿½ï¿½Ëµï¿½ï¿½Ä¼ï¿½Í·ï¿½Â¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÎªHI_U32ï¿½ï¿½ÖµÎª::HI_SVR_PLAYER_STATE_PLAYï¿½ï¿½Ê¾ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½Å£ï¿½ï¿½ï¿½ï¿½ï¿½ÖµÎª::HI_SVR_PLAYER_STATE_BACKWARDï¿½ï¿½Ê¾ï¿½ï¿½ï¿½Ëµï¿½ï¿½Ä¼ï¿½Í· */
+    HI_SVR_PLAYER_EVENT_EOF,           /**< Event indicating that a file is played till the end of the file. There is no parameter. *//**< CNcomment:ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½Åµï¿½Î²ï¿½Â¼ï¿½ï¿½ï¿½ï¿½Þ²ï¿½ï¿½ï¿½ */
+    HI_SVR_PLAYER_EVENT_PROGRESS,      /**< Event indicating the current progress of the player. This event is reported once every 300 ms. The parameter is ::HI_SVR_PLAYER_PROGRESS_S. *//**< CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç°ï¿½ï¿½ï¿½Å½ï¿½ï¿½ï¿½ï¿½Â¼ï¿½ï¿½ï¿½Ã¿ï¿½ï¿½300msï¿½Ï±ï¿½Ò»ï¿½Î¸ï¿½ï¿½Â¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÖµÎª::HI_SVR_PLAYER_PROGRESS_S */
+    HI_SVR_PLAYER_EVENT_STREAMID_CHANGED,  /**< Stream ID change event. The parameter is ::HI_SVR_PLAYER_STREAMID_S. *//**< CNcomment:stream id ï¿½ï¿½ï¿½ï¿½ï¿½ä»¯ï¿½Â¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îª::HI_SVR_PLAYER_STREAMID_S */
     HI_SVR_PLAYER_EVENT_SEEK_FINISHED,      /**< Seek operation is complete. The parameter is HI_U32. When the value of the parameter is ::HI_FAILURE, the seek operation fails. When the value of the parameter is ::HI_SUCCESS, the seek operation succeeds. When the value of the parameter is ::HI_FORMAT_ERRO_ENDOFFILE, the file is read to the end. */
-                                       /**< CNcomment:Seek²Ù×÷Íê³É£¬²ÎÊýÎªHI_U32£¬ÖµÎª::HI_FAILURE SeekÊ§°Ü£¬::HI_SUCCESS seek³É¹¦£¬::HI_FORMAT_ERRO_ENDOFFILE ÎÄ¼þ¶ÁÈ¡µ½ÎÄ¼þÎ² */
-    HI_SVR_PLAYER_EVENT_CODETYPE_CHANGED,  /**< Event of indicating the byte encoding configuration is complete. The parameter is ::HI_SVR_PLAYER_SUB_CODETYPE_S. *//**< CNcomment:ÉèÖÃ×Ö·û±àÂëÍê³ÉÊÂ¼þ£¬ÊÂ¼þ²ÎÊý::HI_SVR_PLAYER_SUB_CODETYPE_S */
-    HI_SVR_PLAYER_EVENT_DOWNLOAD_PROGRESS,   /**< Current download progress of the player. The event is reported every 300 ms. The parameter is ::HI_SVR_PLAYER_PROGRESS_S. *//**< CNcomment:²¥·ÅÆ÷µ±Ç°ÏÂÔØ½ø¶È£¬Ã¿¸ô300msÉÏ±¨Ò»´Î¸ÃÊÂ¼þ£¬²ÎÊýÖµÎª::HI_SVR_PLAYER_PROGRESS_S */
-    HI_SVR_PLAYER_EVENT_BUFFER_STATE,        /**< Reporting buffer status. The parameter type is ::HI_SVR_PLAYER_BUFFER_S. *//**< CNcomment:»º³å×´Ì¬ÉÏ±¨,²ÎÊýÀàÐÍÎª::HI_SVR_PLAYER_BUFFER_S */
-    HI_SVR_PLAYER_EVENT_FIRST_FRAME_TIME,    /**< The display time of the first frame from setting the setMedia. The parameter is ::HI_U32, in the unit of ms. Not supported now*//**< CNcomment:´ÓÉèÖÃÃ½ÌåsetMedia¿ªÊ¼µÚÒ»Ö¡ÏÔÊ¾Ê±¼ä,²ÎÊýÎª::HI_U32,µ¥Î»Îªms .Ä¿Ç°²»Ö§³Ö*/
+                                       /**< CNcomment:Seekï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É£ï¿½ï¿½ï¿½ï¿½ï¿½ÎªHI_U32ï¿½ï¿½ÖµÎª::HI_FAILURE SeekÊ§ï¿½Ü£ï¿½::HI_SUCCESS seekï¿½É¹ï¿½ï¿½ï¿½::HI_FORMAT_ERRO_ENDOFFILE ï¿½Ä¼ï¿½ï¿½ï¿½È¡ï¿½ï¿½ï¿½Ä¼ï¿½Î² */
+    HI_SVR_PLAYER_EVENT_CODETYPE_CHANGED,  /**< Event of indicating the byte encoding configuration is complete. The parameter is ::HI_SVR_PLAYER_SUB_CODETYPE_S. *//**< CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½Ö·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â¼ï¿½ï¿½ï¿½ï¿½Â¼ï¿½ï¿½ï¿½ï¿½ï¿½::HI_SVR_PLAYER_SUB_CODETYPE_S */
+    HI_SVR_PLAYER_EVENT_DOWNLOAD_PROGRESS,   /**< Current download progress of the player. The event is reported every 300 ms. The parameter is ::HI_SVR_PLAYER_PROGRESS_S. *//**< CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç°ï¿½ï¿½ï¿½Ø½ï¿½ï¿½È£ï¿½Ã¿ï¿½ï¿½300msï¿½Ï±ï¿½Ò»ï¿½Î¸ï¿½ï¿½Â¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÖµÎª::HI_SVR_PLAYER_PROGRESS_S */
+    HI_SVR_PLAYER_EVENT_BUFFER_STATE,        /**< Reporting buffer status. The parameter type is ::HI_SVR_PLAYER_BUFFER_S. *//**< CNcomment:ï¿½ï¿½ï¿½ï¿½×´Ì¬ï¿½Ï±ï¿½,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îª::HI_SVR_PLAYER_BUFFER_S */
+    HI_SVR_PLAYER_EVENT_FIRST_FRAME_TIME,    /**< The display time of the first frame from setting the setMedia. The parameter is ::HI_U32, in the unit of ms. Not supported now*//**< CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã½ï¿½ï¿½setMediaï¿½ï¿½Ê¼ï¿½ï¿½Ò»Ö¡ï¿½ï¿½Ê¾Ê±ï¿½ï¿½,ï¿½ï¿½ï¿½ï¿½Îª::HI_U32,ï¿½ï¿½Î»Îªms .Ä¿Ç°ï¿½ï¿½Ö§ï¿½ï¿½*/
 
-    HI_SVR_PLAYER_EVENT_ERROR,               /**< Event of indicating that an error occurs in the player. The parameter is ::HI_SVR_PLAYER_ERROR_E.*//**< CNcomment:²¥·ÅÆ÷´íÎóÐÅÏ¢ÊÂ¼þ£¬²ÎÊýÎª::HI_SVR_PLAYER_ERROR_E */
-    HI_SVR_PLAYER_EVENT_NETWORK_INFO,       /**< Report the network status. The parameter is ::HI_FORMAT_NET_STATUS_S. *//**< CNcomment:ÍøÂç×´Ì¬ÉÏ±¨, ²ÎÊýÎª::HI_FORMAT_NET_STATUS_S */
-    HI_SVR_PLAYER_EVENT_DOWNLOAD_FINISH,    /**< File download finish, no parameter. *//**< CNcomment:ÎÄ¼þÏÂÔØÍê±Ï, ÎÞ²ÎÊý */
-    HI_SVR_PLAYER_EVENT_UPDATE_FILE_INFO, /**< The file information has been updated. *//**< CNcomment:ÎÄ¼þÐÅÏ¢ÒÑ¸üÐÂ */
-    HI_SVR_PLAYER_EVENT_USER_PRIVATE = 100, /**< Private event of user define, HI_SVR_PLAYER_EVENT_S:pu8Data is addr of user parameter *//**< CNcomment:ÓÃ»§¶¨ÒåµÄË½ÓÐÊÂ¼þ£¬HI_SVR_PLAYER_EVENT_S:pu8Data²ÎÊýÎªÊÂ¼þ²ÎÊýµØÖ· */
+    HI_SVR_PLAYER_EVENT_ERROR,               /**< Event of indicating that an error occurs in the player. The parameter is ::HI_SVR_PLAYER_ERROR_E.*//**< CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½Â¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îª::HI_SVR_PLAYER_ERROR_E */
+    HI_SVR_PLAYER_EVENT_NETWORK_INFO,       /**< Report the network status. The parameter is ::HI_FORMAT_NET_STATUS_S. *//**< CNcomment:ï¿½ï¿½ï¿½ï¿½×´Ì¬ï¿½Ï±ï¿½, ï¿½ï¿½ï¿½ï¿½Îª::HI_FORMAT_NET_STATUS_S */
+    HI_SVR_PLAYER_EVENT_DOWNLOAD_FINISH,    /**< File download finish, no parameter. *//**< CNcomment:ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½, ï¿½Þ²ï¿½ï¿½ï¿½ */
+    HI_SVR_PLAYER_EVENT_UPDATE_FILE_INFO, /**< The file information has been updated. *//**< CNcomment:ï¿½Ä¼ï¿½ï¿½ï¿½Ï¢ï¿½Ñ¸ï¿½ï¿½ï¿½ */
+    HI_SVR_PLAYER_EVENT_USER_PRIVATE = 100, /**< Private event of user define, HI_SVR_PLAYER_EVENT_S:pu8Data is addr of user parameter *//**< CNcomment:ï¿½Ã»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ë½ï¿½ï¿½ï¿½Â¼ï¿½ï¿½ï¿½HI_SVR_PLAYER_EVENT_S:pu8Dataï¿½ï¿½ï¿½ï¿½Îªï¿½Â¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö· */
     HI_SVR_PLAYER_EVENT_BUTT
 } HI_SVR_PLAYER_EVENT_E;
 
 /** Information of playing progress */
-/** CNcomment:½ø¶ÈÊÂ¼þÐÅÏ¢ÄÚÈÝ */
+/** CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½Â¼ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½ */
 typedef struct hiSVR_PLAYER_PROGRESS_S
 {
-    HI_U32 u32Progress;    /**< Progress of current playing. The value ranges from 0 to 100. *//**< CNcomment:½ø¶ÈÖµ, Öµ0-100 */
-    HI_S64 s64Duration;    /**< The duration (in the unit of ms) of  current playing or downloading ,when used for downloading event(e.g. HI_SVR_PLAYER_EVENT_DOWNLOAD_PROGRESS),the duration of data in the decoder's buffer is included*//**< CNcomment:µ±Ç°²¥·Å½ø¶È»òÏÂÔØÊ±³¤,µ¥Î»Îªms ,µ±ÓÃÓÚÏÂÔØÊÂ¼þÊ±(ÈçHI_SVR_PLAYER_EVENT_DOWNLOAD_PROGRESSµÈ)°üº¬ÁËdecoder »º³åÖÐµÄÊý¾ÝÊ±³¤*/
-    HI_S64 s64BufferSize;     /**< The total size(in the unit of byte) of data in the hiplayer's buffer and decoder's buffer*//**< CNcomment:hiplayerÄÚ²¿»º³åÊý¾ÝºÍdecoder»º³åÊý¾Ý×Ü´óÐ¡,µ¥Î»Îªbytes */
+    HI_U32 u32Progress;    /**< Progress of current playing. The value ranges from 0 to 100. *//**< CNcomment:ï¿½ï¿½ï¿½ï¿½Öµ, Öµ0-100 */
+    HI_S64 s64Duration;    /**< The duration (in the unit of ms) of  current playing or downloading ,when used for downloading event(e.g. HI_SVR_PLAYER_EVENT_DOWNLOAD_PROGRESS),the duration of data in the decoder's buffer is included*//**< CNcomment:ï¿½ï¿½Ç°ï¿½ï¿½ï¿½Å½ï¿½ï¿½È»ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½,ï¿½ï¿½Î»Îªms ,ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â¼ï¿½Ê±(ï¿½ï¿½HI_SVR_PLAYER_EVENT_DOWNLOAD_PROGRESSï¿½ï¿½)ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½decoder ï¿½ï¿½ï¿½ï¿½ï¿½Ðµï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½*/
+    HI_S64 s64BufferSize;     /**< The total size(in the unit of byte) of data in the hiplayer's buffer and decoder's buffer*//**< CNcomment:hiplayerï¿½Ú²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ýºï¿½decoderï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ü´ï¿½Ð¡,ï¿½ï¿½Î»Îªbytes */
 } HI_SVR_PLAYER_PROGRESS_S;
 
 /** Information of the buffer event */
-/** CNcomment:HI_SVR_PLAYER_EVENT_BUFFER_STATE »º³åÊÂ¼þÄÚÈÝ */
+/** CNcomment:HI_SVR_PLAYER_EVENT_BUFFER_STATE ï¿½ï¿½ï¿½ï¿½ï¿½Â¼ï¿½ï¿½ï¿½ï¿½ï¿½ */
 typedef struct hiSVR_PLAYER_BUFFER_S
 {
-    HI_SVR_PLAYER_BUFFER_E eType;        /**< Buffer type *//**< CNcomment:»º³åÀàÐÍ::HI_SVR_PLAYER_BUFFER_E */
-    HI_FORMAT_BUFFER_STATUS_S stBufStat; /**< Buffer status *//**< CNcomment:»º³å×´Ì¬::HI_FORMAT_BUFFER_STATUS_S */
+    HI_SVR_PLAYER_BUFFER_E eType;        /**< Buffer type *//**< CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½::HI_SVR_PLAYER_BUFFER_E */
+    HI_FORMAT_BUFFER_STATUS_S stBufStat; /**< Buffer status *//**< CNcomment:ï¿½ï¿½ï¿½ï¿½×´Ì¬::HI_FORMAT_BUFFER_STATUS_S */
 } HI_SVR_PLAYER_BUFFER_S;
 
 /** Player event callback parameters */
-/** CNcomment:²¥·ÅÆ÷ÊÂ¼þ»Øµ÷²ÎÊý */
+/** CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â¼ï¿½ï¿½Øµï¿½ï¿½ï¿½ï¿½ï¿½ */
 typedef struct hiSVR_PLAYER_EVENT_S
 {
-    HI_SVR_PLAYER_EVENT_E  eEvent;    /**< Event type *//**< CNcomment:ÊÂ¼þÀàÐÍ */
-    HI_U32  u32Len;                   /**< Event parameter length, in the unit of byte. *//**< CNcomment:ÊÂ¼þ²ÎÊý³¤¶È£¬×Ö½ÚÎªµ¥Î» */
-    HI_U8   *pu8Data;                 /**< Start address of event parameter data *//**< CNcomment:ÊÂ¼þ²ÎÊýÊý¾ÝÆðÊ¼µØÖ· */
+    HI_SVR_PLAYER_EVENT_E  eEvent;    /**< Event type *//**< CNcomment:ï¿½Â¼ï¿½ï¿½ï¿½ï¿½ï¿½ */
+    HI_U32  u32Len;                   /**< Event parameter length, in the unit of byte. *//**< CNcomment:ï¿½Â¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È£ï¿½ï¿½Ö½ï¿½Îªï¿½ï¿½Î» */
+    HI_U8   *pu8Data;                 /**< Start address of event parameter data *//**< CNcomment:ï¿½Â¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¼ï¿½ï¿½Ö· */
 } HI_SVR_PLAYER_EVENT_S;
 
 /************************************Player Event End************************************/
 
 /** Type of the registered dynamic link library (DLL) */
-/** CNcomment:×¢²áµÄ¶¯Ì¬¿âÀàÐÍ */
+/** CNcomment:×¢ï¿½ï¿½Ä¶ï¿½Ì¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
 typedef enum hiSVR_PLAYER_DLLTYPE_E
 {
-    HI_SVR_PLAYER_DLL_PARSER = 0x0,    /**< DLLs for parsing audio and video media files and subtitle files *//**< CNcomment:ÒôÊÓÆµÃ½ÌåÎÄ¼þ½âÎö¡¢×ÖÄ»½âÎö¶¯Ì¬¿â */
+    HI_SVR_PLAYER_DLL_PARSER = 0x0,    /**< DLLs for parsing audio and video media files and subtitle files *//**< CNcomment:ï¿½ï¿½ï¿½ï¿½ÆµÃ½ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ì¬ï¿½ï¿½ */
     HI_SVR_PLAYER_DLL_BUTT
 } HI_SVR_PLAYER_DLLTYPE_E;
 
 /** Playing speed flag */
-/** CNcomment:²¥·ÅËÙ¶È±êÊ¶ */
+/** CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½Ù¶È±ï¿½Ê¶ */
 typedef enum hiSVR_PLAYER_PLAY_SPEED_E
 {
-    HI_SVR_PLAYER_PLAY_SPEED_1X2_SLOW_FORWARD  = HI_SVR_PLAYER_PLAY_SPEED_NORMAL/2,      /**< 1/2 speed slow forward *//**< CNcomment:1/2±¶ËÙÂý·Å */
-    HI_SVR_PLAYER_PLAY_SPEED_2X_FAST_FORWARD   = 2 * HI_SVR_PLAYER_PLAY_SPEED_NORMAL,      /**< 2 x speed fast forward *//**< CNcomment:2±¶ËÙ¿ì·Å */
-    HI_SVR_PLAYER_PLAY_SPEED_4X_FAST_FORWARD   = 4 * HI_SVR_PLAYER_PLAY_SPEED_NORMAL,      /**< 4 x speed fast forward *//**< CNcomment:4±¶ËÙ¿ì·Å */
-    HI_SVR_PLAYER_PLAY_SPEED_8X_FAST_FORWARD   = 8 * HI_SVR_PLAYER_PLAY_SPEED_NORMAL,      /**< 8 x speed fast forward *//**< CNcomment:8±¶ËÙ¿ì·Å */
-    HI_SVR_PLAYER_PLAY_SPEED_16X_FAST_FORWARD  = 16 * HI_SVR_PLAYER_PLAY_SPEED_NORMAL,     /**< 16 x speed fast forward *//**< CNcomment:16±¶ËÙ¿ì·Å */
-    HI_SVR_PLAYER_PLAY_SPEED_32X_FAST_FORWARD  = 32 * HI_SVR_PLAYER_PLAY_SPEED_NORMAL,     /**< 32 x speed fast forward *//**< CNcomment:32±¶ËÙ¿ì·Å */
-    HI_SVR_PLAYER_PLAY_SPEED_64X_FAST_FORWARD  = 64 * HI_SVR_PLAYER_PLAY_SPEED_NORMAL,     /**< 64 x speed fast forward *//**< CNcomment:64±¶ËÙ¿ì·Å */
-    HI_SVR_PLAYER_PLAY_SPEED_1X_BACKWARD       = -1 * HI_SVR_PLAYER_PLAY_SPEED_NORMAL,     /**< 1 x speed rewind *//**< CNcomment:1±¶ËÙµ¹ÍË */
-    HI_SVR_PLAYER_PLAY_SPEED_2X_FAST_BACKWARD  = -2 * HI_SVR_PLAYER_PLAY_SPEED_NORMAL,     /**< 2 x speed rewind *//**< CNcomment:2±¶ËÙ¿ìÍË */
-    HI_SVR_PLAYER_PLAY_SPEED_4X_FAST_BACKWARD  = -4 * HI_SVR_PLAYER_PLAY_SPEED_NORMAL,     /**< 4 x speed rewind *//**< CNcomment:4±¶ËÙ¿ìÍË */
-    HI_SVR_PLAYER_PLAY_SPEED_8X_FAST_BACKWARD  = -8 * HI_SVR_PLAYER_PLAY_SPEED_NORMAL,     /**< 8 x speed rewind *//**< CNcomment:8±¶ËÙ¿ìÍË */
-    HI_SVR_PLAYER_PLAY_SPEED_16X_FAST_BACKWARD = -16 * HI_SVR_PLAYER_PLAY_SPEED_NORMAL,    /**< 16 x speed rewind *//**< CNcomment:16±¶ËÙ¿ìÍË */
-    HI_SVR_PLAYER_PLAY_SPEED_32X_FAST_BACKWARD = -32 * HI_SVR_PLAYER_PLAY_SPEED_NORMAL,    /**< 32 x speed rewind *//**< CNcomment:32±¶ËÙ¿ìÍË */
-    HI_SVR_PLAYER_PLAY_SPEED_64X_FAST_BACKWARD = -64 * HI_SVR_PLAYER_PLAY_SPEED_NORMAL,    /**< 64 x speed rewind *//**< CNcomment:64±¶ËÙ¿ìÍË */
-    HI_SVR_PLAYER_PLAY_SPEED_BUTT                                                          /**< Invalid speed value *//**< CNcomment:ÎÞÐ§µÄËÙ¶ÈÖµ */
+    HI_SVR_PLAYER_PLAY_SPEED_1X2_SLOW_FORWARD  = HI_SVR_PLAYER_PLAY_SPEED_NORMAL/2,      /**< 1/2 speed slow forward *//**< CNcomment:1/2ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
+    HI_SVR_PLAYER_PLAY_SPEED_2X_FAST_FORWARD   = 2 * HI_SVR_PLAYER_PLAY_SPEED_NORMAL,      /**< 2 x speed fast forward *//**< CNcomment:2ï¿½ï¿½ï¿½Ù¿ï¿½ï¿½ */
+    HI_SVR_PLAYER_PLAY_SPEED_4X_FAST_FORWARD   = 4 * HI_SVR_PLAYER_PLAY_SPEED_NORMAL,      /**< 4 x speed fast forward *//**< CNcomment:4ï¿½ï¿½ï¿½Ù¿ï¿½ï¿½ */
+    HI_SVR_PLAYER_PLAY_SPEED_8X_FAST_FORWARD   = 8 * HI_SVR_PLAYER_PLAY_SPEED_NORMAL,      /**< 8 x speed fast forward *//**< CNcomment:8ï¿½ï¿½ï¿½Ù¿ï¿½ï¿½ */
+    HI_SVR_PLAYER_PLAY_SPEED_16X_FAST_FORWARD  = 16 * HI_SVR_PLAYER_PLAY_SPEED_NORMAL,     /**< 16 x speed fast forward *//**< CNcomment:16ï¿½ï¿½ï¿½Ù¿ï¿½ï¿½ */
+    HI_SVR_PLAYER_PLAY_SPEED_32X_FAST_FORWARD  = 32 * HI_SVR_PLAYER_PLAY_SPEED_NORMAL,     /**< 32 x speed fast forward *//**< CNcomment:32ï¿½ï¿½ï¿½Ù¿ï¿½ï¿½ */
+    HI_SVR_PLAYER_PLAY_SPEED_64X_FAST_FORWARD  = 64 * HI_SVR_PLAYER_PLAY_SPEED_NORMAL,     /**< 64 x speed fast forward *//**< CNcomment:64ï¿½ï¿½ï¿½Ù¿ï¿½ï¿½ */
+    HI_SVR_PLAYER_PLAY_SPEED_1X_BACKWARD       = -1 * HI_SVR_PLAYER_PLAY_SPEED_NORMAL,     /**< 1 x speed rewind *//**< CNcomment:1ï¿½ï¿½ï¿½Ùµï¿½ï¿½ï¿½ */
+    HI_SVR_PLAYER_PLAY_SPEED_2X_FAST_BACKWARD  = -2 * HI_SVR_PLAYER_PLAY_SPEED_NORMAL,     /**< 2 x speed rewind *//**< CNcomment:2ï¿½ï¿½ï¿½Ù¿ï¿½ï¿½ï¿½ */
+    HI_SVR_PLAYER_PLAY_SPEED_4X_FAST_BACKWARD  = -4 * HI_SVR_PLAYER_PLAY_SPEED_NORMAL,     /**< 4 x speed rewind *//**< CNcomment:4ï¿½ï¿½ï¿½Ù¿ï¿½ï¿½ï¿½ */
+    HI_SVR_PLAYER_PLAY_SPEED_8X_FAST_BACKWARD  = -8 * HI_SVR_PLAYER_PLAY_SPEED_NORMAL,     /**< 8 x speed rewind *//**< CNcomment:8ï¿½ï¿½ï¿½Ù¿ï¿½ï¿½ï¿½ */
+    HI_SVR_PLAYER_PLAY_SPEED_16X_FAST_BACKWARD = -16 * HI_SVR_PLAYER_PLAY_SPEED_NORMAL,    /**< 16 x speed rewind *//**< CNcomment:16ï¿½ï¿½ï¿½Ù¿ï¿½ï¿½ï¿½ */
+    HI_SVR_PLAYER_PLAY_SPEED_32X_FAST_BACKWARD = -32 * HI_SVR_PLAYER_PLAY_SPEED_NORMAL,    /**< 32 x speed rewind *//**< CNcomment:32ï¿½ï¿½ï¿½Ù¿ï¿½ï¿½ï¿½ */
+    HI_SVR_PLAYER_PLAY_SPEED_64X_FAST_BACKWARD = -64 * HI_SVR_PLAYER_PLAY_SPEED_NORMAL,    /**< 64 x speed rewind *//**< CNcomment:64ï¿½ï¿½ï¿½Ù¿ï¿½ï¿½ï¿½ */
+    HI_SVR_PLAYER_PLAY_SPEED_BUTT                                                          /**< Invalid speed value *//**< CNcomment:ï¿½ï¿½Ð§ï¿½ï¿½ï¿½Ù¶ï¿½Öµ */
 } HI_SVR_PLAYER_PLAY_SPEED_E;
 
 /** The parameters need to be specified when the player is created. */
-/** CNcomment:²¥·ÅÆ÷´´½¨Ê±ÐèÖ¸¶¨µÄ²ÎÊý */
+/** CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½Ö¸ï¿½ï¿½ï¿½Ä²ï¿½ï¿½ï¿½ */
 typedef struct hiSVR_PLAYER_PARAM_S
 {
-    HI_U32  u32DmxId;                 /**< Dmx ID. Not used now. *//**< CNcomment:dmx id£¬Ä¿Ç°Ã»ÓÐÊ¹ÓÃ*/
-    HI_U32  u32PortId;                /**< Port ID. Not used now. *//**< CNcomment:port id£¬Ä¿Ç°Ã»ÓÐÊ¹ÓÃ*/
-    HI_U32  x;                     /**< Coordinate of the video output window. This parameter is invalid in the case of hAVPlayer!=HI_SVR_PLAYER_INVALID_HDL. *//**< CNcomment:ÊÓÆµÊä³ö´°¿Ú×ø±ê£¬hAVPlayer!=HI_SVR_PLAYER_INVALID_HDL£¬¸Ã²ÎÊýÎÞÐ§ */
-    HI_U32  y;                     /**< Coordinate of the video output window. This parameter is invalid in the case of hAVPlayer!=HI_SVR_PLAYER_INVALID_HDL. *//**< CNcomment:ÊÓÆµÊä³ö´°¿Ú×ø±ê£¬hAVPlayer!=HI_SVR_PLAYER_INVALID_HDL£¬¸Ã²ÎÊýÎÞÐ§ */
-    HI_U32  w;                   /**< Width of the video output window. This parameter is invalid in the case of hAVPlayer!=HI_SVR_PLAYER_INVALID_HDL. *//**< CNcomment:ÊÓÆµÊä³ö´°¿Ú¿í£¬hAVPlayer!=HI_SVR_PLAYER_INVALID_HDL£¬¸Ã²ÎÊýÎÞÐ§ */
-    HI_U32  h;                   /**< Height of the video output window. This parameter is invalid in the case of hAVPlayer!=HI_SVR_PLAYER_INVALID_HDL. *//**< CNcomment:ÊÓÆµÊä³ö´°¿Ú¸ß£¬hAVPlayer!=HI_SVR_PLAYER_INVALID_HDL£¬¸Ã²ÎÊýÎÞÐ§ */
-    HI_U32  u32MixHeight;             /**< Audio output mix weight. The value ranges from 0 to 100. This parameter is invalid in the case of hAVPlayer!=HI_SVR_PLAYER_INVALID_HDL. *//**< CNcomment:ÒôÆµÊä³ö»ìÒôÈ¨ÖØ0-100£¬hAVPlayer!=HI_SVR_PLAYER_INVALID_HDL£¬¸Ã²ÎÊýÎÞÐ§ */
+    HI_U32  u32DmxId;                 /**< Dmx ID. Not used now. *//**< CNcomment:dmx idï¿½ï¿½Ä¿Ç°Ã»ï¿½ï¿½Ê¹ï¿½ï¿½*/
+    HI_U32  u32PortId;                /**< Port ID. Not used now. *//**< CNcomment:port idï¿½ï¿½Ä¿Ç°Ã»ï¿½ï¿½Ê¹ï¿½ï¿½*/
+    HI_U32  x;                     /**< Coordinate of the video output window. This parameter is invalid in the case of hAVPlayer!=HI_SVR_PLAYER_INVALID_HDL. *//**< CNcomment:ï¿½ï¿½Æµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ê£¬hAVPlayer!=HI_SVR_PLAYER_INVALID_HDLï¿½ï¿½ï¿½Ã²ï¿½ï¿½ï¿½ï¿½ï¿½Ð§ */
+    HI_U32  y;                     /**< Coordinate of the video output window. This parameter is invalid in the case of hAVPlayer!=HI_SVR_PLAYER_INVALID_HDL. *//**< CNcomment:ï¿½ï¿½Æµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ê£¬hAVPlayer!=HI_SVR_PLAYER_INVALID_HDLï¿½ï¿½ï¿½Ã²ï¿½ï¿½ï¿½ï¿½ï¿½Ð§ */
+    HI_U32  w;                   /**< Width of the video output window. This parameter is invalid in the case of hAVPlayer!=HI_SVR_PLAYER_INVALID_HDL. *//**< CNcomment:ï¿½ï¿½Æµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú¿ï¿½hAVPlayer!=HI_SVR_PLAYER_INVALID_HDLï¿½ï¿½ï¿½Ã²ï¿½ï¿½ï¿½ï¿½ï¿½Ð§ */
+    HI_U32  h;                   /**< Height of the video output window. This parameter is invalid in the case of hAVPlayer!=HI_SVR_PLAYER_INVALID_HDL. *//**< CNcomment:ï¿½ï¿½Æµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú¸ß£ï¿½hAVPlayer!=HI_SVR_PLAYER_INVALID_HDLï¿½ï¿½ï¿½Ã²ï¿½ï¿½ï¿½ï¿½ï¿½Ð§ */
+    HI_U32  u32MixHeight;             /**< Audio output mix weight. The value ranges from 0 to 100. This parameter is invalid in the case of hAVPlayer!=HI_SVR_PLAYER_INVALID_HDL. *//**< CNcomment:ï¿½ï¿½Æµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È¨ï¿½ï¿½0-100ï¿½ï¿½hAVPlayer!=HI_SVR_PLAYER_INVALID_HDLï¿½ï¿½ï¿½Ã²ï¿½ï¿½ï¿½ï¿½ï¿½Ð§ */
     HI_HANDLE hAVPlayer;              /**< AVPlay created externally. A window device and a sound device are bound to the AVPlay and the window size and the sound volume are set.
                                                                     The AVPlay handle can be transferred to the HiPlayer, which will use the AVPlay for playing. If this parameter is set to
                                                                     HI_SVR_PLAYER_INVALID_HDL, the HiPlayer internally creates the AVPlay and window automatically. */
-                                      /**< CNcomment:Íâ²¿ÒÑ¾­´´½¨ÁËavplay²¢°ó¶¨ÁËwindow,sound£¬²¢ÉèÖÃºÃwindowµÄ´óÐ¡Î»ÖÃ£¬soundµÄÒôÁ¿£¬
-                                                                    ¿ÉÒÔ½«avplay¾ä±ú´«¸øHiPlayer£¬HiPlayer¼ÌÐøÊ¹ÓÃ¸Ãavplay²¥·Å¡£Èç¹û¸Ã²ÎÊýÉèÖÃÎª
-                                                                    HI_SVR_PLAYER_INVALID_HDL£¬HiPlayerÄÚ²¿»á×Ô¶¯´´½¨avplayerºÍwindow */
+                                      /**< CNcomment:ï¿½â²¿ï¿½Ñ¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½avplayï¿½ï¿½ï¿½ï¿½ï¿½ï¿½window,soundï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ãºï¿½windowï¿½Ä´ï¿½Ð¡Î»ï¿½Ã£ï¿½soundï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+                                                                    ï¿½ï¿½ï¿½Ô½ï¿½avplayï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½HiPlayerï¿½ï¿½HiPlayerï¿½ï¿½ï¿½ï¿½Ê¹ï¿½Ã¸ï¿½avplayï¿½ï¿½ï¿½Å¡ï¿½ï¿½ï¿½ï¿½ï¿½Ã²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îª
+                                                                    HI_SVR_PLAYER_INVALID_HDLï¿½ï¿½HiPlayerï¿½Ú²ï¿½ï¿½ï¿½ï¿½Ô¶ï¿½ï¿½ï¿½ï¿½ï¿½avplayerï¿½ï¿½window */
     HI_HANDLE hVSink;                /**< vsink handle create external */
     HI_HANDLE hASink;                /**< asink handle create external */
-    HI_U32   u32SndPort;             /**< Specified audio port number, 0: master audio, 1: slave audio  *//**< CNcomment:Ö¸¶¨ÒôÆµ¶Ë¿ÚºÅ£¬0´ú±íÖ÷Òô£¬1´ú±í¸¨Òô*/
-    HI_U32   u32Display;             /**< Type of display, value is::HI_UNF_DISP_E *//**< CNcomment:display ÀàÐÍ£¬È¡Öµ²Î¿¼::HI_UNF_DISP_E */
+    HI_U32   u32SndPort;             /**< Specified audio port number, 0: master audio, 1: slave audio  *//**< CNcomment:Ö¸ï¿½ï¿½ï¿½ï¿½Æµï¿½Ë¿ÚºÅ£ï¿½0ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½1ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½*/
+    HI_U32   u32Display;             /**< Type of display, value is::HI_UNF_DISP_E *//**< CNcomment:display ï¿½ï¿½ï¿½Í£ï¿½È¡Öµï¿½Î¿ï¿½::HI_UNF_DISP_E */
     HI_U32   u32VDecErrCover;   /**<Error concealment threshold of the output frames of a video decoder. The value 0 indicates that no frames are output if an error occurs; the value 100 indicates that all frames are output no matter whether errors occur.*/
-                                               /**<CNcomment: ÊÓÆµ½âÂëÆ÷µÄÊä³öÖ¡´íÎóÒþ²ØÃÅÏÞ£¬0:³öÏÖ´íÎó¼´²»Êä³ö£»100:²»¹Ü´íÎó±ÈÀýÈ«²¿Êä³ö*/
+                                               /**<CNcomment: ï¿½ï¿½Æµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Þ£ï¿½0:ï¿½ï¿½ï¿½Ö´ï¿½ï¿½ó¼´²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½100:ï¿½ï¿½ï¿½Ü´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È«ï¿½ï¿½ï¿½ï¿½ï¿½*/
     HI_HANDLE hDRMClient;            /**< DRM client created externally. */
     HI_HANDLE hWindow;               /**< window handle create external */
 } HI_SVR_PLAYER_PARAM_S;
 
 /** Input media file */
-/** CNcomment:ÊäÈëµÄÃ½ÌåÎÄ¼þ */
+/** CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½Ã½ï¿½ï¿½ï¿½Ä¼ï¿½ */
 typedef struct hiSVR_PLAYER_MEDIA_S
 {
-    HI_CHAR  aszUrl[HI_FORMAT_MAX_URL_LEN];          /**< File path, absolute file path, such as /mnt/filename.ts. *//**< CNcomment:ÎÄ¼þÂ·¾¶£¬¾ø¶ÔÂ·¾¶£¬Èç/mnt/filename.ts */
-    HI_S32   s32PlayMode;                            /**< Set the mode of the player. The parameter is ::HI_SVR_PLAYER_PLAY_MODE_E *//**< CNcomment:ÉèÖÃ²¥·ÅÄ£Ê½,²ÎÊý::HI_SVR_PLAYER_PLAY_MODE_E */
-    HI_U32   u32ExtSubNum;                        /**< Number of subtitle files *//**< CNcomment:×ÖÄ»ÎÄ¼þ¸öÊý */
-    HI_CHAR  aszExtSubUrl[HI_FORMAT_MAX_LANG_NUM][HI_FORMAT_MAX_URL_LEN];  /**< Absolute path of a subtitle file, such as /mnt/filename.ts. *//**< CNcomment:×ÖÄ»ÎÄ¼þÂ·¾¶£¬¾ø¶ÔÂ·¾¶£¬Èç/mnt/filename.ts */
+    HI_CHAR  aszUrl[HI_FORMAT_MAX_URL_LEN];          /**< File path, absolute file path, such as /mnt/filename.ts. *//**< CNcomment:ï¿½Ä¼ï¿½Â·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½/mnt/filename.ts */
+    HI_S32   s32PlayMode;                            /**< Set the mode of the player. The parameter is ::HI_SVR_PLAYER_PLAY_MODE_E *//**< CNcomment:ï¿½ï¿½ï¿½Ã²ï¿½ï¿½ï¿½Ä£Ê½,ï¿½ï¿½ï¿½ï¿½::HI_SVR_PLAYER_PLAY_MODE_E */
+    HI_U32   u32ExtSubNum;                        /**< Number of subtitle files *//**< CNcomment:ï¿½ï¿½Ä»ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½ï¿½ */
+    HI_CHAR  aszExtSubUrl[HI_FORMAT_MAX_LANG_NUM][HI_FORMAT_MAX_URL_LEN];  /**< Absolute path of a subtitle file, such as /mnt/filename.ts. *//**< CNcomment:ï¿½ï¿½Ä»ï¿½Ä¼ï¿½Â·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½/mnt/filename.ts */
     HI_U32   u32UserData;                            /**< Create a handle by calling the fmt_open function, send the user data to the DEMUX by calling the fmt_invoke, and then call the fmt_find_stream function. */
-                                                     /**< CNcomment:ÓÃ»§Êý¾Ý£¬HiPlayer½ö×÷Í¸´«£¬µ÷ÓÃ½âÎöÆ÷fmt_openÖ®ºó£¬Í¨¹ýfmt_invoke½Ó¿Ú´«µÝ¸ø½âÎöÆ÷£¬ÔÙµ÷ÓÃfmt_find_stream½Ó¿Ú */
+                                                     /**< CNcomment:ï¿½Ã»ï¿½ï¿½ï¿½ï¿½Ý£ï¿½HiPlayerï¿½ï¿½ï¿½ï¿½Í¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã½ï¿½ï¿½ï¿½ï¿½ï¿½fmt_openÖ®ï¿½ï¿½Í¨ï¿½ï¿½fmt_invokeï¿½Ó¿Ú´ï¿½ï¿½Ý¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ùµï¿½ï¿½ï¿½fmt_find_streamï¿½Ó¿ï¿½ */
 } HI_SVR_PLAYER_MEDIA_S;
 
 /** IDs of the AV and subtitle streams to be switched. */
-/** CNcomment:ÒªÇÐ»»µ½µÄÒôÊÓÆµ¡¢×ÖÄ»Á÷ID  */
+/** CNcomment:Òªï¿½Ð»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æµï¿½ï¿½ï¿½ï¿½Ä»ï¿½ï¿½ID  */
 typedef struct hiSVR_PLAYER_STREAMID_S
 {
     HI_U16 u16ProgramId;   /**< Program ID. The value is the subscript of the pastProgramInfo array in the ::HI_FORMAT_FILE_INFO_S structure and ranges from 0 to (u32ProgramNum - 1). */
-                           /**< CNcomment:½ÚÄ¿id£¬ÖµÎª::HI_FORMAT_FILE_INFO_S½á¹¹pastProgramInfoÊý×éÏÂ±ê£¬0-(u32ProgramNum - 1) */
+                           /**< CNcomment:ï¿½ï¿½Ä¿idï¿½ï¿½ÖµÎª::HI_FORMAT_FILE_INFO_Sï¿½á¹¹pastProgramInfoï¿½ï¿½ï¿½ï¿½ï¿½Â±ê£¬0-(u32ProgramNum - 1) */
     HI_U16 u16VidStreamId;   /**< Video stream ID. The value is the subscript of the pastVidStream array in the ::HI_FORMAT_PROGRAM_INFO_S structure and ranges from 0 to (u32VidStreamNum - 1). */
-                           /**< CNcomment:ÊÓÆµÁ÷id£¬ÖµÎª::HI_FORMAT_PROGRAM_INFO_S½á¹¹pastVidStreamÊý×éÏÂ±ê£¬0-(u32VidStreamNum - 1)*/
+                           /**< CNcomment:ï¿½ï¿½Æµï¿½ï¿½idï¿½ï¿½ÖµÎª::HI_FORMAT_PROGRAM_INFO_Sï¿½á¹¹pastVidStreamï¿½ï¿½ï¿½ï¿½ï¿½Â±ê£¬0-(u32VidStreamNum - 1)*/
     HI_U16 u16AudStreamId;   /**< Audio stream ID. The value is the subscript of the pastAudStream array in the ::HI_FORMAT_PROGRAM_INFO_S structure and ranges from 0 to (u32AudStreamNum - 1).*/
-                           /**< CNcomment:ÒôÆµÁ÷id£¬ÖµÎª::HI_FORMAT_PROGRAM_INFO_S½á¹¹pastAudStreamÊý×éÏÂ±ê£¬0-(u32AudStreamNum - 1)*/
+                           /**< CNcomment:ï¿½ï¿½Æµï¿½ï¿½idï¿½ï¿½ÖµÎª::HI_FORMAT_PROGRAM_INFO_Sï¿½á¹¹pastAudStreamï¿½ï¿½ï¿½ï¿½ï¿½Â±ê£¬0-(u32AudStreamNum - 1)*/
     HI_U16 u16SubStreamId;  /**< Subtitle ID. The value is the subscript of the pastSubStream array in the ::HI_FORMAT_PROGRAM_INFO_S structure and ranges from 0 to (u32SubStreamNum - 1). */
-                           /**< CNcomment:×ÖÄ»id£¬ÖµÎª::HI_FORMAT_PROGRAM_INFO_S½á¹¹astSubTitleÊý×éÏÂ±ê£¬0-(u32SubStreamNum - 1) */
+                           /**< CNcomment:ï¿½ï¿½Ä»idï¿½ï¿½ÖµÎª::HI_FORMAT_PROGRAM_INFO_Sï¿½á¹¹astSubTitleï¿½ï¿½ï¿½ï¿½ï¿½Â±ê£¬0-(u32SubStreamNum - 1) */
 } HI_SVR_PLAYER_STREAMID_S;
 
 /** Set the offset of the stream PTS */
-/** CNcomment:ÉèÖÃÒôÊÓÆµ¡¢×ÖÄ»Ê±¼äÆ«ÒÆ */
+/** CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æµï¿½ï¿½ï¿½ï¿½Ä»Ê±ï¿½ï¿½Æ«ï¿½ï¿½ */
 typedef struct hiSVR_PLAYER_SYNC_ATTR_S
 {
-    HI_S32 s32VidFrameOffset;    /**< offset (in the unit of ms) of the video stream. Add this offset to the PTS of the video stream. *//**< CNcomment:ÊÓÆµÁ÷Æ«ÒÆÖµ£¬ÔÚÊÓÆµÁ÷Ê±¼ä´Á»ù´¡ÉÏÔö¼Ó¸Ãoffset£¬µ¥Î»ms */
-    HI_S32 s32AudFrameOffset;    /**< offset (in the unit of ms) of the audio stream. Add this offset to the PTS of the audio stream. *//**< CNcomment:ÒôÆµÁ÷Æ«ÒÆÖµ£¬ÔÚÒôÆµÁ÷Ê±¼ä´Á»ù´¡ÉÏÔö¼Ó¸Ãoffset£¬µ¥Î»ms */
-    HI_S32 s32SubTitleOffset;  /**< offset (in the unit of ms) of the subtitle stream. Add this offset to the PTS of the subtitle stream. *//**< CNcomment:×ÖÄ»Á÷Æ«ÒÆÖµ£¬ÔÚ×ÖÄ»Á÷Ê±¼ä´Á»ù´¡ÉÏÔö¼Ó¸Ãoffset£¬µ¥Î»ms */
-    HI_S32 s32SyncVidPlusTime;  /**<Plus time range during video synchronization*//**<CNcomment: ÊÓÆµÍ¬²½³¬Ç°µÄÊ±¼ä·¶Î§ */
-    HI_S32 s32SyncVidNegativeTime;  /**<Negative time range during video synchronization*//**<CNcomment: ÊÓÆµÍ¬²½ÂäºóµÄÊ±¼ä·¶Î§ */
+    HI_S32 s32VidFrameOffset;    /**< offset (in the unit of ms) of the video stream. Add this offset to the PTS of the video stream. *//**< CNcomment:ï¿½ï¿½Æµï¿½ï¿½Æ«ï¿½ï¿½Öµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æµï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó¸ï¿½offsetï¿½ï¿½ï¿½ï¿½Î»ms */
+    HI_S32 s32AudFrameOffset;    /**< offset (in the unit of ms) of the audio stream. Add this offset to the PTS of the audio stream. *//**< CNcomment:ï¿½ï¿½Æµï¿½ï¿½Æ«ï¿½ï¿½Öµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æµï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó¸ï¿½offsetï¿½ï¿½ï¿½ï¿½Î»ms */
+    HI_S32 s32SubTitleOffset;  /**< offset (in the unit of ms) of the subtitle stream. Add this offset to the PTS of the subtitle stream. *//**< CNcomment:ï¿½ï¿½Ä»ï¿½ï¿½Æ«ï¿½ï¿½Öµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä»ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó¸ï¿½offsetï¿½ï¿½ï¿½ï¿½Î»ms */
+    HI_S32 s32SyncVidPlusTime;  /**<Plus time range during video synchronization*//**<CNcomment: ï¿½ï¿½ÆµÍ¬ï¿½ï¿½ï¿½ï¿½Ç°ï¿½ï¿½Ê±ï¿½ä·¶Î§ */
+    HI_S32 s32SyncVidNegativeTime;  /**<Negative time range during video synchronization*//**<CNcomment: ï¿½ï¿½ÆµÍ¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ä·¶Î§ */
 } HI_SVR_PLAYER_SYNC_ATTR_S;
 
 /** Player information */
-/** CNcomment:²¥·ÅÆ÷ÐÅÏ¢ */
+/** CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ */
 typedef struct hiSVR_PLAYER_INFO_S
 {
-    HI_U32  u32Progress;                 /**< Playing progress. The value ranges from 0 to 100. *//**< CNcomment:²¥·Å°Ù·Ö±È£¬0-100 */
-    HI_U64  u64TimePlayed;               /**< Elapsed time, in the unit of ms. *//**< CNcomment:ÒÑ²¥·ÅÊ±¼ä£¬µ¥Î»ms */
-    HI_S32  s32Speed;                    /**< Playing speed *//**< CNcomment:²¥·ÅËÙÂÊ */
-    HI_SVR_PLAYER_STATE_E  eStatus;      /**< Playing status *//**< CNcomment:²¥·Å×´Ì¬ */
+    HI_U32  u32Progress;                 /**< Playing progress. The value ranges from 0 to 100. *//**< CNcomment:ï¿½ï¿½ï¿½Å°Ù·Ö±È£ï¿½0-100 */
+    HI_U64  u64TimePlayed;               /**< Elapsed time, in the unit of ms. *//**< CNcomment:ï¿½Ñ²ï¿½ï¿½ï¿½Ê±ï¿½ä£¬ï¿½ï¿½Î»ms */
+    HI_S32  s32Speed;                    /**< Playing speed *//**< CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
+    HI_SVR_PLAYER_STATE_E  eStatus;      /**< Playing status *//**< CNcomment:ï¿½ï¿½ï¿½ï¿½×´Ì¬ */
 } HI_SVR_PLAYER_INFO_S;
 
 /** The result of setting the subtitle transcoding type */
-/** CNcomment:InvokeÃüÁîÉèÖÃ×ÖÄ»±àÂëÀàÐÍµÄÊÂ¼þ»Øµ÷²ÎÊý */
+/** CNcomment:Invokeï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Íµï¿½ï¿½Â¼ï¿½ï¿½Øµï¿½ï¿½ï¿½ï¿½ï¿½ */
 typedef struct hiSVR_PLAYER_SUB_CODETYPE_S
 {
-    HI_U32 u32SubId;                    /**< Subtitle ID. For details, see ::HI_FORMAT_SUB_INFO_S:s32StreamIndex *//**< CNcomment:×ÖÄ»ID£¬²Î¿¼::HI_FORMAT_SUB_INFO_S:s32StreamIndex¶¨Òå */
-    HI_U32 u32Result;                   /**< Result of setting the subtitle transcoding type *//**< CNcomment:invokeÃüÁî·µ»ØÖµ */
+    HI_U32 u32SubId;                    /**< Subtitle ID. For details, see ::HI_FORMAT_SUB_INFO_S:s32StreamIndex *//**< CNcomment:ï¿½ï¿½Ä»IDï¿½ï¿½ï¿½Î¿ï¿½::HI_FORMAT_SUB_INFO_S:s32StreamIndexï¿½ï¿½ï¿½ï¿½ */
+    HI_U32 u32Result;                   /**< Result of setting the subtitle transcoding type *//**< CNcomment:invokeï¿½ï¿½ï¿½î·µï¿½ï¿½Öµ */
 } HI_SVR_PLAYER_SUB_CODETYPE_S;
 
 /** @} */  /** <!-- ==== Structure Definition end ==== */
@@ -288,11 +288,11 @@ typedef struct hiSVR_PLAYER_SUB_CODETYPE_S
 /** @{ */  /** <!-- [Hiplayer]*/
 
 /**
-\brief Player event callback function. The ::HI_SVR_PLAYER_RegCallback interface can be called to register the callback function. CNcomment:²¥·ÅÆ÷ÊÂ¼þ»Øµ÷º¯Êý£¬µ÷ÓÃ::HI_SVR_PLAYER_RegCallback½Ó¿Ú×¢²á¸Ã»Øµ÷º¯ÊýCNend
+\brief Player event callback function. The ::HI_SVR_PLAYER_RegCallback interface can be called to register the callback function. CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â¼ï¿½ï¿½Øµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½::HI_SVR_PLAYER_RegCallbackï¿½Ó¿ï¿½×¢ï¿½ï¿½Ã»Øµï¿½ï¿½ï¿½ï¿½ï¿½CNend
 \attention \n
 None.
-\param[out] hPlayer player handle. CNcomment:²¥·ÅÆ÷¾ä±úCNend
-\param[out] pstruEvent event parameter. CNcomment: ÊÂ¼þ²ÎÊýCNend
+\param[out] hPlayer player handle. CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½CNend
+\param[out] pstruEvent event parameter. CNcomment: ï¿½Â¼ï¿½ï¿½ï¿½ï¿½ï¿½CNend
 
 \retval ::HI_SUCCESS
 
@@ -302,15 +302,15 @@ None.
 typedef HI_S32 (*HI_SVR_PLAYER_EVENT_FN)(HI_HANDLE hPlayer, HI_SVR_PLAYER_EVENT_S *pstruEvent);
 
 /**
-\brief Initialize the player. CNcomment:³õÊ¼»¯Player CNend
+\brief Initialize the player. CNcomment:ï¿½ï¿½Ê¼ï¿½ï¿½Player CNend
 \attention \n
 The HI_S32 HI_SVR_PLAYER_Init interface can be called to return a success message after the initialization is successful. Multiple processes are not supported
 . This interface must be called prior to other interfaces.
-CNcomment:³õÊ¼»¯³É¹¦ºóÔÙµ÷ÓÃ¸Ã½Ó¿Ú·µ»Ø³É¹¦£¬²»Ö§³Ö¶à½ø³Ì£¬µ÷ÓÃÆäËü½Ó¿ÚÇ°±ØÐëÏÈµ÷ÓÃ¸Ã½Ó¿ÚCNend
-\param None. CNcomment:ÎÞCNend
+CNcomment:ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½É¹ï¿½ï¿½ï¿½ï¿½Ùµï¿½ï¿½Ã¸Ã½Ó¿Ú·ï¿½ï¿½Ø³É¹ï¿½ï¿½ï¿½ï¿½ï¿½Ö§ï¿½Ö¶ï¿½ï¿½ï¿½Ì£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó¿ï¿½Ç°ï¿½ï¿½ï¿½ï¿½ï¿½Èµï¿½ï¿½Ã¸Ã½Ó¿ï¿½CNend
+\param None. CNcomment:ï¿½ï¿½CNend
 
-\retval ::HI_SUCCESS The initialization is successful. CNcomment:³õÊ¼»¯³É¹¦CNend
-\retval ::HI_FAILURE The initialization fails. CNcomment:³õÊ¼»¯Ê§°ÜCNend
+\retval ::HI_SUCCESS The initialization is successful. CNcomment:ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½É¹ï¿½CNend
+\retval ::HI_FAILURE The initialization fails. CNcomment:ï¿½ï¿½Ê¼ï¿½ï¿½Ê§ï¿½ï¿½CNend
 
 \see \n
 None.
@@ -318,16 +318,16 @@ None.
 HI_S32 HI_SVR_PLAYER_Init(HI_VOID);
 
 /**
-\brief Deinitialize the player module by calling the HI_S32 HI_SVR_PLAYER_Deinit interface. The player module is not used any more. CNcomment:È¥³õÊ¼»¯playerÄ£¿é£¬²»ÔÙÊ¹ÓÃplayerÄ£¿é£¬µ÷ÓÃ¸Ã½Ó¿ÚÈ¥³õÊ¼»¯playerÄ£¿éCNend
+\brief Deinitialize the player module by calling the HI_S32 HI_SVR_PLAYER_Deinit interface. The player module is not used any more. CNcomment:È¥ï¿½ï¿½Ê¼ï¿½ï¿½playerÄ£ï¿½é£¬ï¿½ï¿½ï¿½ï¿½Ê¹ï¿½ï¿½playerÄ£ï¿½é£¬ï¿½ï¿½ï¿½Ã¸Ã½Ó¿ï¿½È¥ï¿½ï¿½Ê¼ï¿½ï¿½playerÄ£ï¿½ï¿½CNend
 \attention \n
 The ::HI_SVR_PLAYER_Destroy interface must be called to release the created player first. Otherwise, a failure is returned. The Deinit interface does not release the player resource. \n
 This interface can be called to return a success message after the deinitialization is successful.
-CNcomment:±ØÐëÏÈµ÷ÓÃ::HI_SVR_PLAYER_Destroy½Ó¿ÚÊÍ·Åµô´´½¨µÄ²¥·ÅÆ÷£¬ÔÙµ÷ÓÃ¸Ã½Ó¿Ú£¬·ñÔò»á·µ»ØÊ§°Ü£¬Deinit²»¸ºÔðÊÍ·Å\n
-²¥·ÅÆ÷×ÊÔ´¡£È¥³õÊ¼»¯³É¹¦ºóÔÙµ÷ÓÃ¸Ã½Ó¿Ú·µ»Ø³É¹¦CNend
-\param None. CNcomment:ÎÞCNend
+CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½Èµï¿½ï¿½ï¿½::HI_SVR_PLAYER_Destroyï¿½Ó¿ï¿½ï¿½Í·Åµï¿½ï¿½ï¿½Ä²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ùµï¿½ï¿½Ã¸Ã½Ó¿Ú£ï¿½ï¿½ï¿½ï¿½ï¿½á·µï¿½ï¿½Ê§ï¿½Ü£ï¿½Deinitï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í·ï¿½\n
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô´ï¿½ï¿½È¥ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½É¹ï¿½ï¿½ï¿½ï¿½Ùµï¿½ï¿½Ã¸Ã½Ó¿Ú·ï¿½ï¿½Ø³É¹ï¿½CNend
+\param None. CNcomment:ï¿½ï¿½CNend
 
-\retval ::HI_SUCCESS The deinitialization is successful. CNcomment:È¥³õÊ¼»¯³É¹¦CNend
-\retval ::HI_FAILURE The deinitialization fails and the created player is not released. CNcomment:È¥³õÊ¼»¯Ê§°Ü£¬Ã»ÓÐÊÍ·Åµô´´½¨µÄ²¥·ÅÆ÷CNend
+\retval ::HI_SUCCESS The deinitialization is successful. CNcomment:È¥ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½É¹ï¿½CNend
+\retval ::HI_FAILURE The deinitialization fails and the created player is not released. CNcomment:È¥ï¿½ï¿½Ê¼ï¿½ï¿½Ê§ï¿½Ü£ï¿½Ã»ï¿½ï¿½ï¿½Í·Åµï¿½ï¿½ï¿½Ä²ï¿½ï¿½ï¿½ï¿½ï¿½CNend
 
 \see \n
 None.
@@ -335,15 +335,15 @@ None.
 HI_S32 HI_SVR_PLAYER_Deinit(HI_VOID);
 
 /**
-\brief Create a player. CNcomment:´´½¨Ò»¸ö²¥·ÅÆ÷CNend
+\brief Create a player. CNcomment:ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½CNend
 \attention \n
 This interface must be called after initialization. Only one player can be created. \n
-CNcomment:¸Ã½Ó¿Ú±ØÐëÔÚ³õÊ¼»¯ºóµ÷ÓÃ£¬Ö§³Ö×î¶à´´½¨Ò»¸ö²¥·ÅÆ÷\n CNend
-\param[in] pstruParam player initialization attribute. CNcomment:²¥·ÅÆ÷³õÊ¼»¯ÊôÐÔCNend
-\param[out] phPlayer handle of the created player. CNcomment:´´½¨µÄ²¥·ÅÆ÷¾ä±úCNend
+CNcomment:ï¿½Ã½Ó¿Ú±ï¿½ï¿½ï¿½ï¿½Ú³ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã£ï¿½Ö§ï¿½ï¿½ï¿½ï¿½à´´ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½\n CNend
+\param[in] pstruParam player initialization attribute. CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½CNend
+\param[out] phPlayer handle of the created player. CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½Ä²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½CNend
 
-\retval ::HI_SUCCESS A player is created successfully and the player handle is valid. CNcomment:´´½¨³É¹¦£¬²¥·ÅÆ÷¾ä±úÓÐÐ§CNend
-\retval ::HI_FAILURE A player fails to be created. The parameters are invalid or resources are insufficient. CNcomment:´´½¨Ê§°Ü£¬²ÎÊý·Ç·¨»ò×ÊÔ´²»¹»CNend
+\retval ::HI_SUCCESS A player is created successfully and the player handle is valid. CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½É¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð§CNend
+\retval ::HI_FAILURE A player fails to be created. The parameters are invalid or resources are insufficient. CNcomment:ï¿½ï¿½ï¿½ï¿½Ê§ï¿½Ü£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ï¿½ï¿½ï¿½ï¿½Ô´ï¿½ï¿½ï¿½ï¿½CNend
 
 \see \n
 None.
@@ -351,7 +351,7 @@ None.
 HI_S32 HI_SVR_PLAYER_Create(const HI_SVR_PLAYER_PARAM_S *pstruParam, HI_HANDLE *phPlayer);
 
 /**
-\brief Set the URL of the media file to be played. The URL format is absolute path + media file name. CNcomment:ÉèÖÃÒª²¥·ÅµÄÃ½ÌåÎÄ¼þurlµØÖ·£¬url¸ñÊ½Îª:¾ø¶ÔÂ·¾¶+Ã½ÌåÎÄ¼þÃûCNend
+\brief Set the URL of the media file to be played. The URL format is absolute path + media file name. CNcomment:ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½ï¿½Åµï¿½Ã½ï¿½ï¿½ï¿½Ä¼ï¿½urlï¿½ï¿½Ö·ï¿½ï¿½urlï¿½ï¿½Ê½Îª:ï¿½ï¿½ï¿½ï¿½Â·ï¿½ï¿½+Ã½ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½CNend
 \attention \n
 The HI_SVR_PLAYER_SetMedia interface is a synchronous interface. It must be called after the ::HI_SVR_PLAYER_Create interface is called or after the ::
 HI_SVR_PLAYER_Stop interface is called to stop the player.
@@ -364,31 +364,31 @@ This interface performs the following operations:
    Creates a audio track(use device HI_UNF_SND_0),and bind it to the AVPlay.
 The window display location and mixheight set for binding audio track to the AVPlay are specified when the ::HI_SVR_PLAYER_Create interface is called.
 The window display location and mixheight are invalid if the AVPlay is specified externally.
-CNcomment:Í¬²½½Ó¿Ú£¬¸Ã½Ó¿Ú±ØÐëÔÚµ÷ÓÃ::HI_SVR_PLAYER_CreateÖ®ºóµ÷ÓÃ£¬»òÕßµ÷ÓÃ::HI_SVR_PLAYER_Stop½Ó¿ÚÍ£Ö¹²¥·ÅÆ÷ºóµ÷ÓÃ
-¸Ã½ÓÖ÷ÒªÖ´ÐÐÒÔÏÂ´¦Àí:
-1¡¢²éÕÒ½âÎöÆ÷½âÎöÉèÖÃµÄÃ½ÌåÎÄ¼þ
-2¡¢ÔÚÓëÃ½ÌåÎÄ¼þÏàÍ¬µÄÂ·¾¶ÏÂ²éÕÒÓëÃ½ÌåÎÄ¼þÍ¬ÃûµÄ×ÖÄ»ÎÄ¼þ
-3¡¢Èç¹ûÃ»ÓÐÖ¸¶¨avplayÔò
-   ´´½¨avplay£¬¸ù¾Ý½âÎö³öµÄÎÄ¼þÊôÐÔÉèÖÃÒôÊÓÆµÊôÐÔ£¬ÈçÒôÊÓÆµ±àÂëÀàÐÍ
-   ´´½¨window£¬ÉèÖÃwindow´°¿ÚÎ»ÖÃ£¬½«window°ó¶¨µ½avplay
-   ´´½¨audio track(Ê¹ÓÃÉè±¸HI_UNF_SND_0)£¬²¢½«audio track°ó¶¨µ½avplay
-windowÏÔÊ¾Î»ÖÃ£¬°ó¶¨µ½avplayµÄaudio trackµÄmixheight(Èç¹ûavplayÊÇÍâ²¿Ö¸¶¨£¬ÔòÏÔÊ¾Î»ÖÃºÍmixheight²ÎÊýÎÞÐ§)£¬
-ÔÚµ÷ÓÃ::HI_SVR_PLAYER_Create½Ó¿ÚÊ±Ö¸¶¨CNend
+CNcomment:Í¬ï¿½ï¿½ï¿½Ó¿Ú£ï¿½ï¿½Ã½Ó¿Ú±ï¿½ï¿½ï¿½ï¿½Úµï¿½ï¿½ï¿½::HI_SVR_PLAYER_CreateÖ®ï¿½ï¿½ï¿½ï¿½Ã£ï¿½ï¿½ï¿½ï¿½ßµï¿½ï¿½ï¿½::HI_SVR_PLAYER_Stopï¿½Ó¿ï¿½Í£Ö¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+ï¿½Ã½ï¿½ï¿½ï¿½ÒªÖ´ï¿½ï¿½ï¿½ï¿½ï¿½Â´ï¿½ï¿½ï¿½:
+1ï¿½ï¿½ï¿½ï¿½ï¿½Ò½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ãµï¿½Ã½ï¿½ï¿½ï¿½Ä¼ï¿½
+2ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã½ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½Í¬ï¿½ï¿½Â·ï¿½ï¿½ï¿½Â²ï¿½ï¿½ï¿½ï¿½ï¿½Ã½ï¿½ï¿½ï¿½Ä¼ï¿½Í¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä»ï¿½Ä¼ï¿½
+3ï¿½ï¿½ï¿½ï¿½ï¿½Ã»ï¿½ï¿½Ö¸ï¿½ï¿½avplayï¿½ï¿½
+   ï¿½ï¿½ï¿½ï¿½avplayï¿½ï¿½ï¿½ï¿½ï¿½Ý½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æµï¿½ï¿½ï¿½Ô£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+   ï¿½ï¿½ï¿½ï¿½windowï¿½ï¿½ï¿½ï¿½ï¿½ï¿½windowï¿½ï¿½ï¿½ï¿½Î»ï¿½Ã£ï¿½ï¿½ï¿½windowï¿½ó¶¨µï¿½avplay
+   ï¿½ï¿½ï¿½ï¿½audio track(Ê¹ï¿½ï¿½ï¿½è±¸HI_UNF_SND_0)ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½audio trackï¿½ó¶¨µï¿½avplay
+windowï¿½ï¿½Ê¾Î»ï¿½Ã£ï¿½ï¿½ó¶¨µï¿½avplayï¿½ï¿½audio trackï¿½ï¿½mixheight(ï¿½ï¿½ï¿½avplayï¿½ï¿½ï¿½â²¿Ö¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¾Î»ï¿½Ãºï¿½mixheightï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð§)ï¿½ï¿½
+ï¿½Úµï¿½ï¿½ï¿½::HI_SVR_PLAYER_Createï¿½Ó¿ï¿½Ê±Ö¸ï¿½ï¿½CNend
 
-\param[in] hPlayer handle of the player is created by calling the ::HI_SVR_PLAYER_Create interface. CNcomment:Í¨¹ýµ÷ÓÃ::HI_SVR_PLAYER_Create½Ó¿Ú´´½¨µÄ²¥·ÅÆ÷¾ä±úCNend
+\param[in] hPlayer handle of the player is created by calling the ::HI_SVR_PLAYER_Create interface. CNcomment:Í¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½::HI_SVR_PLAYER_Createï¿½Ó¿Ú´ï¿½ï¿½ï¿½ï¿½Ä²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½CNend
 \param[in] eType media file. If only AV media files are specified, set this parameter to HI_SVR_PLAYER_MEDIA_STREAMFILE.\n
            If a subtitle file is specified, set this parameter to HI_SVR_PLAYER_MEDIA_STREAMFILE | HI_SVR_PLAYER_MEDIA_SUBTITLE.
-           CNcomment:Ã½ÌåÎÄ¼þ¡£Ö»Ö¸¶¨ÒôÊÓÆµÃ½ÌåÎÄ¼þ£¬Ôò¸Ã²ÎÊýÉèÖÃÎªHI_SVR_PLAYER_MEDIA_STREAMFILE£¬\n
-            Èç¹û»¹Ö¸¶¨ÁË×ÖÄ»ÎÄ¼þÔòÉèÖÃ(HI_SVR_PLAYER_MEDIA_STREAMFILE | HI_SVR_PLAYER_MEDIA_SUBTITLE) CNend
+           CNcomment:Ã½ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½Ö»Ö¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÆµÃ½ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½ï¿½Ã²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÎªHI_SVR_PLAYER_MEDIA_STREAMFILEï¿½ï¿½\n
+            ï¿½ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä»ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½(HI_SVR_PLAYER_MEDIA_STREAMFILE | HI_SVR_PLAYER_MEDIA_SUBTITLE) CNend
 \param[in] pstruMedia media file information. Only absolute path is supported.  \n
            The player searches for a subtitle file whose name is the same as the name of the audio and video media file in the same directory as the audio and video media file automatically.
-            CNcomment:Ã½ÌåÎÄ¼þÐÅÏ¢£¬Ö»Ö§³Ö¾ø¶ÔÂ·¾¶¡£²¥·ÅÆ÷»á×Ô¶¯ÔÚÒôÊÓÆµÃ½\n
-            ÌåÎÄ¼þËùÔÚÄ¿Â¼ÏÂ²éÕÒÓëÒôÊÓÆµÃ½ÌåÎÄ¼þÃûÏàÍ¬µÄ×ÖÄ»ÎÄ¼þCNend
+            CNcomment:Ã½ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½Ö»Ö§ï¿½Ö¾ï¿½ï¿½ï¿½Â·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÆµÃ½\n
+            ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½ï¿½Ä¿Â¼ï¿½Â²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÆµÃ½ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½ï¿½Í¬ï¿½ï¿½ï¿½ï¿½Ä»ï¿½Ä¼ï¿½CNend
 
-\retval ::HI_SUCCESS The media file is set successfully. The ::HI_SVR_PLAYER_Play interface can be called to start playing the file. CNcomment:Ã½ÌåÎÄ¼þÉèÖÃ³É¹¦£¬´ËÊ±µ÷ÓÃ::HI_SVR_PLAYER_Play½Ó¿Ú¿ÉÒÔ¿ªÊ¼²¥·ÅCNend
-\retval ::HI_FAILURE The media file fails to be set. CNcomment:Ã½ÌåÎÄ¼þÉèÖÃÊ§°ÜCNend
-\retval ::HI_ERRNO_NOT_SUPPORT_FORMAT The file format is not supported. CNcomment:²»Ö§³ÖµÄÎÄ¼þ¸ñÊ½CNend
-\retval ::HI_ERRNO_NOT_SUPPORT_PROTOCOL The protocol is not supported. CNcomment:²»Ö§³ÖµÄÐ­ÒéCNend
+\retval ::HI_SUCCESS The media file is set successfully. The ::HI_SVR_PLAYER_Play interface can be called to start playing the file. CNcomment:Ã½ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½Ã³É¹ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½::HI_SVR_PLAYER_Playï¿½Ó¿Ú¿ï¿½ï¿½Ô¿ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½CNend
+\retval ::HI_FAILURE The media file fails to be set. CNcomment:Ã½ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½ï¿½Ê§ï¿½ï¿½CNend
+\retval ::HI_ERRNO_NOT_SUPPORT_FORMAT The file format is not supported. CNcomment:ï¿½ï¿½Ö§ï¿½Öµï¿½ï¿½Ä¼ï¿½ï¿½ï¿½Ê½CNend
+\retval ::HI_ERRNO_NOT_SUPPORT_PROTOCOL The protocol is not supported. CNcomment:ï¿½ï¿½Ö§ï¿½Öµï¿½Ð­ï¿½ï¿½CNend
 
 \see \n
 None.
@@ -396,17 +396,17 @@ None.
 HI_S32 HI_SVR_PLAYER_SetMedia(HI_HANDLE hPlayer, HI_U32 eType, HI_SVR_PLAYER_MEDIA_S *pstruMedia);
 
 /**
-\brief Switch a new Demux source.This interface is not supported now. CNcomment:ÖØÐÂÇÐ»»Êý¾ÝÔ´£¬¸Ã½Ó¿Úµ±Ç°²»Ö§³ÖCNend
+\brief Switch a new Demux source.This interface is not supported now. CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½Ð»ï¿½ï¿½ï¿½ï¿½ï¿½Ô´ï¿½ï¿½ï¿½Ã½Ó¿Úµï¿½Ç°ï¿½ï¿½Ö§ï¿½ï¿½CNend
 \attention \n
 The HI_SVR_PLAYER_SetSource interface is a synchronous interface. It must be called after the ::HI_SVR_PLAYER_Stop interface is called. Call
 ::HI_SVR_PLAYER_Play to play the new Demux source.
 The handle of the new demux source is created by call the ::HI_SVR_FORMAT_Open function.
-CNcomment:µ÷ÓÃ::HI_SVR_PLAYER_StopÍ£Ö¹²¥·ÅÆ÷ºó£¬µ÷ÓÃ¸Ã½Ó¿ÚÖØÐÂ°ó¶¨Ò»¸öÊý¾ÝÔ´£¬µ÷ÓÃ::HI_SVR_PLAYER_Play½Ó¿ÚÖØÐÂ²¥·ÅÐÂµÄÊý¾ÝÔ´£¬ÐÂÊý¾ÝÔ´¾ä±úÍ¨¹ýµ÷ÓÃ::HI_SVR_FORMAT_Openº¯Êý´´½¨CNend
-\param[in] hPlayer player handle. CNcomment:²¥·ÅÆ÷¾ä±úCNend
-\param[in] hFormat The handle of the new demux source. CNcomment:ÐÂÊý¾ÝÔ´¾ä±úCNend
+CNcomment:ï¿½ï¿½ï¿½ï¿½::HI_SVR_PLAYER_StopÍ£Ö¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ó£¬µï¿½ï¿½Ã¸Ã½Ó¿ï¿½ï¿½ï¿½ï¿½Â°ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½::HI_SVR_PLAYER_Playï¿½Ó¿ï¿½ï¿½ï¿½ï¿½Â²ï¿½ï¿½ï¿½ï¿½Âµï¿½ï¿½ï¿½ï¿½ï¿½Ô´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô´ï¿½ï¿½ï¿½Í¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½::HI_SVR_FORMAT_Openï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½CNend
+\param[in] hPlayer player handle. CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½CNend
+\param[in] hFormat The handle of the new demux source. CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô´ï¿½ï¿½ï¿½CNend
 
-\retval ::HI_SUCCESS The new demux source is set successfully. The ::HI_SVR_PLAYER_Play interface can be called to start playing the file. CNcomment:ÐÂÊý¾ÝÔ´ÉèÖÃ³É¹¦£¬´ËÊ±µ÷ÓÃ::HI_SVR_PLAYER_Play½Ó¿Ú¿ÉÒÔ¿ªÊ¼²¥·ÅCNend
-\retval ::HI_FAILURE The new demux source fails to be set. CNcomment:ÐÂÊý¾ÝÔ´ÉèÖÃÊ§°ÜCNend
+\retval ::HI_SUCCESS The new demux source is set successfully. The ::HI_SVR_PLAYER_Play interface can be called to start playing the file. CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô´ï¿½ï¿½ï¿½Ã³É¹ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½::HI_SVR_PLAYER_Playï¿½Ó¿Ú¿ï¿½ï¿½Ô¿ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½CNend
+\retval ::HI_FAILURE The new demux source fails to be set. CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô´ï¿½ï¿½ï¿½ï¿½Ê§ï¿½ï¿½CNend
 
 \see \n
 None.
@@ -414,14 +414,14 @@ None.
 HI_S32 HI_SVR_PLAYER_SetSource(HI_HANDLE hPlayer, HI_HANDLE hFormat);
 
 /**
-\brief Destroy a player instance. CNcomment:Ïú»ÙÒ»¸ö²¥·ÅÆ÷ÊµÀýCNend
+\brief Destroy a player instance. CNcomment:ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Êµï¿½ï¿½CNend
 \attention \n
 The HI_S32 HI_SVR_PLAYER_Destroy interface is called to destroy the player resource after the ::HI_SVR_PLAYER_Create interface is called to create a player.
-CNcomment:µ÷ÓÃ::HI_SVR_PLAYER_Create´´½¨²¥·ÅÆ÷ºó£¬µ÷ÓÃ¸Ã½Ó¿ÚÏú»Ù²¥·ÅÆ÷×ÊÔ´CNend
-\param[in] hPlayer player handle. CNcomment:²¥·ÅÆ÷¾ä±úCNend
+CNcomment:ï¿½ï¿½ï¿½ï¿½::HI_SVR_PLAYER_Createï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ó£¬µï¿½ï¿½Ã¸Ã½Ó¿ï¿½ï¿½ï¿½ï¿½Ù²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô´CNend
+\param[in] hPlayer player handle. CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½CNend
 
-\retval ::HI_SUCCESS The player is released successfully. CNcomment:²¥·ÅÆ÷ÊÍ·Å³É¹¦CNend
-\retval ::HI_FAILURE The operation is invalid. CNcomment:·Ç·¨²Ù×÷CNend
+\retval ::HI_SUCCESS The player is released successfully. CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í·Å³É¹ï¿½CNend
+\retval ::HI_FAILURE The operation is invalid. CNcomment:ï¿½Ç·ï¿½ï¿½ï¿½ï¿½ï¿½CNend
 
 \see \n
 None.
@@ -429,7 +429,7 @@ None.
 HI_S32 HI_SVR_PLAYER_Destroy(HI_HANDLE hPlayer);
 
 /**
-\brief Set player parameters. CNcomment:ÉèÖÃ²¥·ÅÆ÷²ÎÊýCNend
+\brief Set player parameters. CNcomment:ï¿½ï¿½ï¿½Ã²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½CNend
 \attention \n
 The following operations are supported:
 The ::HI_SVR_PLAYER_ATTR_STREAMID interface can be used to set the ID of the stream to be played. It can be called to set the audio streams to be played for
@@ -438,19 +438,19 @@ Calling the HI_SVR_PLAYER_SetParam interface is an asynchronous operation during
 after the SetMedia operation is performed prior to playing. Values returned by the interface cannot be used to check whether the operation is successful.
 The player notifies the application (APP) of the stream ID setting status by using the ::HI_SVR_PLAYER_EVENT_STREAMID_CHANGED event. The event parameter is ::
 HI_SVR_PLAYER_STREAMID_S.
-CNcomment:¸Ã½Ó¿Ú±ØÐëÔÚµ÷ÓÃ::HI_SVR_PLAYER_SetMedia½Ó¿Úºóµ÷ÓÃCNend
-CNcomment:Ö§³ÖµÄ²Ù×÷ÈçÏÂ
-::HI_SVR_PLAYER_ATTR_STREAMID : ÉèÖÃ²¥·ÅµÄÁ÷id£¬¶ÔÓÚµ¥ÊÓÆµ¡¢¶àÒôÆµÎÄ¼þ£¬¿ÉÒÔÍ¨¹ý¸Ã²Ù×÷ÉèÖÃÒª²¥·ÅµÄÒôÆµÁ÷\n
-²¥·Å¹ý³ÌÖÐµ÷ÓÃ¸Ã½Ó¿ÚÎªÒì²½²Ù×÷£¬²¥·ÅÇ°£¬SetMediaºóµ÷ÓÃ¸Ã½Ó¿ÚÎªÍ¬²½²Ù×÷£¬Òì²½²Ù×÷²»ÄÜÍ¨¹ý½Ó¿Ú·µ»ØÖµÀ´ÅÐ¶Ï\n
-Á÷idÊÇ·ñÉèÖÃ³É¹¦£¬²¥·ÅÆ÷»áÍ¨¹ý::HI_SVR_PLAYER_EVENT_STREAMID_CHANGEDÊÂ¼þÍ¨Öªapp£¬ÊÂ¼þ²ÎÊýÎª::HI_SVR_PLAYER_STREAMID_S¡£\n
-::HI_SVR_PLAYER_ATTR_SYNC : ÉèÖÃÒôÊÓÆµ¡¢×ÖÄ»Á÷Ê±¼ä´ÁÆ«ÒÆ£¬HiPlayer¶ÁÈ¡ÒôÊÓÆµÖ¡ºó½«Ê±¼ä´Á¼ÓÉÏÉèÖÃµÄÆ«ÒÆÖµÔÙÓÃÓÚÍ¬²½CNend
+CNcomment:ï¿½Ã½Ó¿Ú±ï¿½ï¿½ï¿½ï¿½Úµï¿½ï¿½ï¿½::HI_SVR_PLAYER_SetMediaï¿½Ó¿Úºï¿½ï¿½ï¿½ï¿½CNend
+CNcomment:Ö§ï¿½ÖµÄ²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+::HI_SVR_PLAYER_ATTR_STREAMID : ï¿½ï¿½ï¿½Ã²ï¿½ï¿½Åµï¿½ï¿½ï¿½idï¿½ï¿½ï¿½ï¿½ï¿½Úµï¿½ï¿½ï¿½Æµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æµï¿½Ä¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¨ï¿½ï¿½ï¿½Ã²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½ï¿½Åµï¿½ï¿½ï¿½Æµï¿½ï¿½\n
+ï¿½ï¿½ï¿½Å¹ï¿½ï¿½ï¿½ï¿½Ðµï¿½ï¿½Ã¸Ã½Ó¿ï¿½Îªï¿½ì²½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç°ï¿½ï¿½SetMediaï¿½ï¿½ï¿½ï¿½Ã¸Ã½Ó¿ï¿½ÎªÍ¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ì²½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¨ï¿½ï¿½ï¿½Ó¿Ú·ï¿½ï¿½ï¿½Öµï¿½ï¿½ï¿½Ð¶ï¿½\n
+ï¿½ï¿½idï¿½Ç·ï¿½ï¿½ï¿½ï¿½Ã³É¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¨ï¿½ï¿½::HI_SVR_PLAYER_EVENT_STREAMID_CHANGEDï¿½Â¼ï¿½Í¨Öªappï¿½ï¿½ï¿½Â¼ï¿½ï¿½ï¿½ï¿½ï¿½Îª::HI_SVR_PLAYER_STREAMID_Sï¿½ï¿½\n
+::HI_SVR_PLAYER_ATTR_SYNC : ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æµï¿½ï¿½ï¿½ï¿½Ä»ï¿½ï¿½Ê±ï¿½ï¿½ï¿½Æ«ï¿½Æ£ï¿½HiPlayerï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ÆµÖ¡ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ãµï¿½Æ«ï¿½ï¿½Öµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¬ï¿½ï¿½CNend
 
-\param[in] hPlayer player handle. CNcomment:²¥·ÅÆ÷¾ä±úCNend
-\param[in] eAttrId ID of the player parameter to be set. CNcomment:ÒªÉèÖÃµÄ²¥·ÅÆ÷²ÎÊýID CNend
-\param[in] pArg player parameter to be set. CNcomment:ÒªÉèÖÃµÄ²¥·ÅÆ÷²ÎÊýCNend
+\param[in] hPlayer player handle. CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½CNend
+\param[in] eAttrId ID of the player parameter to be set. CNcomment:Òªï¿½ï¿½ï¿½ÃµÄ²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ID CNend
+\param[in] pArg player parameter to be set. CNcomment:Òªï¿½ï¿½ï¿½ÃµÄ²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½CNend
 
-\retval ::HI_SUCCESS Parameters are set successfully. CNcomment:²ÎÊýÉèÖÃ³É¹¦CNend
-\retval ::HI_FAILURE The operation fails. CNcomment:²Ù×÷Ê§°ÜCNend
+\retval ::HI_SUCCESS Parameters are set successfully. CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã³É¹ï¿½CNend
+\retval ::HI_FAILURE The operation fails. CNcomment:ï¿½ï¿½ï¿½ï¿½Ê§ï¿½ï¿½CNend
 
 \see \n
 None.
@@ -458,7 +458,7 @@ None.
 HI_S32 HI_SVR_PLAYER_SetParam(HI_HANDLE hPlayer, HI_SVR_PLAYER_ATTR_E eAttrId, const HI_VOID *pArg);
 
 /**
-\brief Obtain player parameters. CNcomment:»ñÈ¡²¥·ÅÆ÷²ÎÊýCNend
+\brief Obtain player parameters. CNcomment:ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½CNend
 \attention \n
 This interface must be called after the ::HI_SVR_PLAYER_SetMedia interface is called.
 The following operations are supported:
@@ -468,20 +468,20 @@ The following operations are supported:
 ::HI_SVR_PLAYER_ATTR_SO_HDL: Obtain the SO module handle created by the player.
 ::HI_SVR_PLAYER_ATTR_AUDTRACK_HDL:Obtain the audio track handle created by the player.
 
-CNcomment:¸Ã½Ó¿Ú±ØÐëÔÚµ÷ÓÃ::HI_SVR_PLAYER_SetMedia½Ó¿Úºóµ÷ÓÃ
-Ö§³ÖµÄ²Ù×÷ÈçÏÂ
-::HI_SVR_PLAYER_ATTR_STREAMID :»ñÈ¡µ±Ç°²¥·ÅµÄÁ÷id
-::HI_SVR_PLAYER_ATTR_WINDOW_HDL :»ñÈ¡²¥·ÅÆ÷´´½¨µÄwindow¾ä±ú
-::HI_SVR_PLAYER_ATTR_AVPLAYER_HDL :»ñÈ¡²¥·ÅÆ÷´´½¨µÄavplay¾ä±ú
-::HI_SVR_PLAYER_ATTR_SO_HDL :»ñÈ¡²¥·ÅÆ÷´´½¨µÄ×ÖÄ»Êä³öÄ£¿é(so)¾ä±ú
-::HI_SVR_PLAYER_ATTR_AUDTRACK_HDL :»ñÈ¡²¥·ÅÆ÷´´½¨µÄÒôÆµtrack id CNend
+CNcomment:ï¿½Ã½Ó¿Ú±ï¿½ï¿½ï¿½ï¿½Úµï¿½ï¿½ï¿½::HI_SVR_PLAYER_SetMediaï¿½Ó¿Úºï¿½ï¿½ï¿½ï¿½
+Ö§ï¿½ÖµÄ²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+::HI_SVR_PLAYER_ATTR_STREAMID :ï¿½ï¿½È¡ï¿½ï¿½Ç°ï¿½ï¿½ï¿½Åµï¿½ï¿½ï¿½id
+::HI_SVR_PLAYER_ATTR_WINDOW_HDL :ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½windowï¿½ï¿½ï¿½
+::HI_SVR_PLAYER_ATTR_AVPLAYER_HDL :ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½avplayï¿½ï¿½ï¿½
+::HI_SVR_PLAYER_ATTR_SO_HDL :ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä»ï¿½ï¿½ï¿½Ä£ï¿½ï¿½(so)ï¿½ï¿½ï¿½
+::HI_SVR_PLAYER_ATTR_AUDTRACK_HDL :ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æµtrack id CNend
 
-\param[in] hPlayer player handle. CNcomment:²¥·ÅÆ÷¾ä±úCNend
-\param[in] eAttrId player parameter ID. CNcomment:²¥·ÅÆ÷²ÎÊýID CNend
-\param[out] pArg obtained player parameters. CNcomment:»ñÈ¡µÄ²¥·ÅÆ÷²ÎÊýCNend
+\param[in] hPlayer player handle. CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½CNend
+\param[in] eAttrId player parameter ID. CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ID CNend
+\param[out] pArg obtained player parameters. CNcomment:ï¿½ï¿½È¡ï¿½Ä²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½CNend
 
-\retval ::HI_SUCCESS Parameters are obtained successfully. CNcomment:»ñÈ¡²ÎÊý³É¹¦CNend
-\retval ::HI_FAILURE The operation fails. CNcomment:²Ù×÷Ê§°ÜCNend
+\retval ::HI_SUCCESS Parameters are obtained successfully. CNcomment:ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½É¹ï¿½CNend
+\retval ::HI_FAILURE The operation fails. CNcomment:ï¿½ï¿½ï¿½ï¿½Ê§ï¿½ï¿½CNend
 
 \see \n
 None.
@@ -489,15 +489,15 @@ None.
 HI_S32 HI_SVR_PLAYER_GetParam(HI_HANDLE hPlayer, HI_SVR_PLAYER_ATTR_E eAttrId, HI_VOID *pArg);
 
 /**
-\brief Register a player event callback function. CNcomment:×¢²á²¥·ÅÆ÷ÊÂ¼þ»Øµ÷º¯ÊýCNend
+\brief Register a player event callback function. CNcomment:×¢ï¿½á²¥ï¿½ï¿½ï¿½ï¿½ï¿½Â¼ï¿½ï¿½Øµï¿½ï¿½ï¿½ï¿½ï¿½CNend
 \attention \n
 This interface must be called after the ::HI_SVR_PLAYER_Create interface is called. This interface is unrelated to the player status. This function cannot be called in any player callback event.
-CNcomment:¸Ãº¯Êý±ØÐëÔÚµ÷ÓÃ::HI_SVR_PLAYER_Create½Ó¿Úºóµ÷ÓÃ£¬¸Ã½Ó¿ÚÓë²¥·ÅÆ÷×´Ì¬ÎÞ¹Ø£¬¸Ãº¯Êý²»ÄÜÔÚplayerÈÎºÎ»Øµ÷ÊÂ¼þÖÐµ÷ÓÃCNend
-\param[in] hPlayer player handle. CNcomment:²¥·ÅÆ÷¾ä±úCNend
-\param[in] pfnCallback player event callback function. The callback function definition is ::HI_SVR_PLAYER_EVENT_FN. CNcomment:²¥·ÅÆ÷ÊÂ¼þ»Øµ÷º¯Êý£¬»Øµ÷º¯Êý¶¨Òå::HI_SVR_PLAYER_EVENT_FN CNend
+CNcomment:ï¿½Ãºï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Úµï¿½ï¿½ï¿½::HI_SVR_PLAYER_Createï¿½Ó¿Úºï¿½ï¿½ï¿½Ã£ï¿½ï¿½Ã½Ó¿ï¿½ï¿½ë²¥ï¿½ï¿½ï¿½ï¿½×´Ì¬ï¿½Þ¹Ø£ï¿½ï¿½Ãºï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½playerï¿½ÎºÎ»Øµï¿½ï¿½Â¼ï¿½ï¿½Ðµï¿½ï¿½ï¿½CNend
+\param[in] hPlayer player handle. CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½CNend
+\param[in] pfnCallback player event callback function. The callback function definition is ::HI_SVR_PLAYER_EVENT_FN. CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â¼ï¿½ï¿½Øµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Øµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½::HI_SVR_PLAYER_EVENT_FN CNend
 
-\retval ::HI_SUCCESS The registration is successful. CNcomment:×¢²á³É¹¦CNend
-\retval ::HI_FAILURE The registration fails. CNcomment:ÉèÖÃÊ§°ÜCNend
+\retval ::HI_SUCCESS The registration is successful. CNcomment:×¢ï¿½ï¿½É¹ï¿½CNend
+\retval ::HI_FAILURE The registration fails. CNcomment:ï¿½ï¿½ï¿½ï¿½Ê§ï¿½ï¿½CNend
 
 \see \n
 None.
@@ -505,20 +505,20 @@ None.
 HI_S32 HI_SVR_PLAYER_RegCallback(HI_HANDLE hPlayer, HI_SVR_PLAYER_EVENT_FN pfnCallback);
 
 /**
-\brief Start playing. CNcomment:¿ªÊ¼²¥·ÅCNend
+\brief Start playing. CNcomment:ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½CNend
 \attention \n
 This interface is an asynchronous interface. It must be called after the ::HI_SVR_PLAYER_SetMedia interface is called. If this interface is called after successful playing, HI_SUCCESS is returned. \n
 Values returned by this interface cannot be used to check whether the playing is successful. The player notifies the APP of playing success or failure by using the ::HI_SVR_PLAYER_EVENT_STATE_CHANGED event. \n
 The event parameter value is ::HI_SVR_PLAYER_STATE_PLAY.This interface can be called to restart playing after the playing stops.
 
-CNcomment:Òì²½½Ó¿Ú£¬¸Ã½Ó¿Ú±ØÐëÔÚµ÷ÓÃ::HI_SVR_PLAYER_SetMedia½Ó¿Úºóµ÷ÓÃ£¬²¥·Å³É¹¦ºóÔÙµ÷ÓÃ¸Ã½Ó¿Ú·µ»ØHI_SUCCESS£¬\n
-²»ÄÜÍ¨¹ý¸Ã½Ó¿Ú·µ»ØÖµÀ´ÅÐ¶Ï²¥·ÅÆ÷ÊÇ·ñ²¥·Å³É¹¦£¬²¥·ÅÆ÷»áÍ¨¹ý::HI_SVR_PLAYER_EVENT_STATE_CHANGED ÊÂ¼þÍ¨Öª\n
-app²¥·Å³É¹¦£¬ÊÂ¼þ²ÎÊýÖµÎª::HI_SVR_PLAYER_STATE_PLAY¡£Í£Ö¹²¥·Åºó£¬¿ÉÒÔµ÷ÓÃ¸Ã½Ó¿ÚÖØÐÂ²¥·ÅCNend
+CNcomment:ï¿½ì²½ï¿½Ó¿Ú£ï¿½ï¿½Ã½Ó¿Ú±ï¿½ï¿½ï¿½ï¿½Úµï¿½ï¿½ï¿½::HI_SVR_PLAYER_SetMediaï¿½Ó¿Úºï¿½ï¿½ï¿½Ã£ï¿½ï¿½ï¿½ï¿½Å³É¹ï¿½ï¿½ï¿½ï¿½Ùµï¿½ï¿½Ã¸Ã½Ó¿Ú·ï¿½ï¿½ï¿½HI_SUCCESSï¿½ï¿½\n
+ï¿½ï¿½ï¿½ï¿½Í¨ï¿½ï¿½ï¿½Ã½Ó¿Ú·ï¿½ï¿½ï¿½Öµï¿½ï¿½ï¿½Ð¶Ï²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ñ²¥·Å³É¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¨ï¿½ï¿½::HI_SVR_PLAYER_EVENT_STATE_CHANGED ï¿½Â¼ï¿½Í¨Öª\n
+appï¿½ï¿½ï¿½Å³É¹ï¿½ï¿½ï¿½ï¿½Â¼ï¿½ï¿½ï¿½ï¿½ï¿½ÖµÎª::HI_SVR_PLAYER_STATE_PLAYï¿½ï¿½Í£Ö¹ï¿½ï¿½ï¿½Åºó£¬¿ï¿½ï¿½Ôµï¿½ï¿½Ã¸Ã½Ó¿ï¿½ï¿½ï¿½ï¿½Â²ï¿½ï¿½ï¿½CNend
 
-\param[in] hPlayer player handle. CNcomment:²¥·ÅÆ÷¾ä±úCNend
+\param[in] hPlayer player handle. CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½CNend
 
-\retval ::HI_SUCCESS The operation is valid. CNcomment:ºÏ·¨²Ù×÷CNend
-\retval ::HI_FAILURE The operation is invalid. CNcomment:·Ç·¨²Ù×÷CNend
+\retval ::HI_SUCCESS The operation is valid. CNcomment:ï¿½Ï·ï¿½ï¿½ï¿½ï¿½ï¿½CNend
+\retval ::HI_FAILURE The operation is invalid. CNcomment:ï¿½Ç·ï¿½ï¿½ï¿½ï¿½ï¿½CNend
 
 \see \n
 None.
@@ -526,20 +526,20 @@ None.
 HI_S32 HI_SVR_PLAYER_Play(HI_HANDLE hPlayer);
 
 /**
-\brief Stop playing. CNcomment:Í£Ö¹²¥·ÅCNend
+\brief Stop playing. CNcomment:Í£Ö¹ï¿½ï¿½ï¿½ï¿½CNend
 \attention \n
 This interface is an asynchronous interface. It can be called to stop playing during playing, fast forward, rewind, and pause. Values returned by this interface cannot be used to check whether playing is stopped successfully. \n
 The player notifies the APP of stop success or failure by using the ::HI_SVR_PLAYER_EVENT_STATE_CHANGED event. The event parameter value is ::HI_SVR_PLAYER_STATE_STOP. \n
 The ::HI_SVR_PLAYER_Play interface can be called to restart playing after playing is stopped.
 
-CNcomment:Òì²½½Ó¿Ú£¬²¥·Å¡¢¿ì½ø¡¢¿ìÍË¡¢ÔÝÍ£¹ý³ÌÖÐ¶¼¿ÉÒÔµ÷ÓÃ¸Ã½Ó¿ÚÍ£Ö¹²¥·Å£¬²»ÄÜÍ¨¹ý¸Ã½Ó¿Ú·µ»ØÖµÀ´ÅÐ¶Ï²¥·ÅÆ÷\n
-ÊÇ·ñÍ£Ö¹³É¹¦£¬²¥·ÅÆ÷»áÍ¨¹ý::HI_SVR_PLAYER_EVENT_STATE_CHANGED ÊÂ¼þÍ¨ÖªappÍ£Ö¹³É¹¦£¬ÊÂ¼þ²ÎÊýÖµÎª::HI_SVR_PLAYER_STATE_STOP¡£\n
-Í£Ö¹²¥·Åºó£¬¿ÉÒÔµ÷ÓÃ::HI_SVR_PLAYER_Play½Ó¿ÚÖØÐÂ²¥·ÅCNend
+CNcomment:ï¿½ì²½ï¿½Ó¿Ú£ï¿½ï¿½ï¿½ï¿½Å¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ë¡ï¿½ï¿½ï¿½Í£ï¿½ï¿½ï¿½ï¿½ï¿½Ð¶ï¿½ï¿½ï¿½ï¿½Ôµï¿½ï¿½Ã¸Ã½Ó¿ï¿½Í£Ö¹ï¿½ï¿½ï¿½Å£ï¿½ï¿½ï¿½ï¿½ï¿½Í¨ï¿½ï¿½ï¿½Ã½Ó¿Ú·ï¿½ï¿½ï¿½Öµï¿½ï¿½ï¿½Ð¶Ï²ï¿½ï¿½ï¿½ï¿½ï¿½\n
+ï¿½Ç·ï¿½Í£Ö¹ï¿½É¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¨ï¿½ï¿½::HI_SVR_PLAYER_EVENT_STATE_CHANGED ï¿½Â¼ï¿½Í¨ÖªappÍ£Ö¹ï¿½É¹ï¿½ï¿½ï¿½ï¿½Â¼ï¿½ï¿½ï¿½ï¿½ï¿½ÖµÎª::HI_SVR_PLAYER_STATE_STOPï¿½ï¿½\n
+Í£Ö¹ï¿½ï¿½ï¿½Åºó£¬¿ï¿½ï¿½Ôµï¿½ï¿½ï¿½::HI_SVR_PLAYER_Playï¿½Ó¿ï¿½ï¿½ï¿½ï¿½Â²ï¿½ï¿½ï¿½CNend
 
-\param[in] hPlayer player handle. CNcomment:²¥·ÅÆ÷¾ä±úCNend
+\param[in] hPlayer player handle. CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½CNend
 
-\retval ::HI_SUCCESS The operation is valid. CNcomment:ºÏ·¨²Ù×÷CNend
-\retval ::HI_FAILURE The operation is invalid. CNcomment:·Ç·¨²Ù×÷CNend
+\retval ::HI_SUCCESS The operation is valid. CNcomment:ï¿½Ï·ï¿½ï¿½ï¿½ï¿½ï¿½CNend
+\retval ::HI_FAILURE The operation is invalid. CNcomment:ï¿½Ç·ï¿½ï¿½ï¿½ï¿½ï¿½CNend
 
 \see \n
 None.
@@ -547,19 +547,19 @@ None.
 HI_S32 HI_SVR_PLAYER_Stop(HI_HANDLE hPlayer);
 
 /**
-\brief Pause playing.  CNcomment:ÔÝÍ£²¥·ÅCNend
+\brief Pause playing.  CNcomment:ï¿½ï¿½Í£ï¿½ï¿½ï¿½ï¿½CNend
 \attention \n
 This interface is an asynchronous interface. It can be called to pause playing but cannot be called during fast forward and rewind. Values returned by this interface cannot be used to check whether playing is paused successfully. \n
 The player notifies the APP of pause success or failure by using the ::HI_SVR_PLAYER_EVENT_STATE_CHANGED event. The event parameter value is ::HI_SVR_PLAYER_STATE_PAUSE. \n
 The ::HI_SVR_PLAYER_Resume interface can be called to resume playing after a successful pause.
-CNcomment:Òì²½½Ó¿Ú£¬²¥·Å¹ý³ÌÖÐ¿ÉÒÔµ÷ÓÃ¸Ã½Ó¿ÚÔÝÍ£²¥·Å£¬¿ì½ø¡¢¿ìÍË×´Ì¬ÏÂ²»ÄÜµ÷ÓÃ¸Ã½Ó¿Ú£¬²»ÄÜÍ¨¹ý¸Ã½Ó¿Ú·µ»ØÖµÀ´ÅÐ¶Ï²¥·ÅÆ÷\n
-ÊÇ·ñÔÝÍ£³É¹¦£¬²¥·ÅÆ÷»áÍ¨¹ý::HI_SVR_PLAYER_EVENT_STATE_CHANGED ÊÂ¼þÍ¨ÖªappÍ£Ö¹³É¹¦£¬ÊÂ¼þ²ÎÊýÖµÎª::HI_SVR_PLAYER_STATE_PAUSE¡£\n
-ÔÝÍ£³É¹¦ºó£¬¿ÉÒÔµ÷ÓÃ::HI_SVR_PLAYER_Resume¼ÌÐø²¥·ÅCNend
+CNcomment:ï¿½ì²½ï¿½Ó¿Ú£ï¿½ï¿½ï¿½ï¿½Å¹ï¿½ï¿½ï¿½ï¿½Ð¿ï¿½ï¿½Ôµï¿½ï¿½Ã¸Ã½Ó¿ï¿½ï¿½ï¿½Í£ï¿½ï¿½ï¿½Å£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×´Ì¬ï¿½Â²ï¿½ï¿½Üµï¿½ï¿½Ã¸Ã½Ó¿Ú£ï¿½ï¿½ï¿½ï¿½ï¿½Í¨ï¿½ï¿½ï¿½Ã½Ó¿Ú·ï¿½ï¿½ï¿½Öµï¿½ï¿½ï¿½Ð¶Ï²ï¿½ï¿½ï¿½ï¿½ï¿½\n
+ï¿½Ç·ï¿½ï¿½ï¿½Í£ï¿½É¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¨ï¿½ï¿½::HI_SVR_PLAYER_EVENT_STATE_CHANGED ï¿½Â¼ï¿½Í¨ÖªappÍ£Ö¹ï¿½É¹ï¿½ï¿½ï¿½ï¿½Â¼ï¿½ï¿½ï¿½ï¿½ï¿½ÖµÎª::HI_SVR_PLAYER_STATE_PAUSEï¿½ï¿½\n
+ï¿½ï¿½Í£ï¿½É¹ï¿½ï¿½ó£¬¿ï¿½ï¿½Ôµï¿½ï¿½ï¿½::HI_SVR_PLAYER_Resumeï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½CNend
 
-\param[in] hPlayer player handle. CNcomment:²¥·ÅÆ÷¾ä±úCNend
+\param[in] hPlayer player handle. CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½CNend
 
-\retval ::HI_SUCCESS The operation is valid. CNcomment:ºÏ·¨²Ù×÷CNend
-\retval ::HI_FAILURE The operation is invalid. CNcomment:·Ç·¨²Ù×÷CNend
+\retval ::HI_SUCCESS The operation is valid. CNcomment:ï¿½Ï·ï¿½ï¿½ï¿½ï¿½ï¿½CNend
+\retval ::HI_FAILURE The operation is invalid. CNcomment:ï¿½Ç·ï¿½ï¿½ï¿½ï¿½ï¿½CNend
 
 \see \n
 None.
@@ -567,18 +567,18 @@ None.
 HI_S32 HI_SVR_PLAYER_Pause(HI_HANDLE hPlayer);
 
 /**
-\brief Resume playing. CNcomment:»Ö¸´²¥·ÅCNend
+\brief Resume playing. CNcomment:ï¿½Ö¸ï¿½ï¿½ï¿½ï¿½ï¿½CNend
 \attention \n
 This interface is an asynchronous interface. It can be called to resume playing during pause, fast forward, and rewind. Values returned by this interface cannot be used to check whether playing is resumed successfully. \n
 The player notifies the APP of resumption success or failure by using the ::HI_SVR_PLAYER_EVENT_STATE_CHANGED event. The event parameter value is ::HI_SVR_PLAYER_STATE_PLAY.
 
-CNcomment:Òì²½½Ó¿Ú£¬ÔÝÍ£¡¢¿ì½ø¡¢¿ìÍË×´Ì¬ÏÂ£¬µ÷ÓÃ¸Ã½Ó¿Ú»Ö¸´Õý³£²¥·Å£¬²»ÄÜÍ¨¹ý¸Ã½Ó¿Ú·µ»ØÖµÀ´ÅÐ¶Ï²¥·ÅÆ÷ÊÇ·ñ»Ö¸´²¥·Å\n
-²¥·ÅÆ÷»áÍ¨¹ý::HI_SVR_PLAYER_EVENT_STATE_CHANGED ÊÂ¼þÍ¨Öªapp»Ö¸´³É¹¦£¬ÊÂ¼þ²ÎÊýÖµÎª::HI_SVR_PLAYER_STATE_PLAY¡£CNend
+CNcomment:ï¿½ì²½ï¿½Ó¿Ú£ï¿½ï¿½ï¿½Í£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×´Ì¬ï¿½Â£ï¿½ï¿½ï¿½ï¿½Ã¸Ã½Ó¿Ú»Ö¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Å£ï¿½ï¿½ï¿½ï¿½ï¿½Í¨ï¿½ï¿½ï¿½Ã½Ó¿Ú·ï¿½ï¿½ï¿½Öµï¿½ï¿½ï¿½Ð¶Ï²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½Ö¸ï¿½ï¿½ï¿½ï¿½ï¿½\n
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¨ï¿½ï¿½::HI_SVR_PLAYER_EVENT_STATE_CHANGED ï¿½Â¼ï¿½Í¨Öªappï¿½Ö¸ï¿½ï¿½É¹ï¿½ï¿½ï¿½ï¿½Â¼ï¿½ï¿½ï¿½ï¿½ï¿½ÖµÎª::HI_SVR_PLAYER_STATE_PLAYï¿½ï¿½CNend
 
-\param[in] hPlayer player handle. CNcomment:²¥·ÅÆ÷¾ä±úCNend
+\param[in] hPlayer player handle. CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½CNend
 
-\retval ::HI_SUCCESS The operation is valid. CNcomment:ºÏ·¨²Ù×÷CNend
-\retval ::HI_FAILURE The operation is invalid. CNcomment:·Ç·¨²Ù×÷CNend
+\retval ::HI_SUCCESS The operation is valid. CNcomment:ï¿½Ï·ï¿½ï¿½ï¿½ï¿½ï¿½CNend
+\retval ::HI_FAILURE The operation is invalid. CNcomment:ï¿½Ç·ï¿½ï¿½ï¿½ï¿½ï¿½CNend
 
 \see \n
 None.
@@ -586,7 +586,7 @@ None.
 HI_S32 HI_SVR_PLAYER_Resume(HI_HANDLE hPlayer);
 
 /**
-\brief Fast forward and rewind. CNcomment:¿ì½ø¡¢¿ìÍËCNend
+\brief Fast forward and rewind. CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½CNend
 \attention \n
 This interface is an asynchronous interface. It must be called in play, pause or tplay status. The negative value of s32Speed indicates rewind and the
 positive value of s32Speed indicates fast forward. Values returned by the interface cannot be used to check whether the fast forward or rewind is successful.
@@ -594,16 +594,16 @@ positive value of s32Speed indicates fast forward. Values returned by the interf
 The player notifies the APP of the fast forward or rewind status by using the ::HI_SVR_PLAYER_EVENT_STATE_CHANGED event. \n
 The event parameter value is ::HI_SVR_PLAYER_STATE_FORWARD or ::HI_SVR_PLAYER_STATE_BACKWARD. The ::HI_SVR_PLAYER_Resume interface can be called to \n
 resume normal playing after fast forward or rewind.
-CNcomment:Òì²½½Ó¿Ú£¬¸Ãº¯Êý±ØÐë²¥·Å¡¢ÔÝÍ£»ò¿ì½ø/¿ìÍË×´Ì¬ÏÂµ÷ÓÃ£¬s32SpeedÎª¸º±íÊ¾¿ìÍË£¬ÎªÕý±íÊ¾¿ì½ø£¬²»ÄÜÍ¨¹ý¸Ã½Ó¿Ú\n
-·µ»ØÖµÀ´ÅÐ¶ÏÊÇ·ñ¿ì½ø»ò¿ìÍË³É¹¦£¬²¥·ÅÆ÷»áÍ¨¹ý::HI_SVR_PLAYER_EVENT_STATE_CHANGED ÊÂ¼þÍ¨Öªapp£¬ÊÂ¼þ²ÎÊýÖµÎª\n
-::HI_SVR_PLAYER_STATE_FORWARD»ò::HI_SVR_PLAYER_STATE_BACKWARD£¬¿ì½ø¡¢¿ìÍËºóÍ¨¹ýµ÷ÓÃ::HI_SVR_PLAYER_Resume\n
-½Ó¿Ú»Ö¸´Õý³£²¥·Å¡£CNend
+CNcomment:ï¿½ì²½ï¿½Ó¿Ú£ï¿½ï¿½Ãºï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ë²¥ï¿½Å¡ï¿½ï¿½ï¿½Í£ï¿½ï¿½ï¿½ï¿½/ï¿½ï¿½ï¿½ï¿½×´Ì¬ï¿½Âµï¿½ï¿½Ã£ï¿½s32SpeedÎªï¿½ï¿½ï¿½ï¿½Ê¾ï¿½ï¿½ï¿½Ë£ï¿½Îªï¿½ï¿½ï¿½ï¿½Ê¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¨ï¿½ï¿½ï¿½Ã½Ó¿ï¿½\n
+ï¿½ï¿½ï¿½ï¿½Öµï¿½ï¿½ï¿½Ð¶ï¿½ï¿½Ç·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ë³É¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¨ï¿½ï¿½::HI_SVR_PLAYER_EVENT_STATE_CHANGED ï¿½Â¼ï¿½Í¨Öªappï¿½ï¿½ï¿½Â¼ï¿½ï¿½ï¿½ï¿½ï¿½ÖµÎª\n
+::HI_SVR_PLAYER_STATE_FORWARDï¿½ï¿½::HI_SVR_PLAYER_STATE_BACKWARDï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ëºï¿½Í¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½::HI_SVR_PLAYER_Resume\n
+ï¿½Ó¿Ú»Ö¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Å¡ï¿½CNend
 
-\param[in] hPlayer player handle. CNcomment:²¥·ÅÆ÷¾ä±úCNend
-\param[in] s32Speed playing speed. The value is HI_SVR_PLAYER_PLAY_SPEED_E. CNcomment:²¥·Å±¶Êý,ÖµÎªHI_SVR_PLAYER_PLAY_SPEED_E CNend
+\param[in] hPlayer player handle. CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½CNend
+\param[in] s32Speed playing speed. The value is HI_SVR_PLAYER_PLAY_SPEED_E. CNcomment:ï¿½ï¿½ï¿½Å±ï¿½ï¿½ï¿½,ÖµÎªHI_SVR_PLAYER_PLAY_SPEED_E CNend
 
-\retval ::HI_SUCCESS The operation is valid. CNcomment:ºÏ·¨²Ù×÷CNend
-\retval ::HI_FAILURE The operation is invalid. CNcomment:·Ç·¨²Ù×÷CNend
+\retval ::HI_SUCCESS The operation is valid. CNcomment:ï¿½Ï·ï¿½ï¿½ï¿½ï¿½ï¿½CNend
+\retval ::HI_FAILURE The operation is invalid. CNcomment:ï¿½Ç·ï¿½ï¿½ï¿½ï¿½ï¿½CNend
 
 \see \n
 None.
@@ -611,16 +611,16 @@ None.
 HI_S32 HI_SVR_PLAYER_TPlay(HI_HANDLE hPlayer, HI_S32 s32Speed);
 
 /**
-\brief Seek to a specified location for playing. CNcomment:Ìøµ½Ö¸¶¨Î»ÖÃ²¥·ÅCNend
+\brief Seek to a specified location for playing. CNcomment:ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½Î»ï¿½Ã²ï¿½ï¿½ï¿½CNend
 \attention \n
 This interface is an asynchronous interface. It must be called after the ::HI_SVR_PLAYER_SetMedia interface is called. It can be called to jump to a specified time point for playing.
-CNcomment:Òì²½½Ó¿Ú£¬¸Ã½Ó¿Ú±ØÐëÔÚµ÷ÓÃ::HI_SVR_PLAYER_SetMedia½Ó¿Úºóµ÷ÓÃ£¬²¥·Å¡¢Í£Ö¹×´Ì¬ÏÂ£¬µ÷ÓÃ¸Ã½Ó¿ÚÌøµ½Ö¸¶¨Ê±¼äµã²¥·ÅCNend
+CNcomment:ï¿½ì²½ï¿½Ó¿Ú£ï¿½ï¿½Ã½Ó¿Ú±ï¿½ï¿½ï¿½ï¿½Úµï¿½ï¿½ï¿½::HI_SVR_PLAYER_SetMediaï¿½Ó¿Úºï¿½ï¿½ï¿½Ã£ï¿½ï¿½ï¿½ï¿½Å¡ï¿½Í£Ö¹×´Ì¬ï¿½Â£ï¿½ï¿½ï¿½ï¿½Ã¸Ã½Ó¿ï¿½ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½Ê±ï¿½ï¿½ã²¥ï¿½ï¿½CNend
 
-\param[in] hPlayer player handle. CNcomment:²¥·ÅÆ÷¾ä±úCNend
-\param[in] s64TimeInMs seeking time. The unit is ms. CNcomment:seekÊ±¼ä£¬µ¥Î»ms CNend
+\param[in] hPlayer player handle. CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½CNend
+\param[in] s64TimeInMs seeking time. The unit is ms. CNcomment:seekÊ±ï¿½ä£¬ï¿½ï¿½Î»ms CNend
 
-\retval ::HI_SUCCESS The operation is successful. CNcomment:Seek³É¹¦CNend
-\retval ::HI_FAILURE The operation is invalid. CNcomment:·Ç·¨²Ù×÷CNend
+\retval ::HI_SUCCESS The operation is successful. CNcomment:Seekï¿½É¹ï¿½CNend
+\retval ::HI_FAILURE The operation is invalid. CNcomment:ï¿½Ç·ï¿½ï¿½ï¿½ï¿½ï¿½CNend
 
 \see \n
 None.
@@ -628,16 +628,16 @@ None.
 HI_S32 HI_SVR_PLAYER_Seek(HI_HANDLE hPlayer, HI_S64 s64TimeInMs);
 
 /**
-\brief Seek to a specified location for playing. CNcomment:Ìøµ½Ö¸¶¨Î»ÖÃ²¥·ÅCNend
+\brief Seek to a specified location for playing. CNcomment:ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½Î»ï¿½Ã²ï¿½ï¿½ï¿½CNend
 \attention \n
 This interface is an asynchronous interface. It must be called after the ::HI_SVR_PLAYER_SetMedia interface is called. It can be called to jump to a specified file position  for playing.
-CNcomment:Òì²½½Ó¿Ú£¬¸Ã½Ó¿Ú±ØÐëÔÚµ÷ÓÃ::HI_SVR_PLAYER_SetMedia½Ó¿Úºóµ÷ÓÃ£¬²¥·Å¡¢Í£Ö¹×´Ì¬ÏÂ£¬µ÷ÓÃ¸Ã½Ó¿ÚÌøµ½Ö¸¶¨ÎÄ¼þÎ»ÖÃ²¥·ÅCNend
+CNcomment:ï¿½ì²½ï¿½Ó¿Ú£ï¿½ï¿½Ã½Ó¿Ú±ï¿½ï¿½ï¿½ï¿½Úµï¿½ï¿½ï¿½::HI_SVR_PLAYER_SetMediaï¿½Ó¿Úºï¿½ï¿½ï¿½Ã£ï¿½ï¿½ï¿½ï¿½Å¡ï¿½Í£Ö¹×´Ì¬ï¿½Â£ï¿½ï¿½ï¿½ï¿½Ã¸Ã½Ó¿ï¿½ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½ï¿½Ä¼ï¿½Î»ï¿½Ã²ï¿½ï¿½ï¿½CNend
 
-\param[in] hPlayer player handle. CNcomment:²¥·ÅÆ÷¾ä±úCNend
-\param[in] s64Offset offset(in bytes) of the starting position. CNcomment:Ïà¶ÔÎÄ¼þÆðÊ¼Î»ÖÃµÄ×Ö½ÚÆ«ÒÆCNend
+\param[in] hPlayer player handle. CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½CNend
+\param[in] s64Offset offset(in bytes) of the starting position. CNcomment:ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½Ê¼Î»ï¿½Ãµï¿½ï¿½Ö½ï¿½Æ«ï¿½ï¿½CNend
 
-\retval ::HI_SUCCESS The operation is successful. CNcomment:Seek³É¹¦CNend
-\retval ::HI_FAILURE The operation is invalid. CNcomment:·Ç·¨²Ù×÷CNend
+\retval ::HI_SUCCESS The operation is successful. CNcomment:Seekï¿½É¹ï¿½CNend
+\retval ::HI_FAILURE The operation is invalid. CNcomment:ï¿½Ç·ï¿½ï¿½ï¿½ï¿½ï¿½CNend
 
 \see \n
 None.
@@ -645,17 +645,17 @@ None.
 HI_S32 HI_SVR_PLAYER_SeekPos(HI_HANDLE hPlayer, HI_S64 s64Offset);
 
 /**
-\brief Invoke operation. Application expand operation. The player will transparently transmits the invoke to the demux. CNcomment:invoke²Ù×÷£¬appÀ©Õ¹Ê¹ÓÃ£¬player»á½«¸Ã²Ù×÷Í¸´«¸ødemux CNend
+\brief Invoke operation. Application expand operation. The player will transparently transmits the invoke to the demux. CNcomment:invokeï¿½ï¿½ï¿½ï¿½ï¿½ï¿½appï¿½ï¿½Õ¹Ê¹ï¿½Ã£ï¿½playerï¿½á½«ï¿½Ã²ï¿½ï¿½ï¿½Í¸ï¿½ï¿½ï¿½ï¿½demux CNend
 \attention \n
 It must be called after the ::HI_SVR_PLAYER_SetMedia interface is called.
-CNcomment:¸Ã½Ó¿Ú±ØÐëÔÚµ÷ÓÃ::HI_SVR_PLAYER_SetMedia½Ó¿Úºóµ÷ÓÃCNend
+CNcomment:ï¿½Ã½Ó¿Ú±ï¿½ï¿½ï¿½ï¿½Úµï¿½ï¿½ï¿½::HI_SVR_PLAYER_SetMediaï¿½Ó¿Úºï¿½ï¿½ï¿½ï¿½CNend
 
-\param[in] hPlayer player handle. CNcomment:²¥·ÅÆ÷¾ä±úCNend
-\param[in] u32InvokeId Operation ID of application expanding,the type of u32InvokeId is HI_FORMAT_INVOKE_ID_E. CNcomment:appÀ©Õ¹µÄ²Ù×÷id, ²Î¿¼HI_FORMAT_INVOKE_ID_E CNend
-\param[in/out] pArg param of the invoking operation. CNcomment:²Ù×÷²ÎÊýCNend
+\param[in] hPlayer player handle. CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½CNend
+\param[in] u32InvokeId Operation ID of application expanding,the type of u32InvokeId is HI_FORMAT_INVOKE_ID_E. CNcomment:appï¿½ï¿½Õ¹ï¿½Ä²ï¿½ï¿½ï¿½id, ï¿½Î¿ï¿½HI_FORMAT_INVOKE_ID_E CNend
+\param[in/out] pArg param of the invoking operation. CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½CNend
 
-\retval ::HI_SUCCESS The operation is successful. CNcomment:²Ù×÷³É¹¦CNend
-\retval ::HI_FAILURE The operation is invalid. CNcomment:·Ç·¨²Ù×÷CNend
+\retval ::HI_SUCCESS The operation is successful. CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½É¹ï¿½CNend
+\retval ::HI_FAILURE The operation is invalid. CNcomment:ï¿½Ç·ï¿½ï¿½ï¿½ï¿½ï¿½CNend
 
 \see \n
 None.
@@ -664,16 +664,16 @@ HI_S32 HI_SVR_PLAYER_Invoke(HI_HANDLE hPlayer, HI_U32 u32InvokeId, HI_VOID *pArg
 
 /**
 \brief Obtain information about the current open file, such as the file size, playing duration, file bit rate, video width, video height, coding format, frame rate, video bit rate, audio encoding, and audio bit rate.
-CNcomment:»ñÈ¡µ±Ç°´ò¿ªÎÄ¼þÐÅÏ¢£¬ÈçÎÄ¼þ´óÐ¡¡¢ÎÄ¼þ²¥·ÅÊ±³¤¡¢ÂëÂÊµÈ£¬ÊÓÆµ¿í¡¢¸ß£¬±àÂë¸ñÊ½£¬Ö¡ÂÊ¡¢ÂëÂÊ£¬ÒôÆµ±àÂë¡¢ÂëÂÊµÈCNend
+CNcomment:ï¿½ï¿½È¡ï¿½ï¿½Ç°ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½Ð¡ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÊµÈ£ï¿½ï¿½ï¿½Æµï¿½ï¿½ï¿½ß£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê½ï¿½ï¿½Ö¡ï¿½Ê¡ï¿½ï¿½ï¿½ï¿½Ê£ï¿½ï¿½ï¿½Æµï¿½ï¿½ï¿½ë¡¢ï¿½ï¿½ï¿½Êµï¿½CNend
 \attention \n
 This interface must be called after the ::HI_SVR_PLAYER_SetMedia interface is called.
-CNcomment:¸Ãº¯Êý±ØÐëÔÚµ÷ÓÃ::HI_SVR_PLAYER_SetMedia½Ó¿Úºóµ÷ÓÃCNend
+CNcomment:ï¿½Ãºï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Úµï¿½ï¿½ï¿½::HI_SVR_PLAYER_SetMediaï¿½Ó¿Úºï¿½ï¿½ï¿½ï¿½CNend
 
-\param[in] hPlayer player handle. CNcomment:²¥·ÅÆ÷¾ä±úCNend
-\param[out] ppstruInfo obtained file information. CNcomment:»ñÈ¡µÄÎÄ¼þÐÅÏ¢CNend
+\param[in] hPlayer player handle. CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½CNend
+\param[out] ppstruInfo obtained file information. CNcomment:ï¿½ï¿½È¡ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½Ï¢CNend
 
-\retval ::HI_SUCCESS The file information is obtained successfully. CNcomment:»ñÈ¡µ½ÎÄ¼þÐÅÏ¢CNend
-\retval ::HI_FAILURE The file information fails to be obtained. CNcomment:»ñÈ¡ÎÄ¼þÐÅÏ¢Ê§°ÜCNend
+\retval ::HI_SUCCESS The file information is obtained successfully. CNcomment:ï¿½ï¿½È¡ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½Ï¢CNend
+\retval ::HI_FAILURE The file information fails to be obtained. CNcomment:ï¿½ï¿½È¡ï¿½Ä¼ï¿½ï¿½ï¿½Ï¢Ê§ï¿½ï¿½CNend
 
 \see \n
 None.
@@ -681,17 +681,17 @@ None.
 HI_S32 HI_SVR_PLAYER_GetFileInfo(HI_HANDLE hPlayer, HI_FORMAT_FILE_INFO_S **ppstruInfo);
 
 /**
-\brief Obtain the player information, such as the current playing status, playing progress, and elapsed time. CNcomment:»ñÈ¡²¥·ÅÆ÷ÐÅÏ¢£¬Èçµ±Ç°²¥·Å×´Ì¬¡¢²¥·Å½ø¶È¡¢ÒÑ²¥·ÅÊ±¼äµÈCNend
+\brief Obtain the player information, such as the current playing status, playing progress, and elapsed time. CNcomment:ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½çµ±Ç°ï¿½ï¿½ï¿½ï¿½×´Ì¬ï¿½ï¿½ï¿½ï¿½ï¿½Å½ï¿½ï¿½È¡ï¿½ï¿½Ñ²ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½CNend
 \attention \n
 This interface must be called after the ::HI_SVR_PLAYER_Create interface is called. The playing progress and elapsed time are valid only after the ::HI_SVR_PLAYER_Play interface is called.
-CNcomment:¸Ãº¯Êý±ØÐëÔÚµ÷ÓÃ::HI_SVR_PLAYER_Create½Ó¿Úºóµ÷ÓÃ£¬²¥·Å½ø¶È¡¢ÒÑ²¥·ÅÊ±¼äÖ»ÓÐÔÚµ÷ÓÃ::HI_SVR_PLAYER_Play½Ó¿ÚºóÓÐÐ§
-::HI_SVR_PLAYER_SetMediaÎ´·µ»ØÇ°²»ÔÊÐíµ÷ÓÃ¸Ã½Ó¿ÚCNend
+CNcomment:ï¿½Ãºï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Úµï¿½ï¿½ï¿½::HI_SVR_PLAYER_Createï¿½Ó¿Úºï¿½ï¿½ï¿½Ã£ï¿½ï¿½ï¿½ï¿½Å½ï¿½ï¿½È¡ï¿½ï¿½Ñ²ï¿½ï¿½ï¿½Ê±ï¿½ï¿½Ö»ï¿½ï¿½ï¿½Úµï¿½ï¿½ï¿½::HI_SVR_PLAYER_Playï¿½Ó¿Úºï¿½ï¿½ï¿½Ð§
+::HI_SVR_PLAYER_SetMediaÎ´ï¿½ï¿½ï¿½ï¿½Ç°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã¸Ã½Ó¿ï¿½CNend
 
-\param[in] hPlayer player handle. CNcomment:²¥·ÅÆ÷¾ä±úCNend
-\param[out] pstruInfo player information. CNcomment:²¥·ÅÆ÷ÐÅÏ¢CNend
+\param[in] hPlayer player handle. CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½CNend
+\param[out] pstruInfo player information. CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢CNend
 
-\retval ::HI_SUCCESS The player information is obtained successfully. CNcomment:²¥·ÅÆ÷ÐÅÏ¢»ñÈ¡³É¹¦CNend
-\retval ::HI_FAILURE The player information fails to be obtained. CNcomment:²¥·ÅÆ÷ÐÅÏ¢»ñÈ¡Ê§°ÜCNend
+\retval ::HI_SUCCESS The player information is obtained successfully. CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½È¡ï¿½É¹ï¿½CNend
+\retval ::HI_FAILURE The player information fails to be obtained. CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½È¡Ê§ï¿½ï¿½CNend
 
 \see \n
 None.
@@ -699,20 +699,20 @@ None.
 HI_S32 HI_SVR_PLAYER_GetPlayerInfo(HI_HANDLE hPlayer, HI_SVR_PLAYER_INFO_S *pstruInfo);
 
 /**
-\brief Register a media file DEMUX or subtitle file DEMUX. The DEMUX must be a DLL and is implemented based on the specifications of the hi_svr_format.h header file.  CNcomment:×¢²áÃ½ÌåÎÄ¼þ½âÎö¡¢×ÖÄ»½âÎöÆ÷£¬½âÎöÆ÷±ØÐëÊÇ¶¯Ì¬¿â£¬ÇÒ°´hi_svr_format.hÍ·ÎÄ¼þ¹æ·¶ÊµÏÖCNend
+\brief Register a media file DEMUX or subtitle file DEMUX. The DEMUX must be a DLL and is implemented based on the specifications of the hi_svr_format.h header file.  CNcomment:×¢ï¿½ï¿½Ã½ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç¶ï¿½Ì¬ï¿½â£¬ï¿½Ò°ï¿½hi_svr_format.hÍ·ï¿½Ä¼ï¿½ï¿½æ·¶Êµï¿½ï¿½CNend
 \attention \n
 This interface must be called after the ::HI_SVR_PLAYER_Init interface is called.
 DLLs such as libformat.so are stored in /usr/lib. The interface is called as follows:
 HI_SVR_PLAYER_RegisterDynamic(HI_SVR_PLAYER_DLL_PARSER, "libformat.so")
-CNcomment:¸Ã½Ó¿Ú±ØÐëÔÚµ÷ÓÃ::HI_SVR_PLAYER_Init½Ó¿Úºóµ÷ÓÃ
-¶¯Ì¬¿â·ÅÔÚ/usr/libÄ¿Â¼ÏÂ£¬Èçlibformat.so£¬Ôòµ÷ÓÃ¸Ã½Ó¿Ú·½Ê½Îª:
+CNcomment:ï¿½Ã½Ó¿Ú±ï¿½ï¿½ï¿½ï¿½Úµï¿½ï¿½ï¿½::HI_SVR_PLAYER_Initï¿½Ó¿Úºï¿½ï¿½ï¿½ï¿½
+ï¿½ï¿½Ì¬ï¿½ï¿½ï¿½ï¿½ï¿½/usr/libÄ¿Â¼ï¿½Â£ï¿½ï¿½ï¿½libformat.soï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã¸Ã½Ó¿Ú·ï¿½Ê½Îª:
 HI_SVR_PLAYER_RegisterDynamic(HI_SVR_PLAYER_DLL_PARSER, "libformat.so") CNend
 
-\param[in] eDllType DDL type. CNcomment:¶¯Ì¬¿âÀàÐÍCNend
-\param[in] dllName DDL name. CNcomment:¶¯Ì¬¿âÃû³ÆCNend
+\param[in] eDllType DDL type. CNcomment:ï¿½ï¿½Ì¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½CNend
+\param[in] dllName DDL name. CNcomment:ï¿½ï¿½Ì¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½CNend
 
-\retval ::HI_SUCCESS The DDL is registered successfully.  CNcomment:¶¯Ì¬¿â×¢²á³É¹¦CNend
-\retval ::HI_FAILURE The DDL fails to be registered. CNcomment:×¢²áÊ§°ÜCNend
+\retval ::HI_SUCCESS The DDL is registered successfully.  CNcomment:ï¿½ï¿½Ì¬ï¿½ï¿½×¢ï¿½ï¿½É¹ï¿½CNend
+\retval ::HI_FAILURE The DDL fails to be registered. CNcomment:×¢ï¿½ï¿½Ê§ï¿½ï¿½CNend
 
 \see \n
 None.
@@ -720,15 +720,15 @@ None.
 HI_S32 HI_SVR_PLAYER_RegisterDynamic(HI_SVR_PLAYER_DLLTYPE_E eDllType, const HI_CHAR *dllName);
 
 /**
-\brief Register a file and subtitle DEMUX object. This interface is not supported now.CNcomment:Ê¹ÓÃ¶ÔÏóµÄ·½Ê½×¢²áÎÄ¼þ½âÎöÆ÷£¬¸Ã½Ó¿Úµ±Ç°²»Ö§³ÖCNend
+\brief Register a file and subtitle DEMUX object. This interface is not supported now.CNcomment:Ê¹ï¿½Ã¶ï¿½ï¿½ï¿½Ä·ï¿½Ê½×¢ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã½Ó¿Úµï¿½Ç°ï¿½ï¿½Ö§ï¿½ï¿½CNend
 \attention \n
 This interface must be called after the ::HI_SVR_PLAYER_Init interface is called.
-CNcomment:¸Ã½Ó¿Ú±ØÐëÔÚµ÷ÓÃ::HI_SVR_PLAYER_Init½Ó¿Úºóµ÷ÓÃCNend
+CNcomment:ï¿½Ã½Ó¿Ú±ï¿½ï¿½ï¿½ï¿½Úµï¿½ï¿½ï¿½::HI_SVR_PLAYER_Initï¿½Ó¿Úºï¿½ï¿½ï¿½ï¿½CNend
 
 \param[in] pEntry DEMUX object.
 
-\retval ::HI_SUCCESS The object is registered successfully.  CNcomment:×¢²á³É¹¦CNend
-\retval ::HI_FAILURE The object fails to be registered. CNcomment:×¢²áÊ§°ÜCNend
+\retval ::HI_SUCCESS The object is registered successfully.  CNcomment:×¢ï¿½ï¿½É¹ï¿½CNend
+\retval ::HI_FAILURE The object fails to be registered. CNcomment:×¢ï¿½ï¿½Ê§ï¿½ï¿½CNend
 
 \see \n
 None.
@@ -737,16 +737,16 @@ HI_S32 HI_SVR_PLAYER_RegisterEntry(HI_FORMAT_S * pEntry);
 
 
 /**
-\brief Remove all DDLs for parsing files and subtitles. CNcomment:Ð¶ÔØËùÓÐÎÄ¼þ½âÎö¡¢×ÖÄ»½âÎö¶¯Ì¬¿âCNend
+\brief Remove all DDLs for parsing files and subtitles. CNcomment:Ð¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ì¬ï¿½ï¿½CNend
 \attention \n
 This interface must be called after the ::HI_SVR_PLAYER_Init interface is called.
-CNcomment:¸Ã½Ó¿Ú±ØÐëÔÚµ÷ÓÃ::HI_SVR_PLAYER_Init½Ó¿Úºóµ÷ÓÃCNend
+CNcomment:ï¿½Ã½Ó¿Ú±ï¿½ï¿½ï¿½ï¿½Úµï¿½ï¿½ï¿½::HI_SVR_PLAYER_Initï¿½Ó¿Úºï¿½ï¿½ï¿½ï¿½CNend
 
-\param[in] eDllType DDL type. CNcomment:¶¯Ì¬¿âÀàÐÍCNend
-\param[in] dllName DDL name. It is reserved. CNcomment:¶¯Ì¬¿âÃû³Æ£¬±£Áô²ÎÊý£¬ÔÝ²»Ê¹ÓÃCNend
+\param[in] eDllType DDL type. CNcomment:ï¿½ï¿½Ì¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½CNend
+\param[in] dllName DDL name. It is reserved. CNcomment:ï¿½ï¿½Ì¬ï¿½ï¿½ï¿½ï¿½ï¿½Æ£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý²ï¿½Ê¹ï¿½ï¿½CNend
 
-\retval ::HI_SUCCESS The DDLs are removed successfully. CNcomment:Ð¶ÔØ³É¹¦CNend
-\retval ::HI_FAILURE The DDLs fail to be removed. CNcomment:Ð¶ÔØÊ§°ÜCNend
+\retval ::HI_SUCCESS The DDLs are removed successfully. CNcomment:Ð¶ï¿½Ø³É¹ï¿½CNend
+\retval ::HI_FAILURE The DDLs fail to be removed. CNcomment:Ð¶ï¿½ï¿½Ê§ï¿½ï¿½CNend
 
 \see \n
 None.
@@ -754,12 +754,12 @@ None.
 HI_S32 HI_SVR_PLAYER_UnRegisterDynamic(HI_SVR_PLAYER_DLLTYPE_E eDllType, const HI_CHAR *dllName);
 
 /**
-\brief Enable or disable the player debug. CNcomment:´ò¿ª/¹Ø±Õplayer dbgÐÅÏ¢CNend
+\brief Enable or disable the player debug. CNcomment:ï¿½ï¿½/ï¿½Ø±ï¿½player dbgï¿½ï¿½Ï¢CNend
 \attention \n
 This interface can be called in any state.
-CNcomment:¸Ã½Ó¿Ú¿ÉÒÔÔÚÈÎºÎ×´Ì¬µ÷ÓÃCNend
+CNcomment:ï¿½Ã½Ó¿Ú¿ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îºï¿½×´Ì¬ï¿½ï¿½ï¿½ï¿½CNend
 
-\param[in] bEnable enable value. HI_TRUE: enables the player log. HI_FALSE: disables the player log. CNcomment:Ê¹ÄÜÖµ£¬HI_TRUE:´ò¿ªplayerÈÕÖ¾ÐÅÏ¢£¬HI_FALSE:¹Ø±ÕÈÕÖ¾ÐÅÏ¢CNend
+\param[in] bEnable enable value. HI_TRUE: enables the player log. HI_FALSE: disables the player log. CNcomment:Ê¹ï¿½ï¿½Öµï¿½ï¿½HI_TRUE:ï¿½ï¿½playerï¿½ï¿½Ö¾ï¿½ï¿½Ï¢ï¿½ï¿½HI_FALSE:ï¿½Ø±ï¿½ï¿½ï¿½Ö¾ï¿½ï¿½Ï¢CNend
 
 \retval :: None.
 
@@ -769,12 +769,12 @@ None.
 HI_VOID HI_SVR_PLAYER_EnableDbg(HI_BOOL bEnable);
 
 /**
-\brief Obtain the player version. CNcomment:»ñÈ¡²¥·ÅÆ÷°æ±¾ºÅCNend
+\brief Obtain the player version. CNcomment:ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½æ±¾ï¿½ï¿½CNend
 \attention \n
 This interface can be called in any state.
-CNcomment:¸Ã½Ó¿Ú¿ÉÒÔÔÚÈÎºÎ×´Ì¬µ÷ÓÃCNend
+CNcomment:ï¿½Ã½Ó¿Ú¿ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îºï¿½×´Ì¬ï¿½ï¿½ï¿½ï¿½CNend
 
-\param[out] pstVersion player version. CNcomment:²¥·ÅÆ÷°æ±¾ºÅCNend
+\param[out] pstVersion player version. CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½æ±¾ï¿½ï¿½CNend
 
 \retval :: None.
 
@@ -784,7 +784,7 @@ None.
 HI_VOID HI_SVR_PLAYER_GetVersion(HI_FORMAT_LIB_VERSION_S *pstVersion);
 
 /** The parameters need to be specified when a media file is opened by user calling HI_SVR_FORMAT_Open() directly*/
-/** CNcomment:ÓÃ»§Ö±½Óµ÷ÓÃHI_SVR_FORMAT_Open()´ò¿ªÃ½ÌåÎÄ¼þÊ±ÐèÒªÖ¸¶¨µÄ²ÎÊý*/
+/** CNcomment:ï¿½Ã»ï¿½Ö±ï¿½Óµï¿½ï¿½ï¿½HI_SVR_FORMAT_Open()ï¿½ï¿½Ã½ï¿½ï¿½ï¿½Ä¼ï¿½Ê±ï¿½ï¿½ÒªÖ¸ï¿½ï¿½ï¿½Ä²ï¿½ï¿½ï¿½*/
 typedef struct hiSVR_FORMAT_PARAMETER_S
 {
     HI_FORMAT_BUFFER_CONFIG_S stBufConfig;     /**< buffer config, only used for network play */
@@ -972,16 +972,16 @@ non
 HI_S32 HI_SVR_FORMAT_GetMsg(HI_HANDLE handle, HI_FORMAT_MSG_S *pstMsg);
 
 /**
-\brief Create a player for meta retriever. CNcomment:´´½¨Ò»¸ö²¥·ÅÆ÷ÓÃÓÚÃ½ÌåÔªÊý¾Ý»ñÈ¡CNend
+\brief Create a player for meta retriever. CNcomment:ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã½ï¿½ï¿½Ôªï¿½ï¿½ï¿½Ý»ï¿½È¡CNend
 \attention \n
 This interface must be called after initialization. Only one player can be created. \n
-CNcomment:¸Ã½Ó¿Ú±ØÐëÔÚ³õÊ¼»¯ºóµ÷ÓÃ£¬Ö§³Ö×î¶à´´½¨Ò»¸ö²¥·ÅÆ÷\n  CNend
-\param[in] pstruParam player initialization attribute. CNcomment:²¥·ÅÆ÷³õÊ¼»¯ÊôÐÔCNend
+CNcomment:ï¿½Ã½Ó¿Ú±ï¿½ï¿½ï¿½ï¿½Ú³ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã£ï¿½Ö§ï¿½ï¿½ï¿½ï¿½à´´ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½\n  CNend
+\param[in] pstruParam player initialization attribute. CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½CNend
 \param[in] pstruMedia media file information. Only absolute path is supported.\n
-\param[out] phPlayer handle of the created player. CNcomment:´´½¨µÄ²¥·ÅÆ÷¾ä±úCNend
+\param[out] phPlayer handle of the created player. CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½Ä²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½CNend
 
-\retval ::HI_SUCCESS A player is created successfully and the player handle is valid. CNcomment:´´½¨³É¹¦£¬²¥·ÅÆ÷¾ä±úÓÐÐ§CNend
-\retval ::HI_FAILURE A player fails to be created. The parameters are invalid or resources are insufficient. CNcomment:´´½¨Ê§°Ü£¬²ÎÊý·Ç·¨»ò×ÊÔ´²»¹»CNend
+\retval ::HI_SUCCESS A player is created successfully and the player handle is valid. CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½É¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð§CNend
+\retval ::HI_FAILURE A player fails to be created. The parameters are invalid or resources are insufficient. CNcomment:ï¿½ï¿½ï¿½ï¿½Ê§ï¿½Ü£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ï¿½ï¿½ï¿½ï¿½Ô´ï¿½ï¿½ï¿½ï¿½CNend
 
 \see \n
 None.
@@ -990,14 +990,14 @@ HI_S32 HI_SVR_PLAYER_CreateMetaRetriever(const HI_SVR_PLAYER_PARAM_S *pstruParam
                                             HI_SVR_PLAYER_MEDIA_S *pstruMedia, HI_HANDLE *phPlayer);
 
 /**
-\brief Destroy a player instance for meta retriever. CNcomment:Ïú»ÙÒ»¸öÓÃÓÚÃ½ÌåÔªÊý¾Ý»ñÈ¡µÄ²¥·ÅÆ÷ÊµÀýCNend
+\brief Destroy a player instance for meta retriever. CNcomment:ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã½ï¿½ï¿½Ôªï¿½ï¿½ï¿½Ý»ï¿½È¡ï¿½Ä²ï¿½ï¿½ï¿½ï¿½ï¿½Êµï¿½ï¿½CNend
 \attention \n
 The HI_S32 HI_SVR_PLAYER_Destroy interface is called to destroy the player resource after the ::HI_SVR_PLAYER_CreateMetaRetriever interface is called to create a player.
-CNcomment:µ÷ÓÃ::HI_SVR_PLAYER_CreateMetaRetriever´´½¨²¥·ÅÆ÷ºó£¬µ÷ÓÃ¸Ã½Ó¿ÚÏú»Ù²¥·ÅÆ÷×ÊÔ´CNend
-\param[in] hPlayer player handle. CNcomment:²¥·ÅÆ÷¾ä±úCNend
+CNcomment:ï¿½ï¿½ï¿½ï¿½::HI_SVR_PLAYER_CreateMetaRetrieverï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ó£¬µï¿½ï¿½Ã¸Ã½Ó¿ï¿½ï¿½ï¿½ï¿½Ù²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô´CNend
+\param[in] hPlayer player handle. CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½CNend
 
-\retval ::HI_SUCCESS The player is released successfully. CNcomment:²¥·ÅÆ÷ÊÍ·Å³É¹¦CNend
-\retval ::HI_FAILURE The operation is invalid. CNcomment:·Ç·¨²Ù×÷CNend
+\retval ::HI_SUCCESS The player is released successfully. CNcomment:ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í·Å³É¹ï¿½CNend
+\retval ::HI_FAILURE The operation is invalid. CNcomment:ï¿½Ç·ï¿½ï¿½ï¿½ï¿½ï¿½CNend
 
 \see \n
 None.

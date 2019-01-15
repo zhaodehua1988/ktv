@@ -73,6 +73,7 @@ typedef struct TSK_UART_DEV_E
 	WV_U32      stopBit;
 	WV_U32      windowMode; //mode 0 :正常模式， mode 1：串口控制所有窗口开关
 	WV_U32      openDev;    //0：串口控制开关机无效  1：串口控制开关机有效
+    WV_U32      typeRound;   //视频跟随分类进行循环播放
 	WV_U32      rcvEroNum;
 	WV_U32      checkEroNum;
 	WV_U32      procEroNum;
@@ -1435,11 +1436,25 @@ WV_S32 TSK_UART_SetSerialConf(WV_S8 * buf)
 	{
 		//printf("********SetSerialConf [%s]=%d *************\n ",name,data);
 		gUartDev.openDev = data;
+	}else if(strcmp(name,"TypeRound") == 0)
+	{
+		//printf("********SetSerialConf [%s]=%d *************\n ",name,data);
+        if(data != 0 && data != 1) data = 0;
+		gUartDev.typeRound = data;
 	}
 
 	printf("********SetSerialConf [%s]=%d *************\n ",name,data);
 	return 0;
 	
+}
+/********************************************************
+
+WV_S32 TSK_UART_GetTypeRound()
+查询视频循环播放，是否按类别进行循环，还是单曲循环
+*********************************************************/
+WV_S32 TSK_UART_GetTypeRound()
+{
+    return gUartDev.typeRound;
 }
 
 /********************************************************

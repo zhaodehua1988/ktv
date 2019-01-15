@@ -2096,6 +2096,44 @@ WV_S32 TSK_SCENE_StartingUP(WV_S32 mode)
     pthread_mutex_unlock(&mutex_sceneContral);      
     return WV_SOK;
 }
+
+/*******************************************************************
+WV_S32 TSK_SCENE_GetMovIDByplayerHandle(WV_U32 playerHandle);
+通过playerHandle获取当前播放的第几个视频
+*******************************************************************/
+WV_S32 TSK_SCENE_GetMovIDByplayerHandle(WV_U32 playerHandle) 
+{
+    WV_S32 playerID;
+    playerID = TSK_PLAYER_GetPlayerIDByHandle(playerHandle);
+    if(playerID == -1) return WV_EFAIL;
+
+    return gCurScene.scene.mov[playerID].id;
+}
+/*******************************************************************
+WV_S32 TSK_SCENE_ChangeMovByPlayerHandle(WV_U32 playerHandle,WV_U32 movID) ;
+通过playerHandle播放指定的第几个视频
+*******************************************************************/
+WV_S32 TSK_SCENE_ChangeMovByPlayerHandle(WV_U32 playerHandle,WV_U32 movID) 
+{
+    WV_S32 playerID,ret=-1;
+    playerID = TSK_PLAYER_GetPlayerIDByHandle(playerHandle);
+    if(playerID == -1) return WV_EFAIL;
+  
+    WV_S32 mutex_ret;
+    mutex_ret = pthread_mutex_trylock(&gScene_mov_mutex.mutex[playerID]);/*lock the mutex*/
+    if(mutex_ret != 0 ){
+        WV_printf("get mov mutex[%d] err !\n",playerID);
+        return WV_EFAIL;
+    } 
+
+
+    WV_S8 movName[32]={0};
+    sprintf(movName,"./mov/mov%d.mp4",movID);
+    ret = TSK_PLAYER_ChangeMov(playerHandle,movName);
+    pthread_mutex_unlock(&gScene_mov_mutex.mutex[playerID]);
+    return ret;
+}
+
 /****************************************************************************
 
 WV_S32 TSK_SCENE_CMDGet(WV_S32 argc, WV_S8 **argv,WV_S8 *prfBuff)
