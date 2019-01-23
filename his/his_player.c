@@ -293,44 +293,34 @@ static WV_S32 HIS_PLAYER_CallBack(HI_HANDLE hPlayer, HI_SVR_PLAYER_EVENT_S *pstr
     }
     else if (HI_SVR_PLAYER_EVENT_EOF == (HI_SVR_PLAYER_EVENT_E)pstruEvent->eEvent)
     {
-        //WV_printf("[0x%x]:File postion is end of file, clear last frame and replay! \n",hPlayer);
-        //HI_SVR_PLAYER_GetParam(hPlayer, HI_SVR_PLAYER_ATTR_WINDOW_HDL, &hWindow);
-        //HI_UNF_VO_ResetWindow(hWindow, HI_UNF_WINDOW_FREEZE_MODE_BLACK);
 
-        //clearSubtitle();
-        /*rtsp/mms/rtmp need to redo setting media when stop->play/replay*/
-        /*
-        if (strstr(s_aszUrl, "rtsp") ||
-            strstr(s_aszUrl, "mms")  ||
-            strstr(s_aszUrl, "rtmp"))
-        {
-            s32Ret = setMedia(hPlayer, s_aszUrl);
-            if (HI_SUCCESS != s32Ret)
-            {
-                return HI_FAILURE;
-            }
-        }
-         */
-        //if
-        //printf("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n");
         if(TSK_SCENE_GetSyncEna() == 0)
         {
-            //printf("++++++++++++++++++++++++++++++++++++++++\n");
+           
 
             if(TSK_PLAYER_SetHiPlayNext(1,hPlayer) != 0)
             {
-
+                    
                 if(TSK_SCENE_GetPlayMode() == 0 )
                 {
                      //按类别循环
                     if(SVR_CONTROL_GetTypeRound()==1 || TSK_UART_GetTypeRound() == 1){
-                        
                         if(TSK_CONF_changeMovRollType(hPlayer) != 0 )//如果按类别播放下一个失败，则继续播放当前视频
                         {
                             HI_SVR_PLAYER_Play(hPlayer);
                         }
-                    }else {//单视频循环
-                        
+                    }else if(TSK_UART_GetTypeRound() == 2){
+                        if(TSK_PLAYER_GetPlayerIDByHandle(hPlayer) == 0) //如果时player0,则两幕视频同时播放
+                        {
+                            if(TSK_CONF_changeMovRollType(hPlayer) != 0 )//如果按类别播放下一个失败，则继续播放当前视频
+                            {
+                                HI_SVR_PLAYER_Play(hPlayer);
+                            }
+                            
+                        }
+
+                    }else{//单视频循环
+                         
                         HI_SVR_PLAYER_Play(hPlayer);
                     }
                 }else{

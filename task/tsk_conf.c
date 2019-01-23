@@ -133,6 +133,12 @@ typedef struct TSK_MOV_TYPE_INFO
 }TSK_MOV_TYPE_INFO;
 
 
+typedef struct TSK_CONF_PLAYERHANDLE{
+    WV_U32 handle;
+    WV_S32 movID;
+
+}TSK_CONF_PLAYERHANDLE;
+
 #pragma pack(pop)
 static TSK_MOV_TYPE_INFO gMovTypeInfo[TSK_CONF_MOV_TYPE_MAX_NUM];
 
@@ -144,6 +150,8 @@ static TSK_CONF_MOV_INFO_E *pMovInfoDev;
 static TSK_MOV_UPDATA_E gMovUpdata;
 
 static WV_S8 gCurrentTypeName[TSK_CONF_MOV_TYPE_NAME_LEN]={0};
+static int gMovInfoInited=0;
+static int gSceneInfoInited = 0;
 
 /********************************************************************
 
@@ -188,7 +196,7 @@ WV_S32 TSK_CONF_getMovTypeNum()
 
         }
     }
-#if 0
+#if 1
     WV_printf("--------------------------------------------------------\n");
     for(i=0;i<TSK_CONF_MOV_TYPE_MAX_NUM;i++)
     {
@@ -239,12 +247,61 @@ WV_S32 TSK_CONF_saveMovType(WV_U8 *pType,WV_U32 dataLen)
 
 /********************************************************************
 
+WV_S32 TSK_CONF_GetNextTypeMovID(WV_S32 movID); 
+//根据当前场景的视频id，查询下一个相同类别的视频，返回视频查询到的视频id，
+********************************************************************/
+WV_S32 TSK_CONF_GetNextTypeMovID(WV_S32 movID)
+{
+    WV_S32 nextSameTypeMovID=-1;
+    WV_S32 i,j=0;
+    WV_U16 u16Type=0xffff;
+
+    for(i=0;i<TSK_CONF_MOV_TYPE_MAX_NUM;i++)
+    {
+
+        if(gMovTypeInfo[i].typeEna == 0 ) continue;
+        //printf("ucTypeName is %s\n",gMovTypeInfo[i].ucTypeName);
+        if(strncmp(pMovInfoDev->movFile[movID].typeName,gMovTypeInfo[i].ucTypeName,TSK_CONF_MOV_TYPE_NAME_LEN) == 0)
+        {
+            u16Type=i;
+            //memcpy(gCurrentTypeName,pType,TSK_CONF_MOV_TYPE_NAME_LEN);
+            break;
+        }
+    }
+
+    for(i=0;i<TSK_CONF_MOV_MAX_NUM;i++)
+    {
+        if((pMovInfoDev->movFile[i].dataLen > 0) && (pMovInfoDev->movFile[i].u16Type == u16Type))
+        {
+
+            if(j<gMovTypeInfo[u16Type].u32LocalNum)
+            {
+                j++;
+                continue;
+            }
+
+            //WV_printf("Get nextSameType mov ID %d \n",i);
+            nextSameTypeMovID = i;
+            gMovTypeInfo[u16Type].u32LocalNum ++;
+            if(gMovTypeInfo[u16Type].u32LocalNum >=gMovTypeInfo[u16Type].u32TotalNum)
+            {
+                gMovTypeInfo[u16Type].u32LocalNum = 0 ;
+            }
+            break;
+        }
+    }
+
+    return nextSameTypeMovID;
+}
+
+/********************************************************************
+
 WV_S32 TSK_CONF_changeMovByType(WV_S8 *pType); 
 
 ********************************************************************/
 WV_S32 TSK_CONF_changeMovByType(WV_S8 *pType)
 {
-    //printf("pType is %s\n",pType);
+
     WV_S32 i,j=0;
     WV_U16 u16Type=0xffff;
 
@@ -260,10 +317,9 @@ WV_S32 TSK_CONF_changeMovByType(WV_S8 *pType)
             break;
         }
     }
-    //printf("the u16Type is %d\n",u16Type);
+
     if(u16Type == 0xffff)
     {
-        //printf("no found!!!!!!\n");
         return WV_EFAIL;
     }
 
@@ -271,7 +327,6 @@ WV_S32 TSK_CONF_changeMovByType(WV_S8 *pType)
     {
         if((pMovInfoDev->movFile[i].dataLen > 0) && (pMovInfoDev->movFile[i].u16Type == u16Type))
         {
-            //WV_printf("get movFile[%d].type = %d \n",i,u16Type);
 
             if(j<gMovTypeInfo[u16Type].u32LocalNum)
             {
@@ -294,18 +349,9 @@ WV_S32 TSK_CONF_changeMovByType(WV_S8 *pType)
         }
     }
 
-    //WV_printf("localNum=%d,total=%d\n",gMovTypeInfo[u16Type].u32LocalNum,gMovTypeInfo[u16Type].u32TotalNum);
-    if((SVR_CONTROL_GetKtvDev() == 0) || (SVR_CONTROL_GetKtvDev() == 4)) //雷石点歌机，初始化时默认歌曲随机播放
-    {
-        //printf("in TSK_CONF_changeMovByType I used the TSK_SCENE_ChangePlayMode +++++++++\n");
-        TSK_SCENE_ChangePlayMode(0);//
-    }
-
     TSK_SCENE_SendSync();
     return WV_SOK;
 }
-
-
 
 /********************************************************************
 
@@ -314,6 +360,7 @@ WV_S32 TSK_CONF_changeMovRollType(WV_U32 handle);
 ********************************************************************/
 WV_S32 TSK_CONF_changeMovRollType(WV_U32 handle)
 {
+    if(gMovInfoInited == 0) return WV_EFAIL;
     WV_S32 ret=-1;
     WV_S32 movID=-1;
     movID=TSK_SCENE_GetMovIDByplayerHandle(handle);
@@ -329,7 +376,6 @@ WV_S32 TSK_CONF_changeMovRollType(WV_U32 handle)
     {
 
         if(gMovTypeInfo[i].typeEna == 0 ) continue;
-        //printf("ucTypeName is %s\n",gMovTypeInfo[i].ucTypeName);
         if(strncmp(pType,gMovTypeInfo[i].ucTypeName,TSK_CONF_MOV_TYPE_NAME_LEN) == 0)
         {
             u16Type=i;
@@ -337,10 +383,8 @@ WV_S32 TSK_CONF_changeMovRollType(WV_U32 handle)
             break;
         }
     }
-    //printf("the u16Type is %d\n",u16Type);
     if(u16Type == 0xffff)
     {
-        //printf("no found!!!!!!\n");
         return WV_EFAIL;
     }
 
@@ -355,12 +399,25 @@ WV_S32 TSK_CONF_changeMovRollType(WV_U32 handle)
                 j++;
                 continue;
             }
-            //if(gMovTypeInfo[u16Type].u32TotalNum >1 && movID == i) continue;
-            //WV_printf("tsk_scene_setMov %d \n",i);
-            //sprintf(name,"./mov/mov%d.mp4",i);
-            //TSK_PLAYER_ChangeMov(handle,name);
-            //if(gMovTypeInfo[u16Type].u32TotalNum >1 && i== movID)
+            WV_S32 player2Ena=0;
             ret = TSK_SCENE_ChangeMovByPlayerHandle(handle,i);
+            //printf("player[0] handle=%d\n",handle);
+            if(TSK_UART_GetTypeRound() == 2)//如果==2 ，第二幕视频跟随第一幕视频播放
+            {
+                WV_S32 handle2;
+                handle2=TSK_PLAYER_GetPlayerHandleByID(1);
+                if(handle2 != -1 ){
+                    //printf("player[1] handle=%d\n",handle2);
+                    TSK_SCENE_ChangeMovByPlayerHandle(handle2,i);
+                    player2Ena = 1;
+                }
+            }
+            if(player2Ena == 1)//如果==2 ，第二幕视频跟随第一幕视频播放
+            {
+                TSK_PLAYER_Seek(0,0);
+                TSK_PLAYER_Seek(1,60);
+            }
+
             gMovTypeInfo[u16Type].u32LocalNum ++;
             if(gMovTypeInfo[u16Type].u32LocalNum >=gMovTypeInfo[u16Type].u32TotalNum)
             {
@@ -1158,6 +1215,7 @@ WV_S32 TSK_CONF_MovInfo_Init()
     TSK_CONF_MovCompare();
     //SVR_CONTROL_ReadConfFileCmd();
     TSK_CONF_getMovTypeNum();
+    gMovInfoInited = 1;
     return WV_SOK;
 }
 
@@ -1168,6 +1226,7 @@ WV_S32 TSK_CONF_MovInfo_DeInit();
 ********************************************************************/
 WV_S32 TSK_CONF_MovInfo_DeInit()
 {
+    gMovInfoInited = 0;
     free(pMovInfoDev);
     return 0;
 }
@@ -1245,11 +1304,11 @@ WV_S32 TSK_CONF_changeSceneByType(WV_U8 *pType)
         }
     }while (1);
 
-    if((SVR_CONTROL_GetKtvDev() == 0) || (SVR_CONTROL_GetKtvDev() == 4)) //雷石点歌机，初始化时默认歌曲随机播放
-    {
+//    if((SVR_CONTROL_GetKtvDev() == 0) || (SVR_CONTROL_GetKtvDev() == 4)) //雷石点歌机，初始化时默认歌曲随机播放
+//    {
         //printf("in TSK_CONF_changeSceneByType I used the TSK_SCENE_ChangePlayMode -----\n");
-        TSK_SCENE_ChangePlayMode(0);//
-    }
+//        TSK_SCENE_ChangePlayMode(0);//
+//    }
     return WV_SOK;
 }
 
@@ -1885,6 +1944,7 @@ WV_S32 TSK_CONF_SceneInfo_Init()
 
     TSK_CONF_SceneGetConf(pSceneInfoDev);
     TSK_CONF_getSceneType();
+    gSceneInfoInited = 1;
     return 0;
 }
 
@@ -1895,6 +1955,7 @@ WV_S32 TSK_CONF_SceneInfo_DeInit();
 ********************************************************************/
 WV_S32 TSK_CONF_SceneInfo_DeInit()
 {
+    gMovInfoInited = 0;
     free(pSceneNameDev);
     free(pSceneInfoDev);
 

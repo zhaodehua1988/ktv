@@ -2006,7 +2006,7 @@ WV_S32  TSK_FPGA_load()
     //	 TSK_FPGA_GetTest();
 
     /************load outfile local pasition*********/
-
+    WV_printf("**************set outline******\n");
     if((chl == 4) || (chl == 8) ){
 
 
@@ -2039,7 +2039,7 @@ WV_S32  TSK_FPGA_load()
     }
 
     /*************load lightfile local pasition*********/
-
+    WV_printf("**************set light******\n");
     if(chl==4){
         FPGA_CONF_SetLightStart();
         for(k=0;k<chl;k++)
@@ -2085,7 +2085,7 @@ WV_S32  TSK_FPGA_load()
     HIS_FB_ClrFpga();
     FPGA_CONF_ClrBuf();
     FPGA_CONF_SetOutput(gFpgaDev.outputEna);
-
+    
     return WV_SOK;
 }
 

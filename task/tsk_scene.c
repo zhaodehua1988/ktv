@@ -49,6 +49,7 @@ static TSK_SCENE_MOV_MUTEX gScene_mov_mutex;
 
 pthread_mutex_t mutex_sceneContral; //场景播放/暂停/上个/下个/音量+/音量-/停止/开机/待机/
 
+
 /*******************************************************************
 WV_S32 TSK_SCENE_GetLightEna();
 *******************************************************************/
@@ -805,6 +806,7 @@ WV_S32 TSK_SCENE_GetCurent(TSK_SCENE_INFO_S *pInfo)
 
     return 0;
 }
+
 /*******************************************************************
  WV_S32 TSK_SCENE_SceneInit();
 *******************************************************************/
@@ -847,10 +849,19 @@ WV_S32 TSK_SCENE_SceneInit()
             TSK_PLAYER_SetFile(i,name);
             TSK_PLAYER_setWin(i,gCurScene.scene.mov[i].x,gCurScene.scene.mov[i].y,gCurScene.scene.mov[i].w,gCurScene.scene.mov[i].h);
             TSK_PLAYER_Creat(i);
+            //TSK_SCENE_PlayerCreat(i);
             //sleep(1);
             //TSK_PLAYER_DevCascade(i,gCurScene.DevCascading);
         }
 
+    }
+    for(i=0;i<2;i++)
+    {
+
+        if(gCurScene.scene.mov[i].ena == 1)
+        {
+            TSK_PLAYER_Seek(i,0);
+        }
     }
     // for animation
     sleep(1);
@@ -891,10 +902,11 @@ WV_S32 TSK_SCENE_GetState()
 {
     return 	gCurScene.sceneOpen;
 }
+
+
 /*******************************************************************
  WV_S32 TSK_SCENE_SceneOpen();
 *******************************************************************/
-
 WV_S32 TSK_SCENE_SceneOpen()
 {
 
@@ -920,32 +932,45 @@ WV_S32 TSK_SCENE_SceneOpen()
         }
     }
     //for player
+   WV_S32 nextMovTypeID = TSK_CONF_GetNextTypeMovID(gCurScene.scene.mov[0].id);
     for(i=0;i<TSK_SCENE_MOV_USE_NUM;i++)
     {
         if(gCurScene.scene.mov[i].ena == 0)
             continue;
-        sprintf(name, "./mov/mov%d.mp4",gCurScene.scene.mov[i].id);
+         
+        if((TSK_UART_GetTypeRound() == 1 || TSK_UART_GetTypeRound()==2) && nextMovTypeID != -1)
+        {
+            //if(nextMovTypeID)
+            sprintf(name, "./mov/mov%d.mp4",nextMovTypeID);
+        }else{
+            sprintf(name, "./mov/mov%d.mp4",gCurScene.scene.mov[i].id);
+        }
+
         if(access(name,0)!=0){
             continue;
         }
         if(gCurScene.scene.mov[i].y==0 && gCurScene.scene.mov[i].x==0 && gCurScene.scene.mov[i].w==0 && gCurScene.scene.mov[i].h == 0 )
         {
-            //gCurScene.scene.mov[i].ena = 0;
+
             break;
         }
+        //if(TSK_CONF_GetNextTypeMovID())
+        
         TSK_PLAYER_SetFile(i,name);
         TSK_PLAYER_setWin(i,gCurScene.scene.mov[i].x,gCurScene.scene.mov[i].y,gCurScene.scene.mov[i].w,gCurScene.scene.mov[i].h);
         TSK_PLAYER_Creat(i);
 
-
     }
     TSK_PLAYER_ReadVolume();
-//    HIS_FB_ClrFpga();
-
     if(gCurScene.DevCascading == 1)
     {
         usleep(1);
         TSK_SCENE_SendSync();
+    }else{
+
+        if(gCurScene.scene.mov[0].ena == 1) TSK_PLAYER_Seek(0,0);
+        if(gCurScene.scene.mov[1].ena == 1) TSK_PLAYER_Seek(1,60);
+
     }
 
     gCurScene.sceneOpen=1;
@@ -1118,13 +1143,12 @@ WV_S32 TSK_SCENE_GetWinChange()
     return winChange;
 
 }
+
 /*******************************************************************
  WV_S32 TSK_SCENE_Change( WV_U32  id);
 *******************************************************************/
 WV_S32 TSK_SCENE_Change(WV_U32 DataType, WV_U32  id)
 {
-
-
 
       //printf("change scene to [%d]\n",id);
     if ((DataType == TSK_SCENE_TYPE_UARTDATA) && (SceneChangeDataType == TSK_SCENE_TYPE_NETDATA))
@@ -1144,12 +1168,12 @@ WV_S32 TSK_SCENE_Change(WV_U32 DataType, WV_U32  id)
     //防止场景和视频同时切换，这里加锁
     if(gScene_mov_mutex.mutex_ena == 1 ){
         WV_S32 mutex_ret;
-        mutex_ret = pthread_mutex_trylock(&gScene_mov_mutex.mutex[0]);/*lock the mutex*/
+        mutex_ret = pthread_mutex_lock(&gScene_mov_mutex.mutex[0]);/*lock the mutex*/
         if(mutex_ret != 0 ){
             WV_printf("get scene mutex[%d] err !\n",0);
             return WV_SOK;
         }
-        mutex_ret = pthread_mutex_trylock(&gScene_mov_mutex.mutex[1]);/*lock the mutex*/
+        mutex_ret = pthread_mutex_lock(&gScene_mov_mutex.mutex[1]);/*lock the mutex*/
         if(mutex_ret != 0 ){
             pthread_mutex_unlock(&gScene_mov_mutex.mutex[0]);
             WV_printf("get scene mutex[%d] err !\n",1);
@@ -2107,6 +2131,8 @@ WV_S32 TSK_SCENE_GetMovIDByplayerHandle(WV_U32 playerHandle)
     playerID = TSK_PLAYER_GetPlayerIDByHandle(playerHandle);
     if(playerID == -1) return WV_EFAIL;
 
+    if(TSK_UART_GetTypeRound() == 2 && playerID == 1) return WV_EFAIL;//只跟随第一幕视频播放
+
     return gCurScene.scene.mov[playerID].id;
 }
 /*******************************************************************
@@ -2125,8 +2151,6 @@ WV_S32 TSK_SCENE_ChangeMovByPlayerHandle(WV_U32 playerHandle,WV_U32 movID)
         WV_printf("get mov mutex[%d] err !\n",playerID);
         return WV_EFAIL;
     } 
-
-
     WV_S8 movName[32]={0};
     sprintf(movName,"./mov/mov%d.mp4",movID);
     ret = TSK_PLAYER_ChangeMov(playerHandle,movName);
@@ -2377,6 +2401,20 @@ WV_S32 TSK_SCENE_CMDSet(WV_S32 argc, WV_S8 **argv, WV_S8 * prfBuff)
 WV_S32  TSK_SCENE_Init()
 {
 
+
+    //scene_mov_mutex
+
+    if(pthread_mutex_init(&gScene_mov_mutex.mutex[0],NULL) != 0 || pthread_mutex_init(&gScene_mov_mutex.mutex[1],NULL) != 0 || pthread_mutex_init(&gScene_mov_mutex.mutex[2],NULL) != 0 )
+    {
+        WV_printf("Init scene_mov_metux error.\n");
+        gScene_mov_mutex.mutex_ena = 0;
+    }else{
+         WV_printf("Init scene_mov_metux ok.\n");
+        gScene_mov_mutex.mutex_ena = 1;
+    }
+    pthread_mutex_init(&mutex_sceneContral,NULL);
+
+
     WV_S32 ret = 0;
     //先注册scene命令到控制台
     WV_CMD_Register("get","scene","print scene info",TSK_SCENE_CMDGet);
@@ -2392,17 +2430,7 @@ WV_S32  TSK_SCENE_Init()
     gettimeofday(&SceneChangeTimeStart, NULL);
     SceneChangeDataType = TSK_SCENE_TYPE_NETDATA;
 
-    //scene_mov_mutex
-
-    if(pthread_mutex_init(&gScene_mov_mutex.mutex[0],NULL) != 0 || pthread_mutex_init(&gScene_mov_mutex.mutex[1],NULL) != 0 || pthread_mutex_init(&gScene_mov_mutex.mutex[2],NULL) != 0 )
-    {
-        WV_printf("Init scene_mov_metux error.\n");
-        gScene_mov_mutex.mutex_ena = 0;
-    }else{
-         WV_printf("Init scene_mov_metux ok.\n");
-        gScene_mov_mutex.mutex_ena = 1;
-    }
-    pthread_mutex_init(&mutex_sceneContral,NULL);
+    //TSK_SCENE_PlayerPlay();
 
     return ret;
 }

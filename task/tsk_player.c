@@ -183,7 +183,7 @@ WV_S32  TSK_PLAYER_Seek(WV_S32 id,HI_U64 u64TimeInMs);
 ***********************************************************************/
 WV_S32  TSK_PLAYER_Seek(WV_S32 id,HI_U64 u64TimeInMs)
 {
-
+    //WV_printf("player[%d] seek=%d\n ",id,u64TimeInMs);
     WV_S32 ret;
     ret =HIS_PLAYER_Seek(&(gTskPlayer[id].playerHandl),u64TimeInMs);
 
@@ -534,6 +534,18 @@ WV_S32  TSK_PLAYER_GetPlayerIDByHandle(WV_U32 playerHandle)
 }
 /****************************************************************************
 
+WV_S32  TSK_PLAYER_GetPlayerHandleByID(WV_U32 playerID)
+
+****************************************************************************/
+WV_S32  TSK_PLAYER_GetPlayerHandleByID(WV_U32 playerID)
+{
+    if(gTskPlayer[playerID].playerEna == 1) return  gTskPlayer[playerID].playerHandl ;
+    
+    return WV_EFAIL;
+}
+
+/****************************************************************************
+
 WV_S32 TSK_PLAYER_CMDStart(WV_S32 argc, WV_S8 **argv,WV_S8 *prfBuff)
 
 ****************************************************************************/
@@ -703,17 +715,16 @@ WV_S32 TSK_PLAYER_CMDStop(WV_S32 argc, WV_S8 **argv, WV_S8 * prfBuff)
     }
 
 
-    //prfBuff += sprintf(prfBuff,"Player[%d] Stop  %s \r\n",id,gTskPlayer[id].fileName);
+    HI_BOOL bEnable;
+    HIS_DIS_GetWinFreezeStatus(&(gTskPlayer[id].winHandl),&bEnable);
+    printf("stop .win freez is [%d]\n",bEnable);
+    if(	bEnable != HI_TRUE)
+    {
+        //设置输出定格在最后一帧画面，防止切换视频黑场
+        HIS_DIS_WinFreeze(&(gTskPlayer[id].winHandl),HI_TRUE,0);
+    }
+    TSK_PLAYER_Stop(id);
 
-            HI_BOOL bEnable;
-        HIS_DIS_GetWinFreezeStatus(&(gTskPlayer[id].winHandl),&bEnable);
-        printf("stop .win freez is [%d]\n",bEnable);
-        if(	bEnable != HI_TRUE)
-        {
-            //设置输出定格在最后一帧画面，防止切换视频黑场
-            HIS_DIS_WinFreeze(&(gTskPlayer[id].winHandl),HI_TRUE,0);
-        }
-        TSK_PLAYER_Stop(id);
     return WV_SOK;
 
 }

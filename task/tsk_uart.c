@@ -1439,7 +1439,7 @@ WV_S32 TSK_UART_SetSerialConf(WV_S8 * buf)
 	}else if(strcmp(name,"TypeRound") == 0)
 	{
 		//printf("********SetSerialConf [%s]=%d *************\n ",name,data);
-        if(data != 0 && data != 1) data = 0;
+        if(data != 0 && data != 1 && data !=2) data = 0;
 		gUartDev.typeRound = data;
 	}
 
