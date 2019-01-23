@@ -933,14 +933,15 @@ WV_S32 TSK_SCENE_SceneOpen()
     }
     //for player
    WV_S32 nextMovTypeID = TSK_CONF_GetNextTypeMovID(gCurScene.scene.mov[0].id);
+   printf("next type mov id = %d \n",nextMovTypeID);
     for(i=0;i<TSK_SCENE_MOV_USE_NUM;i++)
     {
         if(gCurScene.scene.mov[i].ena == 0)
             continue;
          
-        if((TSK_UART_GetTypeRound() == 1 || TSK_UART_GetTypeRound()==2) && nextMovTypeID != -1)
+        if(TSK_UART_GetTypeRound() == 3  && nextMovTypeID != -1)
         {
-            //if(nextMovTypeID)
+            
             sprintf(name, "./mov/mov%d.mp4",nextMovTypeID);
         }else{
             sprintf(name, "./mov/mov%d.mp4",gCurScene.scene.mov[i].id);

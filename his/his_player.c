@@ -968,7 +968,6 @@ WV_S32  HIS_PLAYER_GetStatus(HI_HANDLE  * pHndlPlayer ,WV_U32 *pStatus)
     HI_SVR_PLAYER_INFO_S  stPlayerInfo;
     ret = HI_SVR_PLAYER_GetPlayerInfo(*pHndlPlayer, &stPlayerInfo);
 
-    //printf("player status  [%d]\n",*pStatus);
     if (HI_SUCCESS == ret )
     {
         * pStatus  = (HI_U32)stPlayerInfo.eStatus;
