@@ -2,7 +2,7 @@
 #include "svr_frame.h"
 #include "tsk_go.h"
 #include "tsk_scene.h"
-
+#include "svr_udp.h"
 #define NET_UART_BUF_MAXLEN 1024
 #define NET_UART_CMDFILE  "./env/netContrl.dat"
 #define NET_UART_MAX_LEN  256 
@@ -593,11 +593,16 @@ WV_S32 NET_UART_ProjectorCmd(WV_U32 openProjector);
 ****************************************************************************/
 WV_S32 NET_UART_ProjectorCmd(WV_U32 openProjector)
 {
-
+	
 	//开关投影命令不生效，直接返回
-    if(SVR_CONTROL_GetOpenProjector() != 1){
+    if(SVR_CONTROL_GetOpenProjector() != 1 && TSK_UART_GetOpenprojectorMode() != 1)
+	{
+		WV_printf("开关投影命令不生效");
         return WV_SOK;
     }
+	if(TSK_SCENE_GetSyncEna() == 1){
+		SVR_UDP_SyncProjectorStatus(openProjector);
+	}
 	//接收ktv设备发送的开关机，开关投影命令，通过网络发送给网转串设备。
 	SVR_FRAME_HEAD_E head={SVR_SYNC_WORD,0x2e,0x3,0,0,0,0};
 	WV_U8 buf[64]={0};	
@@ -702,6 +707,8 @@ WV_S32 NET_UART_CliInit(NET_UART_DEV_E * pDev)
 	//pAddr->sin_addr.s_addr = htonl(INADDR_ANY);  
 	pAddr->sin_addr.s_addr = inet_addr((WV_S8 *)pDev->clientIp);
 	bzero(&(pAddr->sin_zero), 8);
+
+	printf("-----------------------client ip=%s,port=%d\n",pDev->clientIp,pDev->clientPort);
 
 	return WV_SOK;	
 }

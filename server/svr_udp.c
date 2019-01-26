@@ -7,7 +7,7 @@
 #include "wv_type.h"
 #include "tsk_player.h"
 #include "tsk_scene.h"
-
+#include "net_uart.h"
 #define SVR_UDP_RECV_PORT 6000
 #define SVR_UDP_SEND_PORT 6001
 #define SVR_UDP_SEND_PORT_PLAYER 6002
@@ -35,6 +35,7 @@
 #define SVR_UDP_CMD_SCENE_PAUSE   0x05
 #define SVR_UDP_CMD_SCENE_PLAY    0x06
 #define SVR_UDP_CMD_SCENE_STOP    0x07
+#define SVR_UDP_CMD_PROJECTOR    0x08   //投影开关命令
 
 
 #define SVR_UDP_CMD_ASK_SEARCH_SLAVE 0x82
@@ -44,6 +45,9 @@
 #define SVR_UDP_CMD_ASK_SCENE_PAUSE   0x85
 #define SVR_UDP_CMD_ASK_SCENE_PLAY    0x86
 #define SVR_UDP_CMD_ASK_SCENE_STOP    0x87
+#define SVR_UDP_CMD_ASK_PROJECTOR    0x88
+
+
 
 //static long long svr_udp_startTime[10];
 //static long long svr_udp_endTime[10];
@@ -176,6 +180,7 @@ WV_S32 SVR_UDP_SwitchChar(WV_S8 *pStr,WV_S32 *pValue)
 
 	return WV_SOK;	
 }
+
 /*******************************************************************
  WV_S32 SVR_UDP_getIp(WV_U8 str);
 *******************************************************************/
@@ -371,6 +376,42 @@ WV_S32 SVR_UDP_SyncSceneStop()
 
 	return ret;
 	
+}
+/****************************************************************************
+
+WV_S32 SVR_UDP_SyncProjectorStatus(WV_U16 status);
+主机发送开/关投影命令
+****************************************************************************/
+WV_S32 SVR_UDP_SyncProjectorStatus(WV_U16 status)
+{
+	
+	WV_S32 ret=0;
+
+	WV_S32 i;
+	WV_U8 cascadeInfo;
+	WV_U16 cascadeNum;
+	WV_U8 ipInt[30];
+	WV_S8 ipString[20];
+	TSK_SCENE_GetCascading(&cascadeInfo,&cascadeNum,ipInt);
+	for(i=0;i<cascadeNum;i++)
+	{
+
+		if(pSvrUdp->slaveDevEna[i] == 1)
+		{
+			sprintf(ipString,"%d.%d.%d.%d",ipInt[i*4],ipInt[i*4+1],ipInt[i*4+2],ipInt[i*4+3]);
+			memset(&pSvrUdp->headBuf,0,sizeof(pSvrUdp->headBuf));
+			pSvrUdp->headBuf.sync = UDP_CMD_SYNC_WORD;
+			pSvrUdp->headBuf.dataNum = 0;
+			pSvrUdp->headBuf.cmdL0 = SVR_UDP_CMD_PROJECTOR;
+			pSvrUdp->headBuf.arg1 = status;
+			ret|=SVR_UDP_Send(pSvrUdp,SVR_UDP_RECV_PORT,ipString);
+			
+		}
+			
+	}
+
+	return ret;	
+
 }
 /****************************************************************************
 
@@ -870,7 +911,7 @@ WV_S32 SVR_UDP_ChangeScenePause(SVR_UDP_HEAD_E *pHead,WV_U8 *pBuf)
 /****************************************************************************
 
 WV_S32 SVR_UDP_ChangeSceneStop(SVR_UDP_HEAD_E *pHead,WV_U8 *pBuf)
-//切换场景暂停
+//切换场景停止
 ****************************************************************************/
 WV_S32 SVR_UDP_ChangeSceneStop(SVR_UDP_HEAD_E *pHead,WV_U8 *pBuf)
 {	
@@ -880,11 +921,22 @@ WV_S32 SVR_UDP_ChangeSceneStop(SVR_UDP_HEAD_E *pHead,WV_U8 *pBuf)
 /****************************************************************************
 
 WV_S32 SVR_UDP_ChangeScenePlay(SVR_UDP_HEAD_E *pHead,WV_U8 *pBuf)
-//切换场景暂停
+//切换场景播放
 ****************************************************************************/
 WV_S32 SVR_UDP_ChangeScenePlay(SVR_UDP_HEAD_E *pHead,WV_U8 *pBuf)
 {	
 	TSK_SCENE_PlayerPlay();
+	return WV_SOK;
+}
+/****************************************************************************
+
+WV_S32 SVR_UDP_ChangeScenePlay(SVR_UDP_HEAD_E *pHead,WV_U8 *pBuf)
+//开关投影命令
+****************************************************************************/
+WV_S32 SVR_UDP_ChangeProjectorStatus(SVR_UDP_HEAD_E *pHead,WV_U8 *pBuf)
+{	
+	//TSK_SCENE_PlayerPlay();
+	NET_UART_ProjectorCmd( (WV_U32)pHead->arg1);
 	return WV_SOK;
 }
 /****************************************************************************
@@ -953,6 +1005,14 @@ WV_S32 SVR_UDP_CMD_Porc(SVR_UDP_DEV_E *pDev)
 				ret = SVR_UDP_ChangeScenePlay(&pDev->headBuf,pDev->pBuf);
 			}						
 			break;
+		case SVR_UDP_CMD_PROJECTOR:
+			//开投影
+			if(TSK_SCENE_GetSyncEna() == 2)
+			{
+				ret = SVR_UDP_ChangeProjectorStatus(&pDev->headBuf,pDev->pBuf);
+			}						
+			break;
+					
 		case SVR_UDP_CMD_ASK_SEARCH_SLAVE:
 			ret = SVR_UDP_SlaveAskOK(pDev->headBuf.arg1);
 			//SVR_UDP_CMD_ASK_TO_MASTER(pHead->arg1);
@@ -961,15 +1021,6 @@ WV_S32 SVR_UDP_CMD_Porc(SVR_UDP_DEV_E *pDev)
 			ret=SVR_UDP_PlayerPlay(pDev->headBuf.arg1);
 			break;
 		case SVR_UDP_CMD_ASK_SCENE_CHANGE:
-			/*		
-			for(i=0;i<10;i++)
-			{			
-				if(TSK_SCENE_GetState() == 1)
-				{ 
-					ret = TSK_SCENE_SendSync();
-				}
-				sleep(1);
-			}*/
 			break;
 		default:
 			ret = -1;

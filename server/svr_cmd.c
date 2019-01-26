@@ -606,9 +606,9 @@ WV_S32  SVR_CMD_windowConfProc(SVR_FRAME_HEAD_E * pHead ,WV_U8 *pData)
 		}
 	}
 
-	 WV_RET_ADD(TSK_SCENE_ConfWin(),ret);//Config window pasition
+	WV_RET_ADD(TSK_SCENE_ConfWin(),ret);//Config window pasition
 
-     SVR_CMD_Ack(pHead,ret);
+    SVR_CMD_Ack(pHead,ret);
      	 
 	return WV_SOK;
 }
@@ -1626,6 +1626,21 @@ WV_S32 SVR_CMD_Fadeinout(SVR_FRAME_HEAD_E * pHead ,WV_U8 *pData)
 }
 
 /********************************************************************
+WV_S32 SVR_CMD_SceneLock(SVR_FRAME_HEAD_E * pHead ,WV_U8 *pData)
+淡入淡出
+*********************************************************************/
+WV_S32 SVR_CMD_SceneLock(SVR_FRAME_HEAD_E * pHead ,WV_U8 *pData)
+{
+
+	WV_S32 ret = 0;
+	
+	SVR_CMD_Ack(pHead,ret);
+	return ret;
+
+}
+
+
+/********************************************************************
 WV_S32  SVR_CMD_Proc(SVR_FRAME_HEAD_E * pHead ,WV_U8 *pData); 
 ********************************************************************/
 WV_S32  SVR_CMD_Proc(SVR_FRAME_HEAD_E * pHead ,WV_U8 *pData) 
@@ -1763,7 +1778,7 @@ WV_S32  SVR_CMD_Init()
 	SVR_CMD_Register( SVR_CMD_CONF_DEV_ON_OFF,"[0x2f] dev on/off cmd",SVR_CMD_DEV_On_Off); // conf text
     SVR_CMD_Register( SVR_CMD_CUSTOM_SCENE, "[0x30] custom scene", SVR_CMD_CustomScene); // 自定义场景
     SVR_CMD_Register( SVR_CMD_FADE_INOUT, "[0x31] fade inout", SVR_CMD_Fadeinout); // 淡入淡出
-
+    SVR_CMD_Register( SVR_CMD_SCENE_LOCK, "[0x32] fade inout", SVR_CMD_SceneLock); // 淡入淡出
 
 	return WV_SOK;  
 }

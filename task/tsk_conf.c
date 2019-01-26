@@ -261,7 +261,7 @@ WV_S32 TSK_CONF_GetNextTypeMovID(WV_S32 movID)
 
         if(gMovTypeInfo[i].typeEna == 0 ) continue;
         //printf("ucTypeName is %s\n",gMovTypeInfo[i].ucTypeName);
-        if(strncmp(pMovInfoDev->movFile[movID].typeName,gMovTypeInfo[i].ucTypeName,TSK_CONF_MOV_TYPE_NAME_LEN) == 0)
+        if(strncmp((WV_S8 *)pMovInfoDev->movFile[movID].typeName,(WV_S8 *)gMovTypeInfo[i].ucTypeName,TSK_CONF_MOV_TYPE_NAME_LEN) == 0)
         {
             u16Type=i;
             //memcpy(gCurrentTypeName,pType,TSK_CONF_MOV_TYPE_NAME_LEN);
@@ -293,7 +293,17 @@ WV_S32 TSK_CONF_GetNextTypeMovID(WV_S32 movID)
 
     return nextSameTypeMovID;
 }
+/********************************************************************
 
+WV_S32 TSK_CONF_getMovType(WV_S32 movId,WV_S8 *pType); 
+
+********************************************************************/
+WV_S32 TSK_CONF_getMovType(WV_S32 movId,WV_S8 *pType)
+{
+    memcpy(pType, pMovInfoDev->movFile[movId].typeName,TSK_CONF_MOV_TYPE_NAME_LEN);
+
+    return WV_SOK;
+}
 /********************************************************************
 
 WV_S32 TSK_CONF_changeMovByType(WV_S8 *pType); 
@@ -301,6 +311,16 @@ WV_S32 TSK_CONF_changeMovByType(WV_S8 *pType);
 ********************************************************************/
 WV_S32 TSK_CONF_changeMovByType(WV_S8 *pType)
 {
+
+    if(TSK_SCENE_GetSceneLockStatus() == 1){ //如果当前场景锁定，则只能播放相同类别的视频
+        
+        WV_S8 type[TSK_CONF_MOV_TYPE_NAME_LEN+1]={0};
+        TSK_CONF_getMovType(TSK_SCENE_GetSceneCurId(),type);
+        if(strncmp(pType,type,TSK_CONF_MOV_TYPE_NAME_LEN) != 0 ){
+            WV_ERROR("当前场景锁定，播放视频类别错误\n");
+            return WV_SOK;
+        }
+    }
 
     WV_S32 i,j=0;
     WV_U16 u16Type=0xffff;
@@ -334,7 +354,6 @@ WV_S32 TSK_CONF_changeMovByType(WV_S8 *pType)
                 continue;
             }
 
-           // WV_printf("tsk_scene_setMov %d \n",i);
             TSK_SCENE_SetMov(0,i);
             TSK_SCENE_ConfMov(0);
             TSK_SCENE_SetMov(1,i);
@@ -633,6 +652,8 @@ WV_S32 TSK_CONF_MovSaveConf()
     return WV_SOK;
 }
 
+
+
 /********************************************************************
 
 WV_S32 TSK_CONF_MovGetConf(); 
@@ -752,13 +773,8 @@ WV_S32 TSK_CONF_UpdateMov(WV_U8 *pData ,WV_U32 dataLen)
 
                 return WV_EFAIL;
             }
-//        }else if(SVR_CONTROL_GetKtvDev() == 0 ){ //ktvDev == 0 是雷石点歌机，雷石点歌机不支持非加密视频，返回-1
-        }else if((SVR_CONTROL_GetKtvDev() == 0) || (SVR_CONTROL_GetKtvDev() == 4)){ //ktvDev == 0 是雷石点歌机，雷石点歌机不支持非加密视频，返回-1
-            fclose(gMovUpdata.fp);
-            remove(TSK_CONF_MOV_DEFAULT_NAME);
-            gMovUpdata.flag = 0;
-            return WV_EFAIL;
         }
+
         gMovUpdata.flag = 2;
     }
     WV_S32 writeLen;

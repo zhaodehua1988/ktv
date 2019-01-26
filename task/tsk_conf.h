@@ -43,4 +43,5 @@ WV_S32 TSK_CONF_ReNameMov(WV_U8 *pData ,WV_U32 dataLen);
 WV_S32 TSK_CONF_SetGif(WV_U8 * pBuf,WV_U32 dataLen,WV_U8 chn);
 
 WV_S32 TSK_CONF_GetNextTypeMovID(WV_S32 movID);
+WV_S32 TSK_CONF_getMovType(WV_S32 movId,WV_S8 *pType);
 #endif

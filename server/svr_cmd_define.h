@@ -54,6 +54,8 @@
 #define SVR_CMD_CUSTOM_SCENE         0x30   //自定义场景
 #define SVR_CMD_FADE_INOUT         0x31   //淡入淡出
 
+#define SVR_CMD_SCENE_LOCK         0x32   //淡入淡出
+
 //#define SVR_SYNC_WORD         0x5a5a5aa5  
 #endif
 

@@ -23,4 +23,5 @@ WV_S32 SVR_UDP_SyncScenePause();
 WV_S32 SVR_UDP_SyncSceneStop();
 WV_S32 SVR_UDP_SyncScenePlay();
 WV_S32 SVR_UDP_PlayNotifySlave();
+WV_S32 SVR_UDP_SyncProjectorStatus(WV_U16 status);
 #endif

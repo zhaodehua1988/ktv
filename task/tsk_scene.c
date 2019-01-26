@@ -8,6 +8,9 @@
 #include "svr_udp.h"
 #include "svr_control_cmd.h"
 #define TSK_SCENE_OUTPUT_ANGLE_FILE "./env/angle.txt"
+
+#define DEFINE_TSK_SCENE_SCENELOCK "./env/scenelock.ini"
+
 #define TSK_SCENE_SETALPHA_SLEEP 35000
 typedef struct TSK_SCENE_DEV_E
 {
@@ -23,6 +26,7 @@ typedef struct TSK_SCENE_DEV_E
     WV_S32 winChange;  //0:开窗无变化，1:开窗有变化
     WV_U8  addOutline; //0:disable 1:enabale
     WV_U8  addAni;    //0:disable 1:enable
+    WV_S32 sceneLock;
 } TSK_SCENE_DEV_E;   
 
 TSK_SCENE_DEV_E   gCurScene;
@@ -791,9 +795,7 @@ WV_S32 TSK_SCENE_GetConf()
 *******************************************************************/
 WV_S32 TSK_SCENE_GetSceneCurId()
 {
-
     return gCurScene.id;
-
 }
 /*******************************************************************
 WV_S32 TSK_SCENE_GetCurent(TSK_SCENE_INFO_S *pInfo);
@@ -849,9 +851,6 @@ WV_S32 TSK_SCENE_SceneInit()
             TSK_PLAYER_SetFile(i,name);
             TSK_PLAYER_setWin(i,gCurScene.scene.mov[i].x,gCurScene.scene.mov[i].y,gCurScene.scene.mov[i].w,gCurScene.scene.mov[i].h);
             TSK_PLAYER_Creat(i);
-            //TSK_SCENE_PlayerCreat(i);
-            //sleep(1);
-            //TSK_PLAYER_DevCascade(i,gCurScene.DevCascading);
         }
 
     }
@@ -891,7 +890,8 @@ WV_S32 TSK_SCENE_SceneInit()
     CurrentSceneMode = SCENE_PLAYING;
     return WV_SOK;
 
-} 
+}
+
 /*******************************************************************
  WV_S32 TSK_SCENE_GetState();
 
@@ -903,6 +903,28 @@ WV_S32 TSK_SCENE_GetState()
     return 	gCurScene.sceneOpen;
 }
 
+/*******************************************************************
+WV_S32 TSK_SCENE_LockScene();
+//场景锁定和解锁，开机默认sceneLock为0，即未锁定。
+//如果当前场景时锁定的，则解锁；如果当前场景时解锁的，则锁定场景
+*******************************************************************/
+WV_S32 TSK_SCENE_LockScene()
+{
+    if(gCurScene.sceneLock == 0 ){
+        gCurScene.sceneLock = 1;    
+    }else if(gCurScene.sceneLock == 1){
+        gCurScene.sceneLock = 0;
+    }
+    return WV_SOK;
+}
+/*********************************************
+ * WV_S32 TSK_SCENE_GetSceneLockStatus()
+ * 查询当前场景是否锁定
+ * ******************************************/
+WV_S32 TSK_SCENE_GetSceneLockStatus()
+{   
+    return gCurScene.sceneLock;
+}
 
 /*******************************************************************
  WV_S32 TSK_SCENE_SceneOpen();
@@ -932,8 +954,8 @@ WV_S32 TSK_SCENE_SceneOpen()
         }
     }
     //for player
-   WV_S32 nextMovTypeID = TSK_CONF_GetNextTypeMovID(gCurScene.scene.mov[0].id);
-   printf("next type mov id = %d \n",nextMovTypeID);
+    WV_S32 nextMovTypeID = TSK_CONF_GetNextTypeMovID(gCurScene.scene.mov[0].id);
+    WV_printf("next type mov id = %d \n",nextMovTypeID);
     for(i=0;i<TSK_SCENE_MOV_USE_NUM;i++)
     {
         if(gCurScene.scene.mov[i].ena == 0)
@@ -941,7 +963,6 @@ WV_S32 TSK_SCENE_SceneOpen()
          
         if(TSK_UART_GetTypeRound() == 3  && nextMovTypeID != -1)
         {
-            
             sprintf(name, "./mov/mov%d.mp4",nextMovTypeID);
         }else{
             sprintf(name, "./mov/mov%d.mp4",gCurScene.scene.mov[i].id);
@@ -1144,6 +1165,17 @@ WV_S32 TSK_SCENE_GetWinChange()
     return winChange;
 
 }
+/*******************************************************************
+WV_S32 TSK_SCENE_GetSceneEna(WV_S32 sceneID);
+*******************************************************************/
+WV_S32 TSK_SCENE_GetSceneEna(WV_S32 sceneID)
+{
+    WV_U32 data;
+    WV_S8 name[WV_CONF_NAME_MAX_LEN]={0};
+    sprintf(name, "Scene%dEnable",sceneID);
+    SYS_ENV_GetU32(name, & data);
+    return data;
+}
 
 /*******************************************************************
  WV_S32 TSK_SCENE_Change( WV_U32  id);
@@ -1151,7 +1183,16 @@ WV_S32 TSK_SCENE_GetWinChange()
 WV_S32 TSK_SCENE_Change(WV_U32 DataType, WV_U32  id)
 {
 
-      //printf("change scene to [%d]\n",id);
+    if(TSK_SCENE_GetSceneEna(id) == 0){
+        //WV_printf("scene[%d] is not ena\n",id);
+        return WV_EFAIL;
+    }
+
+    if(gCurScene.sceneLock == 1 && id !=gCurScene.id){
+        WV_printf("scene is locked \n");
+        return WV_EFAIL;
+    }
+
     if ((DataType == TSK_SCENE_TYPE_UARTDATA) && (SceneChangeDataType == TSK_SCENE_TYPE_NETDATA))
     {
         if (TSK_SCENE_GetChangeTimeOut() != WV_SOK)
@@ -1230,11 +1271,10 @@ WV_S32 TSK_SCENE_Change(WV_U32 DataType, WV_U32  id)
             WV_CHECK_RET(TSK_SCENE_SceneClose());
             WV_CHECK_RET(TSK_SCENE_SceneOpen());
         }
-        //printf("TSK_SCENE_Change--------------------------\n");
         TSK_SCENE_SetDefault(id);
         CurrentSceneMode = SCENE_PLAYING;
     }
- 
+    
     //释放锁
     if(gScene_mov_mutex.mutex_ena == 1 ){
             pthread_mutex_unlock(&gScene_mov_mutex.mutex[1]);
@@ -1243,6 +1283,7 @@ WV_S32 TSK_SCENE_Change(WV_U32 DataType, WV_U32  id)
 
     if(gCurScene.scene.sceneEna != 1)
     {
+        WV_printf("Scene [%d]is not ena\n",id);
         return WV_EFAIL;
     }
 
@@ -1574,7 +1615,7 @@ WV_S32 TSK_SCENE_AddLastWin()
         return WV_SOK;
     }
 
-    printf("add last win\n");
+    WV_printf("add last win\n");
     TSK_GO_MOV_PIC_POS_S pos;
     WV_U16 chn;
     WV_U16 id;
@@ -1999,7 +2040,7 @@ void TSK_SCENE_PlayerStop();
 *******************************************************************/
 void TSK_SCENE_PlayerStop()
 {
-    printf("TSK_SCENE_PlayerStop stop\n");
+    WV_printf("TSK_SCENE_PlayerStop stop\n");
 
     if(gCurScene.DevCascading == 1 )
     {
@@ -2026,7 +2067,7 @@ if(gCurScene.sceneOpen != 1) return ;
         }
         TSK_PLAYER_FreezeWindowBlack();
         CurrentSceneMode = SCENE_STOP;
-        WV_printf("TSK_SCENE_PlayerStop()\n");
+        //WV_printf("TSK_SCENE_PlayerStop()\n");
     }
     
     pthread_mutex_unlock(&mutex_sceneContral);    
@@ -2041,10 +2082,12 @@ WV_S32 TSK_SCENE_Standby(WV_S32 mode)
     if(mode == TSK_SCENE_TYPE_UARTDATA){
         //串口开关机命令不生效，直接返回
         if(TSK_UART_GetOpenDevMode() != 1){ 
+            return WV_SOK;
         }
     }else if(mode == TSK_SCENE_TYPE_NETDATA){
           //网络开关机命令不生效，直接返回
         if(SVR_CONTROL_GetOpenDev() != 1){ 
+            return WV_SOK;
         }      
     }
 

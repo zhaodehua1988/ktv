@@ -22,7 +22,7 @@
 #define TASK_UART_MAX_LEN  256  
 #define TSK_UART_SCENE_NUM (TSK_SCENE_MAX_NUM) 
 #define TSK_UART_WAG_NUM   2
-#define TSK_UART_SCENE_CTRLCMD_NUM 10
+#define TSK_UART_SCENE_CTRLCMD_NUM 13
 #define TSK_UART_WIN_CMD_NUM 2
 //#define TSK_UART_DEBUG_MODE 
 #ifdef  TSK_UART_DEBUG_MODE 
@@ -73,6 +73,7 @@ typedef struct TSK_UART_DEV_E
 	WV_U32      stopBit;
 	WV_U32      windowMode; //mode 0 :正常模式， mode 1：串口控制所有窗口开关
 	WV_U32      openDev;    //0：串口控制开关机无效  1：串口控制开关机有效
+    WV_U32      openProjector;    //0：投影开关机是否有效
     WV_U32      typeRound;   //视频跟随分类进行循环播放
 	WV_U32      rcvEroNum;
 	WV_U32      checkEroNum;
@@ -121,6 +122,14 @@ WV_S32 TSK_UART_GetOpenDevMode()
 {
 	//printf("winmode = %d \n",gUartDev.windowMode);
 	return gUartDev.openDev;
+}
+/*******************************************************************
+WV_S32 TSK_UART_GetOpenprojectorMode();
+*******************************************************************/
+WV_S32 TSK_UART_GetOpenprojectorMode()
+{
+	//printf("winmode = %d \n",gUartDev.windowMode);
+	return gUartDev.openProjector;
 }
 
 /*******************************************************************
@@ -765,6 +774,9 @@ WV_S32 TSK_UART_SceneStrlApp(WV_S32 cmd)
 		case 6:TSK_SCENE_PlayerStop();break;
 		case 7:TSK_SCENE_StartingUP(TSK_SCENE_TYPE_NETDATA);break;
 		case 8:TSK_SCENE_Standby(TSK_SCENE_TYPE_UARTDATA);break;
+        case 9:TSK_SCENE_LockScene();break;
+        case 10:NET_UART_ProjectorCmd(1);break;
+        case 11:NET_UART_ProjectorCmd(0);break;
 		default:break;
 	}
     return WV_SOK;
@@ -1382,7 +1394,6 @@ WV_S32 TSK_UART_AnalyzeSceneCtrl(WV_S8 *buf)
 
     return 0;
 }
-
 /********************************************************
 
 WV_S32 TSK_UART_SetSerialConf(WV_S8 * buf);
@@ -1436,6 +1447,10 @@ WV_S32 TSK_UART_SetSerialConf(WV_S8 * buf)
 	{
 		//printf("********SetSerialConf [%s]=%d *************\n ",name,data);
 		gUartDev.openDev = data;
+	}else if(strcmp(name,"OpenProjector") == 0)
+	{
+		//printf("********SetSerialConf [%s]=%d *************\n ",name,data);
+		gUartDev.openProjector = data;
 	}else if(strcmp(name,"TypeRound") == 0)
 	{
 		//printf("********SetSerialConf [%s]=%d *************\n ",name,data);
@@ -1739,24 +1754,27 @@ void * TSK_UART_Loop(void * prm)
 	pDev = (TSK_UART_LOOP_E  *) prm;
 	pDev-> open  = 1;
 	pDev-> close  = 0;  
+    WV_S32 sceneChange=1;
 	while(pDev -> open == 1)
 	{  
 		if(gSceneLoop.loopEna == 1 && gSceneLoop.loopTime > 0)
 		{
 			for(i=0;i<TSK_UART_SCENE_NUM;i++)
 			{
-				for(j=0;j<gSceneLoop.loopTime;j++)
-				{
-					sleep(60);
-				}
+                if(sceneChange == 1)
+                {
+                    for(j=0;j<gSceneLoop.loopTime;j++)
+                    {
+                        sleep(60);
+                    }
+                }
 
-				while(TSK_SCENE_Change(TSK_SCENE_TYPE_NETDATA, i) != 0 )
-				{
-					i++;
-					if(i>=TSK_UART_SCENE_NUM)
-						break;
-				}
-			
+                if(TSK_SCENE_Change(TSK_SCENE_TYPE_NETDATA,i) != 0){
+                    sceneChange =0;
+                    continue;
+                }else{
+                    sceneChange =1;
+                }
 			}
 		}
 		sleep(1);

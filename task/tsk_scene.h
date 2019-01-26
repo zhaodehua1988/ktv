@@ -135,6 +135,10 @@ WV_S32 TSK_SCENE_GetAngle(WV_U32 *pDataLen,WV_U8 *pData);
 WV_S32 TSK_SCENE_GetLightEna();
 WV_S32 TSK_SCENE_SetLightEna(WV_U32 ena);
 
+WV_S32 TSK_SCENE_LockScene();
+
+WV_S32 TSK_SCENE_GetSceneLockStatus();
+
 void TSK_SCENE_PlayerPlay();
 void TSK_SCENE_PlayerPause();
 void TSK_SCENE_PreScene();

@@ -332,7 +332,6 @@ WV_S32 FPGA_CONF_CleanWinFram()
 /*******************************************************************
  WV_S32 FPGA_CONF_SetWin(WV_U16  num, FPGA_WIN_INFO_S * pInfo);
 *******************************************************************/
- 
 WV_S32 FPGA_CONF_SetWin(WV_U16  num, FPGA_WIN_INFO_S * pInfo)
 {
 	WV_S32 ret = 0;  
