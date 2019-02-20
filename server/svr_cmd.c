@@ -1626,15 +1626,25 @@ WV_S32 SVR_CMD_Fadeinout(SVR_FRAME_HEAD_E * pHead ,WV_U8 *pData)
 }
 
 /********************************************************************
-WV_S32 SVR_CMD_SceneLock(SVR_FRAME_HEAD_E * pHead ,WV_U8 *pData)
-淡入淡出
+WV_S32 SVR_CMD_GetUartCmd(SVR_FRAME_HEAD_E * pHead ,WV_U8 *pData)
+
 *********************************************************************/
-WV_S32 SVR_CMD_SceneLock(SVR_FRAME_HEAD_E * pHead ,WV_U8 *pData)
+WV_S32 SVR_CMD_GetUartCmd(SVR_FRAME_HEAD_E * pHead ,WV_U8 *pData)
 {
 
-	WV_S32 ret = 0;
+	WV_U32 len=0;
+	WV_S32 ret=0;
+	ret=TSK_UART_QueGet(pData,&len);
 	
-	SVR_CMD_Ack(pHead,ret);
+	if(ret != 0){
+		pHead -> dataNum =0;
+	}else{
+		pHead -> dataNum =len;
+	}
+	
+	pHead -> cmdL0 |= 0x80;
+
+	//printf("get uart cmd ok\n");
 	return ret;
 
 }
@@ -1763,7 +1773,6 @@ WV_S32  SVR_CMD_Init()
   	SVR_CMD_Register( SVR_CMD_SET_GIF,"[0x20] get dev id code",SVR_CMD_SetGif);
   	SVR_CMD_Register( SVR_CMD_SET_RESET,"[0x21] get dev id code",SVR_CMD_Reset);
 	SVR_CMD_Register( SVR_CMD_GET_MAPLINE,"[0x22] get map effective coverage ",SVR_CMD_GetMapLine); //map有效区域
-
 	SVR_CMD_Register( SVR_CMD_SET_CASCADING,"[0x23] get map effective coverage ",SVR_CMD_SetCascading); //设置级联
 	SVR_CMD_Register( SVR_CMD_GET_CASCADING,"[0x24] get map effective coverage ",SVR_CMD_GetCascading); //查询级联信息
 	SVR_CMD_Register( SVR_CMD_SET_PLAYMODE,"[0x25] get map effective coverage ",SVR_CMD_SetPlayMode);  //设置视频播放模式(随机和重播)
@@ -1778,7 +1787,7 @@ WV_S32  SVR_CMD_Init()
 	SVR_CMD_Register( SVR_CMD_CONF_DEV_ON_OFF,"[0x2f] dev on/off cmd",SVR_CMD_DEV_On_Off); // conf text
     SVR_CMD_Register( SVR_CMD_CUSTOM_SCENE, "[0x30] custom scene", SVR_CMD_CustomScene); // 自定义场景
     SVR_CMD_Register( SVR_CMD_FADE_INOUT, "[0x31] fade inout", SVR_CMD_Fadeinout); // 淡入淡出
-    SVR_CMD_Register( SVR_CMD_SCENE_LOCK, "[0x32] fade inout", SVR_CMD_SceneLock); // 淡入淡出
+    SVR_CMD_Register( SVR_CMD_GET_UART, "[0x32] fade inout", SVR_CMD_GetUartCmd); // 淡入淡出
 
 	return WV_SOK;  
 }

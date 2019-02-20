@@ -92,13 +92,13 @@ typedef struct TSK_CONF_SCENE_INFO_E
 /**************************************************************************************/
 typedef struct TSK_CONF_MOV_FILE
 {
-    WV_S8  name[TSK_CONF_MOV_NAME_MAX_LEN]; //视频名称
-    WV_U8  typeName[TSK_CONF_MOV_TYPE_NAME_LEN]; // 类型名称
+    WV_S8  name[TSK_CONF_MOV_NAME_MAX_LEN]; //视频名称 256
+    WV_U8  typeName[TSK_CONF_MOV_TYPE_NAME_LEN]; //   8
     WV_U16 dataLen;               //视频大小（M）
     WV_U16 u16Type;               //视频类型
     WV_U8  u8FirstUse;            //第一幕使用
     WV_U8  u8SecondUse;           //第二幕使用
-}TSK_CONF_MOV_FILE;
+}TSK_CONF_MOV_FILE; //270字节
 
 typedef struct TSK_CONF_MOV_TYPE
 {
@@ -109,8 +109,8 @@ typedef struct TSK_CONF_MOV_INFO_E
 {
     WV_U16 diskTotal;
     WV_U16 diskFree;
-    TSK_CONF_MOV_FILE movFile[TSK_CONF_MOV_MAX_NUM];
-    TSK_CONF_MOV_TYPE movType[TSK_CONF_MOV_TYPE_MAX_NUM];
+    TSK_CONF_MOV_FILE movFile[TSK_CONF_MOV_MAX_NUM];  //512 *270 字节
+    TSK_CONF_MOV_TYPE movType[TSK_CONF_MOV_TYPE_MAX_NUM];  //64 * 8 字节
 }TSK_CONF_MOV_INFO_E;
 
 typedef struct TSK_MOV_UPDATA_E
@@ -1931,7 +1931,7 @@ WV_S32 TSK_CONF_GetSceneInfo(WV_U8 * pBuf,WV_U32 *pDataLen)
         }else{
                 *pDataLen = 0;
         }
-*/
+    */
 
     WV_U32 data;
     SYS_ENV_GetU32("SceneCurId",&data);
@@ -2262,8 +2262,8 @@ WV_S32  TSK_CONF_SaveCustomScene(WV_U8 *pData ,WV_U32 dataLen);
 ********************************************************************/
 WV_S32 TSK_CONF_SaveCustomScene(WV_U8 *pData ,WV_U32 dataLen)
 {
-printf("CustomScene dataLen = %d\n",dataLen);
-printf("TSK_CONF_SCENE_INFO_E dataLen = %d\n",sizeof(TSK_CONF_SCENE_INFO_E));
+    //printf("CustomScene dataLen = %d\n",dataLen);
+    //printf("TSK_CONF_SCENE_INFO_E dataLen = %d\n",sizeof(TSK_CONF_SCENE_INFO_E));
     if (dataLen == sizeof(TSK_CONF_SCENE_INFO_E))
     {
         TSK_CONF_SCENE_INFO_E *pScene;
@@ -2287,7 +2287,7 @@ printf("TSK_CONF_SCENE_INFO_E dataLen = %d\n",sizeof(TSK_CONF_SCENE_INFO_E));
         }
         free(pScene);
         pScene = NULL;
-printf("TSK_CONF_SCENE_INFO_E OK\n");
+        //printf("TSK_CONF_SCENE_INFO_E OK\n");
     }
     return WV_SOK;
 }

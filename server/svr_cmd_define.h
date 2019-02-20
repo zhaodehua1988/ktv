@@ -38,23 +38,21 @@
 #define SVR_CMD_GET_MAPLINE     0x22
 #define SVR_CMD_SET_CASCADING        0x23
 #define SVR_CMD_GET_CASCADING        0x24
-
 #define SVR_CMD_SET_PLAYMODE        0x25
 #define SVR_CMD_SET_PLAYWINDOW      0x26   
 #define SVR_CMD_SAVE_ANGLE          0x27
 #define SVR_CMD_GET_ANGLE           0x28   
 #define SVR_CMD_SET_VOLUME          0x29 
-
 #define SVR_CMD_SAVE_MOV_TYPE        0x2a
-#define SVR_CMD_SAVE_SCENE_TYPE        0x2b
-#define SVR_CMD_SET_TEXT         0x2c    //text
-#define SVR_CMD_CONF_TEXTSHOW         0x2d   //conf
+#define SVR_CMD_SAVE_SCENE_TYPE      0x2b
+#define SVR_CMD_SET_TEXT             0x2c    //text
+#define SVR_CMD_CONF_TEXTSHOW        0x2d   //conf
 #define SVR_CMD_CONF_NETUART         0x2e   
 #define SVR_CMD_CONF_DEV_ON_OFF      0x2f
 #define SVR_CMD_CUSTOM_SCENE         0x30   //自定义场景
-#define SVR_CMD_FADE_INOUT         0x31   //淡入淡出
+#define SVR_CMD_FADE_INOUT           0x31   //淡入淡出
 
-#define SVR_CMD_SCENE_LOCK         0x32   //淡入淡出
+#define SVR_CMD_GET_UART             0x32   //获取串口数据
 
 //#define SVR_SYNC_WORD         0x5a5a5aa5  
 #endif

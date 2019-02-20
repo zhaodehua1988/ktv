@@ -438,6 +438,7 @@ WV_S32  TSK_PLAYER_Creat(WV_S32 id)
 
 
         }
+
         //开始播放
         WV_CHECK_RET(  HIS_PLAYER_Create(&(gTskPlayer[id].playerHandl) ,&(gTskPlayer[id].avPlayHandl)));
         TSK_PLAYER_Start(id);
@@ -448,8 +449,7 @@ WV_S32  TSK_PLAYER_Creat(WV_S32 id)
         {
             HIS_DIS_WinFreeze(&(gTskPlayer[id].winHandl),HI_FALSE,0);
         }
-
-
+        
     }
 
     gTskPlayer[id].playerEna = 1;

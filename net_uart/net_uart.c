@@ -941,7 +941,7 @@ WV_S32 NET_UART_Open()
 		return WV_EFAIL;	
 	}
 	WV_CHECK_RET( WV_THR_Create(&(pgNetUartDev->thrHndl),NET_UART_Proc, WV_THR_PRI_DEFAULT, WV_THR_STACK_SIZE_DEFAULT, (void *)pgNetUartDev));
-NET_UART_printf("NET_UART open ok\n");
+	NET_UART_printf("NET_UART open ok\n");
 	return WV_SOK;		
 	
 }

@@ -12,7 +12,7 @@
 #include "wv_conf.h"
 #include "wv_ip.h"
 #include "wv_telnet.h"
-
+#include "wv_que.h"
 #define WV_DEBUG_MODE 
 
 

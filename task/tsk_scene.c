@@ -49,7 +49,9 @@ typedef struct TSK_SCENE_MOV_MUTEX
     WV_U32 mutex_ena;
 }TSK_SCENE_MOV_MUTEX;
 
+
 static TSK_SCENE_MOV_MUTEX gScene_mov_mutex;
+
 
 pthread_mutex_t mutex_sceneContral; //场景播放/暂停/上个/下个/音量+/音量-/停止/开机/待机/
 
@@ -1176,6 +1178,7 @@ WV_S32 TSK_SCENE_GetSceneEna(WV_S32 sceneID)
     SYS_ENV_GetU32(name, & data);
     return data;
 }
+
 
 /*******************************************************************
  WV_S32 TSK_SCENE_Change( WV_U32  id);
@@ -2457,7 +2460,7 @@ WV_S32  TSK_SCENE_Init()
         gScene_mov_mutex.mutex_ena = 1;
     }
     pthread_mutex_init(&mutex_sceneContral,NULL);
-
+//pthread_mutex_destroy
 
     WV_S32 ret = 0;
     //先注册scene命令到控制台
@@ -2496,5 +2499,8 @@ WV_S32  TSK_SCENE_DeInit()
     WV_ASSERT_RET (TSK_SCENE_SceneClose());
 
     TSK_PLAYER_Destory(2);
+    pthread_mutex_destroy(&gScene_mov_mutex.mutex[0]);
+    pthread_mutex_destroy(&gScene_mov_mutex.mutex[1]);
+    
     return ret;
 }
